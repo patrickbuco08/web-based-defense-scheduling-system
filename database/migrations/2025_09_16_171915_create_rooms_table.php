@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->unsignedInteger('capacity')->nullable();
+            $table->string('room_number');
+            $table->string('building');
+            $table->unsignedInteger('capacity');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            
+            // Add composite unique constraint on room_number and building
+            $table->unique(['room_number', 'building']);
         });
     }
 

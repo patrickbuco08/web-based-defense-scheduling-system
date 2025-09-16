@@ -35,6 +35,7 @@ Route::middleware('auth')->group(function () {
     // Admin-only
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('rooms', RoomController::class)->except(['show']);
+        Route::patch('rooms/{room}/toggle-status', [RoomController::class, 'toggleStatus'])->name('rooms.toggle-status');
         Route::resource('terms', TermController::class)->except(['show']);
         Route::get('coordinators', [CoordinatorController::class, 'index'])->name('coordinators.index');
         Route::get('coordinators/create', [CoordinatorController::class, 'create'])->name('coordinators.create');
