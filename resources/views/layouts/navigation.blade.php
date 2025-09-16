@@ -27,6 +27,12 @@
                             {{ __('Rooms') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('manage coordinators')
+                        <x-nav-link :href="route('admin.coordinators.index')" :active="request()->routeIs('admin.coordinators.*')">
+                            {{ __('Coordinators') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
