@@ -12,7 +12,7 @@ Welcome to **Bocum**, a Laravel-based application. This repository includes a fu
 ## Modify Your `/etc/hosts` File
 
 ```
-127.0.0.1 bocum.local
+127.0.0.1 defense-scheduling.local
 ```
 
 ---
@@ -30,9 +30,9 @@ Welcome to **Bocum**, a Laravel-based application. This repository includes a fu
 ```
 DB_HOST=database
 DB_PORT=3306
-DB_DATABASE=bocum
+DB_DATABASE=defense_scheduling
 DB_USERNAME=root
-DB_PASSWORD=bocum_password
+DB_PASSWORD=defense_scheduling_password
 ```
 
 ---
@@ -57,4 +57,4 @@ docker-compose exec app php artisan migrate
 
 ## Access the Application
 
-https://bocum.local/
+https://defense-scheduling.local/
