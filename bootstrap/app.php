@@ -17,7 +17,6 @@ $app = BocumApplication::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-// 👇 Tell Laravel your app folder is "Bocum" instead of "app"
 $app->useAppPath($app->basePath('Bocum'));
 
 return $app;
