@@ -58,3 +58,14 @@ docker-compose exec app php artisan migrate
 ## Access the Application
 
 https://defense-scheduling.local/
+
+## Create Seeder
+```
+php artisan make:seeder RolesAndAdminSeeder
+```
+
+## Run Seeder
+```
+php artisan db:seed
+php artisan db:seed --class=RolesAndAdminSeeder
+```
