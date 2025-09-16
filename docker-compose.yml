@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  # PHP Service
+  php:
+    build:
+      context: .
+      args:
+        - APP_ENV=${APP_ENV}
+    working_dir: /var/www
+    container_name: bocum-app
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - database
+    environment:
+      - APP_ENV=${APP_ENV}
+      - CONTAINER_ROLE=app
+    networks:
+      - bocum_network
+
+  # Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: bocum-server
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      - "443:443"  
+    volumes:
+      - ./Docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./:/var/www
+    depends_on:
+      - php 
+    networks:
+      - bocum_network
+
+  # Database Server
+  database:
+    image: mysql:8.0
+    ports:
+      - '${DB_PORT}:3306'
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USERNAME=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - bocum_network
+
+networks:
+  bocum_network:
+
+volumes:
+  db-data: 
+
