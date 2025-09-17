@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('defenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('adviser_id')->nullable()->constrained('users');
+
             $table->foreignId('term_id')->nullable()->constrained('terms')->nullOnDelete();
         
             $table->string('title');         // thesis/capstone title
@@ -21,6 +23,7 @@ return new class extends Migration
             $table->dateTime('start_at');
             $table->dateTime('end_at');
             $table->string('status')->default('approved'); // MVP: approved/pending
+            $table->string('description')->nullable();
         
             $table->timestamps();
         

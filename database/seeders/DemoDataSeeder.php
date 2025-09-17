@@ -2,32 +2,29 @@
 
 namespace Database\Seeders;
 
-
 use Illuminate\Database\Seeder;
-use Bocum\Models\Room;
-use Bocum\Models\Term;
-use Bocum\Models\Defense;
-use Carbon\Carbon;
 
 class DemoDataSeeder extends Seeder
 {
+    /**
+     * This seeder is a wrapper that runs all demo data seeders
+     * in the correct order to establish relationships
+     */
     public function run(): void
     {
-        $term = Term::firstOrCreate(
-            ['school_year' => '2025-2026', 'semester' => '1st'],
-            ['is_current' => true]
-        );
-
-        $r101 = Room::firstOrCreate(['name' => 'Room 101'], ['capacity' => 30, 'is_active' => true]);
-        $r102 = Room::firstOrCreate(['name' => 'Room 102'], ['capacity' => 30, 'is_active' => true]);
-
-        Defense::factory()->create([
-            'title' => 'Capstone A',
-            'room_id' => $r101->id,
-            'term_id' => $term->id,
-            'start_at' => Carbon::now()->addDays(2)->setTime(9, 0),
-            'end_at'   => Carbon::now()->addDays(2)->setTime(10, 0),
-            'status'   => 'approved',
+        $this->call([
+            // Create terms and rooms first
+            TermSeeder::class,
+            RoomSeeder::class,
+            
+            // Then create users with their roles
+            AdminUserSeeder::class,
+            CoordinatorSeeder::class,
+            AdviserSeeder::class,
+            PanelistSeeder::class,
+            
+            // Finally, create defenses with relationships
+            DefenseSeeder::class,
         ]);
     }
 }

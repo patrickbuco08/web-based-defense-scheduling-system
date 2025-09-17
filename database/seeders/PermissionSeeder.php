@@ -1,17 +1,17 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\Schema;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use App\Models\User;
+namespace Database\Seeders;
 
-return new class extends Migration
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
+class PermissionSeeder extends Seeder
 {
     /**
-     * Run the migrations.
+     * Run the database seeds.
      */
-    public function up(): void
+    public function run(): void
     {
         // Create permissions
         $permissions = [
@@ -30,17 +30,8 @@ return new class extends Migration
 
         // Create coordinator role if it doesn't exist
         $coordinatorRole = Role::firstOrCreate(['name' => 'coordinator', 'guard_name' => 'web']);
-        
+
         // Assign all permissions to coordinator role
         $coordinatorRole->syncPermissions($permissions);
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        // Don't remove permissions as they might be used by other roles
-        Role::where('name', 'coordinator')->delete();
-    }
-};
+}

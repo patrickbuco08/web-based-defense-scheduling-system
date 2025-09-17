@@ -33,6 +33,12 @@
                             {{ __('Coordinators') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('manage defenses')
+                        <x-nav-link :href="route('coordinator.defenses.index')" :active="request()->routeIs('coordinator.defenses.*')">
+                            {{ __('Defenses') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 

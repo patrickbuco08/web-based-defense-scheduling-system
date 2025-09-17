@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -45,5 +47,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get all defenses where this user is the adviser.
+     */
+    public function advisedDefenses(): HasMany
+    {
+        return $this->hasMany(Defense::class, 'adviser_id');
+    }
+
+    /**
+     * Get all defenses where this user is a panelist.
+     */
+    public function paneledDefenses(): BelongsToMany
+    {
+        return $this->belongsToMany(Defense::class, 'defense_panelist', 'panelist_id', 'defense_id')
+            ->withTimestamps();
     }
 }

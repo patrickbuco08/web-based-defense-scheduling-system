@@ -13,8 +13,21 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // RolesAndAdminSeeder::class,
+            // Core setup
+            PermissionSeeder::class,
+            
+            // Create users and roles
             AdminUserSeeder::class,
+            CoordinatorSeeder::class,
+            AdviserSeeder::class,
+            PanelistSeeder::class,
+            
+            // Create terms and rooms
+            TermSeeder::class,
+            RoomSeeder::class,
+            
+            // Create defenses with relationships
+            DefenseSeeder::class,
         ]);
     }
 }

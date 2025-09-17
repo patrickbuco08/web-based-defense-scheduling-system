@@ -3,108 +3,207 @@
 namespace Bocum\Http\Controllers\Coordinator;
 
 use Bocum\Http\Controllers\Controller;
+use Bocum\Http\Requests\DefenseRequest;
 use Bocum\Models\Defense;
 use Bocum\Models\Room;
 use Bocum\Models\Term;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DefenseController extends Controller
 {
+    /**
+     * Display a listing of the defenses.
+     */
     public function index()
     {
-        $defenses = Defense::with('room','term')->latest('start_at')->paginate(15);
+        $defenses = Defense::with(['room', 'term'])
+            ->whereHas('term', function($query) {
+                $query->where('is_current', true);
+            })
+            ->upcoming()
+            ->orderBy('start_at')
+            ->paginate(15);
+
         return view('coordinator.defenses.index', compact('defenses'));
     }
 
+    /**
+     * Show the form for creating a new defense.
+     */
     public function create()
     {
+        $currentTerm = Term::where('is_current', true)->firstOrFail();
+        
         return view('coordinator.defenses.create', [
-            'rooms' => Room::where('is_active', true)->orderBy('name')->get(),
-            'terms' => Term::orderByDesc('is_current')->orderByDesc('id')->get(),
+            'rooms' => Room::where('is_active', true)
+                ->orderBy('building')
+                ->orderBy('room_number')
+                ->get(),
+            'advisers' => \Bocum\Models\User::role('adviser')
+                ->orderBy('name')
+                ->get(),
+            'panelists' => \Bocum\Models\User::role('panelist')
+                ->orderBy('name')
+                ->get(),
+            'currentTerm' => $currentTerm,
+            'minDate' => now()->format('Y-m-d'),
+            'maxDate' => now()->addMonths(3)->format('Y-m-d'),
+            'minTime' => '08:00',
+            'maxTime' => '17:00',
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created defense in storage.
+     *
+     * @param  \Bocum\Http\Requests\DefenseRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
+    public function store(DefenseRequest $request)
     {
-        $data = $request->validate([
-            'title'     => ['required','string','max:255'],
-            'room_id'   => ['required','exists:rooms,id'],
-            'term_id'   => ['nullable','exists:terms,id'],
-            'start_at'  => ['required','date'],
-            'end_at'    => ['required','date','after:start_at'],
-            'status'    => ['nullable','in:approved,pending'],
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // Simple conflict check: overlapping times in the same room
-        $overlap = Defense::where('room_id', $data['room_id'])
-            ->where(function ($q) use ($data) {
-                $q->whereBetween('start_at', [$data['start_at'], $data['end_at']])
-                  ->orWhereBetween('end_at',   [$data['start_at'], $data['end_at']])
-                  ->orWhere(function ($q2) use ($data) {
-                      $q2->where('start_at', '<=', $data['start_at'])
-                         ->where('end_at',   '>=', $data['end_at']);
-                  });
-            })->exists();
+            // Combine date and time fields
+            $startAt = Carbon::parse($request->date . ' ' . $request->start_time);
+            $endAt = Carbon::parse($request->date . ' ' . $request->end_time);
 
-        if ($overlap) {
-            return back()->withErrors(['start_at' => 'Conflict: room already booked in this time range.'])->withInput();
+            // Create the defense with the provided data
+            $defense = Defense::create([
+                'title' => $request->title,
+                'group_code' => $request->group_code,
+                'room_id' => $request->room_id,
+                'term_id' => $request->term_id,
+                'adviser_id' => $request->adviser_id,
+                'start_at' => $startAt,
+                'end_at' => $endAt,
+                'description' => $request->description,
+                'status' => 'pending',
+            ]);
+
+            // Attach panelists
+            if ($request->has('panelists')) {
+                $defense->panelists()->attach($request->panelists);
+            }
+
+            DB::commit();
+            
+            return redirect()
+                ->route('coordinator.defenses.index')
+                ->with('success', 'Defense scheduled successfully.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Log the error
+            Log::error('Error creating defense: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->except(['_token', 'panelists'])
+            ]);
+            
+            return back()
+                ->with('error', 'An error occurred while saving the defense. Please try again.')
+                ->withInput();
         }
-
-        Defense::create([
-            'title'    => $data['title'],
-            'room_id'  => $data['room_id'],
-            'term_id'  => $data['term_id'] ?? null,
-            'start_at' => $data['start_at'],
-            'end_at'   => $data['end_at'],
-            'status'   => $data['status'] ?? 'approved',
-        ]);
-
-        return redirect()->route('coordinator.defenses.index')->with('status','Defense scheduled.');
     }
 
+    /**
+     * Show the form for editing the specified defense.
+     */
     public function edit(Defense $defense)
     {
         return view('coordinator.defenses.edit', [
-            'defense' => $defense,
-            'rooms'   => Room::where('is_active', true)->orderBy('name')->get(),
-            'terms'   => Term::orderByDesc('is_current')->orderByDesc('id')->get(),
+            'defense' => $defense->load(['room', 'term']),
+            'rooms' => Room::where('is_active', true)
+                ->orderBy('building')
+                ->orderBy('room_number')
+                ->get(),
+            'currentTerm' => $defense->term,
+            'minDate' => now()->format('Y-m-d'),
+            'maxDate' => now()->addMonths(3)->format('Y-m-d'),
+            'minTime' => '08:00',
+            'maxTime' => '17:00',
         ]);
     }
 
-    public function update(Request $request, Defense $defense)
+    /**
+     * Update the specified defense in storage.
+     */
+    public function update(DefenseRequest $request, Defense $defense)
     {
-        $data = $request->validate([
-            'title'     => ['required','string','max:255'],
-            'room_id'   => ['required','exists:rooms,id'],
-            'term_id'   => ['nullable','exists:terms,id'],
-            'start_at'  => ['required','date'],
-            'end_at'    => ['required','date','after:start_at'],
-            'status'    => ['nullable','in:approved,pending'],
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $overlap = Defense::where('room_id', $data['room_id'])
-            ->where('id', '!=', $defense->id)
-            ->where(function ($q) use ($data) {
-                $q->whereBetween('start_at', [$data['start_at'], $data['end_at']])
-                  ->orWhereBetween('end_at',   [$data['start_at'], $data['end_at']])
-                  ->orWhere(function ($q2) use ($data) {
-                      $q2->where('start_at', '<=', $data['start_at'])
-                         ->where('end_at',   '>=', $data['end_at']);
-                  });
-            })->exists();
+            // Combine date and time fields
+            $startAt = Carbon::parse($request->date . ' ' . $request->start_time);
+            $endAt = Carbon::parse($request->date . ' ' . $request->end_time);
 
-        if ($overlap) {
-            return back()->withErrors(['start_at' => 'Conflict: room already booked in this time range.'])->withInput();
+            // Validate end time is after start time
+            if ($endAt <= $startAt) {
+                return back()
+                    ->withErrors(['end_time' => 'End time must be after start time'])
+                    ->withInput();
+            }
+
+            // Update the defense
+            $defense->update([
+                'title' => $request->title,
+                'group_code' => $request->group_code,
+                'room_id' => $request->room_id,
+                'start_at' => $startAt,
+                'end_at' => $endAt,
+                'adviser' => $request->adviser,
+                'panelists' => $request->panelists_array,
+                'description' => $request->description,
+            ]);
+            
+            DB::commit();
+            
+            return redirect()
+                ->route('coordinator.defenses.index')
+                ->with('status', 'Defense updated successfully.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            if ($e->getMessage() === 'The selected time slot conflicts with an existing defense in this room.') {
+                return back()
+                    ->withErrors(['start_at' => $e->getMessage()])
+                    ->withInput();
+            }
+            
+            return back()
+                ->with('error', 'An error occurred while updating the defense. Please try again.')
+                ->withInput();
         }
-
-        $defense->update($data);
-
-        return redirect()->route('coordinator.defenses.index')->with('status','Defense updated.');
     }
 
+    /**
+     * Remove the specified defense from storage.
+     */
     public function destroy(Defense $defense)
     {
-        $defense->delete();
-        return back()->with('status','Defense deleted.');
+        try {
+            // Prevent deletion of past defenses
+            if ($defense->end_at < now()) {
+                return redirect()
+                    ->route('coordinator.defenses.index')
+                    ->with('error', 'Cannot delete past defenses.');
+            }
+            
+            $defense->delete();
+            
+            return redirect()
+                ->route('coordinator.defenses.index')
+                ->with('status', 'Defense deleted successfully.');
+                
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('coordinator.defenses.index')
+                ->with('error', 'An error occurred while deleting the defense. Please try again.');
+        }
     }
 }
