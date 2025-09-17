@@ -39,7 +39,7 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">{{ $defense->title }}</div>
-                                        <div class="text-sm text-gray-500">{{ $defense->adviser }}</div>
+                                        <div class="text-sm text-gray-500">{{ $defense->adviser->name }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">

@@ -4,6 +4,7 @@ namespace Bocum\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class Term extends Model
 {
@@ -33,5 +34,13 @@ class Term extends Model
     public function defenses(): HasMany
     {
         return $this->hasMany(Defense::class);
+    }
+    
+    /**
+     * Scope a query to only include the current term.
+     */
+    public function scopeCurrentTerm(Builder $query)
+    {
+        return $query->where('is_current', true);
     }
 }

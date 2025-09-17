@@ -7,6 +7,7 @@ use Bocum\Http\Requests\DefenseRequest;
 use Bocum\Models\Defense;
 use Bocum\Models\Room;
 use Bocum\Models\Term;
+use Bocum\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -115,15 +116,37 @@ class DefenseController extends Controller
      */
     public function edit(Defense $defense)
     {
+        // Get current term
+        $currentTerm = Term::currentTerm()->firstOrFail();
+        
+        // Get all active rooms
+        $rooms = Room::where('is_active', true)
+            ->orderBy('building')
+            ->orderBy('room_number')
+            ->get();
+        
+        // Get all advisers
+        $advisers = User::role('adviser')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+            
+        // Get all panelists
+        $panelists = User::role('panelist')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+            
+        // Get date range for the current term
+        $minDate = now()->format('Y-m-d');
+        $maxDate = now()->addMonths(3)->format('Y-m-d');
+
         return view('coordinator.defenses.edit', [
-            'defense' => $defense->load(['room', 'term']),
-            'rooms' => Room::where('is_active', true)
-                ->orderBy('building')
-                ->orderBy('room_number')
-                ->get(),
-            'currentTerm' => $defense->term,
-            'minDate' => now()->format('Y-m-d'),
-            'maxDate' => now()->addMonths(3)->format('Y-m-d'),
+            'defense' => $defense->load(['room', 'term', 'adviser', 'panelists']),
+            'currentTerm' => $currentTerm,
+            'rooms' => $rooms,
+            'advisers' => $advisers,
+            'panelists' => $panelists,
+            'minDate' => $minDate,
+            'maxDate' => $maxDate,
             'minTime' => '08:00',
             'maxTime' => '17:00',
         ]);
@@ -153,12 +176,18 @@ class DefenseController extends Controller
                 'title' => $request->title,
                 'group_code' => $request->group_code,
                 'room_id' => $request->room_id,
+                'adviser_id' => $request->adviser_id,
                 'start_at' => $startAt,
                 'end_at' => $endAt,
-                'adviser' => $request->adviser,
-                'panelists' => $request->panelists_array,
                 'description' => $request->description,
             ]);
+            
+            // Sync panelists
+            if ($request->has('panelists')) {
+                $defense->panelists()->sync($request->panelists);
+            } else {
+                $defense->panelists()->detach();
+            }
             
             DB::commit();
             
@@ -174,6 +203,13 @@ class DefenseController extends Controller
                     ->withErrors(['start_at' => $e->getMessage()])
                     ->withInput();
             }
+            
+            // Log other errors
+            Log::error('Error updating defense: ' . $e->getMessage(), [
+                'exception' => $e,
+                'defense_id' => $defense->id,
+                'request' => $request->except(['_token', '_method', 'panelists'])
+            ]);
             
             return back()
                 ->with('error', 'An error occurred while updating the defense. Please try again.')

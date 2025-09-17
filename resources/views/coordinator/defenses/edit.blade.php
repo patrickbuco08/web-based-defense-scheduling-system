@@ -35,7 +35,7 @@
                         <!-- Term -->
                         <div>
                             <label for="term_id" class="block text-sm font-medium text-gray-700">Term</label>
-                            <input type="text" value="{{ $currentTerm->name }}" 
+                            <input type="text" value="{{ $currentTerm->school_year }}" 
                                    class="mt-1 block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm"
                                    disabled>
                             <input type="hidden" name="term_id" value="{{ $currentTerm->id }}">
@@ -45,7 +45,6 @@
                         <div>
                             <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
                             <input type="date" name="date" id="date" 
-                                   min="{{ $minDate }}" max="{{ $maxDate }}" 
                                    value="{{ old('date', $defense->start_at->format('Y-m-d')) }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                    required>
@@ -58,7 +57,6 @@
                         <div>
                             <label for="start_time" class="block text-sm font-medium text-gray-700">Start Time</label>
                             <input type="time" name="start_time" id="start_time" 
-                                   min="08:00" max="17:00" step="900"
                                    value="{{ old('start_time', $defense->start_at->format('H:i')) }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                    required>
@@ -71,7 +69,6 @@
                         <div>
                             <label for="end_time" class="block text-sm font-medium text-gray-700">End Time</label>
                             <input type="time" name="end_time" id="end_time" 
-                                   min="08:15" max="18:00" step="900"
                                    value="{{ old('end_time', $defense->end_at->format('H:i')) }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                    required>
@@ -99,21 +96,35 @@
 
                         <!-- Adviser -->
                         <div class="col-span-2">
-                            <label for="adviser" class="block text-sm font-medium text-gray-700">Adviser</label>
-                            <input type="text" name="adviser" id="adviser" value="{{ old('adviser', $defense->adviser) }}" 
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   required>
-                            @error('adviser')
+                            <label for="adviser_id" class="block text-sm font-medium text-gray-700">Adviser</label>
+                            <select name="adviser_id" id="adviser_id" 
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required>
+                                <option value="">Select Adviser</option>
+                                @foreach($advisers as $adviser)
+                                    <option value="{{ $adviser->id }}" {{ old('adviser_id', $defense->adviser_id) == $adviser->id ? 'selected' : '' }}>
+                                        {{ $adviser->name }} ({{ $adviser->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('adviser_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Panelists -->
                         <div class="col-span-2">
-                            <label for="panelists" class="block text-sm font-medium text-gray-700">Panelists (comma-separated)</label>
-                            <textarea name="panelists" id="panelists" rows="3"
-                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('panelists', is_array($defense->panelists) ? implode(', ', $defense->panelists) : '') }}</textarea>
-                            <p class="mt-1 text-sm text-gray-500">Enter panelist names separated by commas</p>
+                            <label for="panelists" class="block text-sm font-medium text-gray-700">Panelists</label>
+                            <select name="panelists[]" id="panelists" multiple
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                    required>
+                                @foreach($panelists as $panelist)
+                                    <option value="{{ $panelist->id }}" {{ in_array($panelist->id, old('panelists', $defense->panelists->pluck('id')->toArray() ?? [])) ? 'selected' : '' }}>
+                                        {{ $panelist->name }} ({{ $panelist->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-sm text-gray-500">Hold Ctrl/Cmd to select multiple panelists</p>
                             @error('panelists')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
