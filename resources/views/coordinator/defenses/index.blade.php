@@ -41,10 +41,29 @@
                                         <div class="text-sm font-medium text-gray-900">{{ $defense->title }}</div>
                                         <div class="text-sm text-gray-500">{{ $defense->adviser->name }}</div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                            {{ $defense->group_code }}
-                                        </span>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $defense->group->title }}</div>
+                                        <div class="mt-1 space-y-1">
+                                            @foreach($defense->group->members as $member)
+                                                <div class="text-xs text-gray-600">
+                                                    • {{ $member->student_name }} ({{ $member->student_no }})
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        @if($defense->group->adviser || $defense->group->critic)
+                                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                                @if($defense->group->adviser)
+                                                    <div class="text-xs text-gray-500">
+                                                        Adviser: {{ $defense->group->adviser->name }}
+                                                    </div>
+                                                @endif
+                                                @if($defense->group->critic)
+                                                    <div class="text-xs text-gray-500">
+                                                        Critic: {{ $defense->group->critic->name }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">{{ $defense->formatted_date }}</div>

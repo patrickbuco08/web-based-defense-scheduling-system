@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Bocum\Models\Defense;
+use Bocum\Models\Group;
 use Bocum\Models\Room;
 use Bocum\Models\Term;
 use Bocum\Models\User;
@@ -13,60 +14,84 @@ class DefenseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get required models
         $term = Term::first();
         $room = Room::first();
-        $advisers = User::role('adviser')->get();
         $panelists = User::role('panelist')->get();
+        $group = Group::with('adviser')->first();
 
-        if ($advisers->isEmpty() || $panelists->isEmpty()) {
-            $this->command->warn('No advisers or panelists found. Please run AdviserSeeder and PanelistSeeder first.');
+        if (!$group) {
+            $this->command->warn('No groups found. Please run GroupSeeder first.');
             return;
         }
 
-        $defenses = [
-            [
-                'title' => 'Capstone A: Smart Campus Navigation System',
-                'group_code' => 'CAP-2025-001',
-                'start_at' => Carbon::now()->addDays(2)->setTime(9, 0),
-                'end_at' => Carbon::now()->addDays(2)->setTime(10, 0),
-                'status' => 'approved',
-                'description' => 'An AI-powered navigation system for campus visitors',
-            ],
-            [
-                'title' => 'Thesis B: E-Learning Platform with AI Tutor',
-                'group_code' => 'THS-2025-002',
-                'start_at' => Carbon::now()->addDays(3)->setTime(13, 0),
-                'end_at' => Carbon::now()->addDays(3)->setTime(14, 30),
-                'status' => 'pending',
-                'description' => 'An intelligent e-learning platform with personalized AI tutor',
-            ],
-            [
-                'title' => 'Capstone C: Smart Parking System',
-                'group_code' => 'CAP-2025-003',
-                'start_at' => Carbon::now()->addDays(5)->setTime(10, 0),
-                'end_at' => Carbon::now()->addDays(5)->setTime(11, 30),
-                'status' => 'approved',
-                'description' => 'IoT-based parking availability system',
-            ],
+        if ($panelists->isEmpty()) {
+            $this->command->warn('No panelists found. Please run PanelistSeeder first.');
+            return;
+        }
+
+        // Get the coordinator user
+        $coordinator = User::role('coordinator')->first();
+        
+        if (!$coordinator) {
+            $this->command->warn('No coordinator found. Please create a coordinator user first.');
+            return;
+        }
+
+        // Create proposal defense
+        $proposalDefense = [
+            'title' => 'Proposal Defense: ' . $group->title,
+            'group_id' => $group->id,
+            'adviser_id' => $group->adviser_id,
+            'proposed_by_id' => $coordinator->id,
+            'approved_by_id' => $coordinator->id,
+            'start_at' => Carbon::now()->addDays(2)->setTime(9, 0),
+            'end_at' => Carbon::now()->addDays(2)->setTime(10, 30),
+            'room_id' => $room->id,
+            'term_id' => $term->id,
+            'status' => 'approved',
+            'description' => 'Initial proposal defense for the Smart Campus Navigation System project.',
         ];
 
+        // Create final defense (for future use)
+        $finalDefense = [
+            'title' => 'Final Defense: ' . $group->title,
+            'group_id' => $group->id,
+            'adviser_id' => $group->adviser_id,
+            'proposed_by_id' => $coordinator->id,
+            'approved_by_id' => $coordinator->id,
+            'start_at' => Carbon::now()->addDays(30)->setTime(9, 0),
+            'end_at' => Carbon::now()->addDays(30)->setTime(11, 0),
+            'room_id' => $room->id,
+            'term_id' => $term->id,
+            'status' => 'pending',
+            'description' => 'Final defense for the Smart Campus Navigation System project.',
+        ];
+
+        $defenses = [$proposalDefense, $finalDefense];
+
         foreach ($defenses as $defenseData) {
+            // Create defense with all necessary fields
             $defense = Defense::create([
                 'title' => $defenseData['title'],
-                'group_code' => $defenseData['group_code'],
-                'room_id' => $room->id,
-                'term_id' => $term->id,
-                'adviser_id' => $advisers->random()->id,
+                'group_id' => $defenseData['group_id'],
+                'adviser_id' => $defenseData['adviser_id'],
+                'proposed_by_id' => $defenseData['proposed_by_id'],
+                'approved_by_id' => $defenseData['approved_by_id'],
                 'start_at' => $defenseData['start_at'],
                 'end_at' => $defenseData['end_at'],
+                'room_id' => $defenseData['room_id'],
+                'term_id' => $defenseData['term_id'],
                 'status' => $defenseData['status'],
                 'description' => $defenseData['description'],
             ]);
 
-            // Assign 3 random panelists to each defense
+            // Assign 3 random panelists to the defense
             $defense->panelists()->attach(
                 $panelists->random(3)->pluck('id')->toArray()
             );
+            
+            $this->command->info('Created defense: ' . $defense->title);
         }
     }
 }

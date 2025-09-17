@@ -39,6 +39,12 @@
                             {{ __('Defenses') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('manage groups')
+                        <x-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
+                            {{ __('Groups') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -102,6 +108,36 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @can('manage terms')
+                <x-responsive-nav-link :href="route('admin.terms.index')" :active="request()->routeIs('admin.terms.*')">
+                    {{ __('Terms') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage rooms')
+                <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')">
+                    {{ __('Rooms') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage coordinators')
+                <x-responsive-nav-link :href="route('admin.coordinators.index')" :active="request()->routeIs('admin.coordinators.*')">
+                    {{ __('Coordinators') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage defenses')
+                <x-responsive-nav-link :href="route('coordinator.defenses.index')" :active="request()->routeIs('coordinator.defenses.*')">
+                    {{ __('Defenses') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('manage groups')
+                <x-responsive-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
+                    {{ __('Groups') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

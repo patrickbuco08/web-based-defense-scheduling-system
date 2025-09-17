@@ -44,6 +44,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:coordinator')->prefix('coordinator')->name('coordinator.')->group(function () {
         Route::resource('defenses', DefenseController::class)->except(['show']);
     });
+
+    // Adviser-only
+    Route::middleware('role:adviser')->prefix('adviser')->name('adviser.')->group(function () {
+        Route::resource('groups', \Bocum\Http\Controllers\Adviser\GroupController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    });
 });
 
 require __DIR__ . '/auth.php';

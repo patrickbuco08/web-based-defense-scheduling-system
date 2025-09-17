@@ -14,7 +14,7 @@ class AdviserSeeder extends Seeder
         $adviserRole = Role::firstOrCreate(['name' => 'adviser']);
         
         $advisers = [
-            ['name' => 'Dr. Elizabeth Tan', 'email' => 'etan@example.com'],
+            ['name' => 'Test Adviser', 'email' => 'adviser@example.com'],
             ['name' => 'Prof. Ricardo Cruz', 'email' => 'rcruz@example.com'],
             ['name' => 'Dr. Melissa Lim', 'email' => 'mlim@example.com'],
             ['name' => 'Prof. Daniel Reyes', 'email' => 'dreyes@example.com'],

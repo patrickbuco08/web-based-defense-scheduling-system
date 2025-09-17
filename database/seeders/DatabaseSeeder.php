@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             // Create terms and rooms
             TermSeeder::class,
             RoomSeeder::class,
+
+            // Create groups with relationships
+            GroupSeeder::class,
             
             // Create defenses with relationships
             DefenseSeeder::class,

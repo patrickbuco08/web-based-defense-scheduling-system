@@ -20,13 +20,23 @@ class DefenseController extends Controller
      */
     public function index()
     {
-        $defenses = Defense::with(['room', 'term'])
+        $defenses = Defense::with([
+                'room', 
+                'term',
+                'group',
+                'group.members',
+                'group.adviser',
+                'group.critic',
+                'adviser'
+            ])
             ->whereHas('term', function($query) {
                 $query->where('is_current', true);
             })
             ->upcoming()
             ->orderBy('start_at')
             ->paginate(15);
+
+            // return $defenses;
 
         return view('coordinator.defenses.index', compact('defenses'));
     }
