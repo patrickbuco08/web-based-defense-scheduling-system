@@ -8,6 +8,8 @@ use Bocum\Http\Controllers\Admin\TermController;
 use Bocum\Http\Controllers\Admin\CoordinatorController;
 use Bocum\Http\Controllers\CalendarController;
 use Bocum\Http\Controllers\Coordinator\DefenseController;
+use Bocum\Http\Controllers\Adviser\DefenseController as AdviserDefenseController;
+use Bocum\Http\Controllers\Adviser\GroupController as AdviserGroupController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -47,7 +49,8 @@ Route::middleware('auth')->group(function () {
 
     // Adviser-only
     Route::middleware('role:adviser')->prefix('adviser')->name('adviser.')->group(function () {
-        Route::resource('groups', \Bocum\Http\Controllers\Adviser\GroupController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::resource('groups', AdviserGroupController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::resource('defenses', AdviserDefenseController::class)->only(['index', 'show']);
     });
 });
 

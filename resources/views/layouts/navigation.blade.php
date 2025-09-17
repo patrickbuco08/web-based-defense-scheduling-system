@@ -44,6 +44,10 @@
                         <x-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
                             {{ __('Groups') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('adviser.defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
+                            {{ __('My Defenses') }}
+                        </x-nav-link>
                     @endcan
                 </div>
             </div>
@@ -136,6 +140,10 @@
             @can('manage groups')
                 <x-responsive-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
                     {{ __('Groups') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('adviser.defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
+                    {{ __('My Defenses') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

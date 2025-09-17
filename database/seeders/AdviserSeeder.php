@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Bocum\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class AdviserSeeder extends Seeder
@@ -12,7 +13,14 @@ class AdviserSeeder extends Seeder
     public function run(): void
     {
         $adviserRole = Role::firstOrCreate(['name' => 'adviser']);
-        
+        $adviserPermissions = [
+            'manage groups',
+        ];
+
+        foreach ($adviserPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        }
+
         $advisers = [
             ['name' => 'Test Adviser', 'email' => 'adviser@example.com'],
             ['name' => 'Prof. Ricardo Cruz', 'email' => 'rcruz@example.com'],
@@ -35,8 +43,9 @@ class AdviserSeeder extends Seeder
                     'email_verified_at' => now(),
                 ]
             );
-            
+
             $user->assignRole($adviserRole);
+            $user->syncPermissions($adviserPermissions);    
         }
     }
 }
