@@ -3,10 +3,16 @@
 namespace Bocum\Http\Controllers\Adviser;
 
 use Bocum\Http\Controllers\Controller;
+use Bocum\Http\Requests\DefenseRequest;
 use Bocum\Models\Defense;
 use Bocum\Models\Group;
+use Bocum\Models\Room;
+use Bocum\Models\Term;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DefenseController extends Controller
 {
@@ -37,5 +43,140 @@ class DefenseController extends Controller
         $defense->load(['group.members', 'room', 'term', 'panelists']);
         
         return view('adviser.defenses.show', compact('defense'));
+    }
+
+    /**
+     * Show the form for creating a new defense proposal.
+     */
+    public function create()
+    {
+        $currentTerm = Term::where('is_current', true)->firstOrFail();
+        $adviser = Auth::user();
+
+        $datas = [
+            'rooms' => Room::where('is_active', true)
+                ->orderBy('building')
+                ->orderBy('room_number')
+                ->get(),
+            'groups' => Group::where('adviser_id', $adviser->id)
+                ->with('members')
+                ->orderBy('id')
+                ->get(),
+            'panelists' => \Bocum\Models\User::role('panelist')
+                ->orderBy('name')
+                ->get(),
+            'currentTerm' => $currentTerm,
+            'minDate' => now()->format('Y-m-d'),
+            'maxDate' => now()->addMonths(3)->format('Y-m-d'),
+            'minTime' => '08:00',
+            'maxTime' => '17:00',
+        ];
+
+        // return $datas;
+        
+        return view('adviser.defenses.create', $datas);
+    }
+
+    /**
+     * Store a newly created defense proposal in storage.
+     *
+     * @param  \Bocum\Http\Requests\DefenseRequest  $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
+    public function store(DefenseRequest $request)
+    {
+
+        // return [
+        //     'request' => $request->all(),
+        //     'auth_id' => Auth::id()
+        // ];
+
+        try {
+            DB::beginTransaction();
+
+            // Verify the group belongs to the authenticated adviser
+            $group = Group::where('id', $request->group_id)
+                ->where('adviser_id', Auth::id())
+                ->firstOrFail();
+
+            // Combine date and time fields
+            $startAt = Carbon::parse($request->date . ' ' . $request->start_time);
+            $endAt = Carbon::parse($request->date . ' ' . $request->end_time);
+
+            // Create the defense with the provided data
+            $defense = Defense::create([
+                'title' => $request->title,
+                'group_id' => $group->id,
+                'room_id' => $request->room_id,
+                'term_id' => $request->term_id,
+                'adviser_id' => Auth::id(),
+                'proposed_by_id' => Auth::id(),
+                'start_at' => $startAt,
+                'end_at' => $endAt,
+                'description' => $request->description,
+                'status' => 'pending', // Set status to pending for adviser-created defenses
+            ]);
+
+            // Attach panelists
+            if ($request->has('panelists')) {
+                $defense->panelists()->attach($request->panelists);
+            }
+
+            DB::commit();
+            
+            return redirect()
+                ->route('adviser.defenses.index')
+                ->with('success', 'Defense proposal submitted successfully. Waiting for coordinator approval.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Log the error
+            Log::error('Error creating defense proposal: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->except(['_token', 'panelists'])
+            ]);
+            
+            return back()
+                ->with('error', 'An error occurred while submitting the defense proposal. Please try again.')
+                ->withInput();
+        }
+    }
+
+    /**
+     * Remove the specified defense from storage.
+     *
+     * @param  \Bocum\Models\Defense  $defense
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy(Defense $defense)
+    {
+        try {
+            // Verify the defense belongs to the authenticated adviser
+            if ($defense->adviser_id !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            // Only allow deletion if defense is still pending
+            if ($defense->status !== 'pending') {
+                return back()
+                    ->with('error', 'Only pending defenses can be deleted.');
+            }
+
+            $defense->delete();
+
+            return redirect()
+                ->route('adviser.defenses.index')
+                ->with('success', 'Defense has been deleted successfully.');
+                
+        } catch (\Exception $e) {
+            Log::error('Error deleting defense: ' . $e->getMessage(), [
+                'defense_id' => $defense->id,
+                'user_id' => Auth::id()
+            ]);
+            
+            return back()
+                ->with('error', 'An error occurred while deleting the defense. Please try again.');
+        }
     }
 }

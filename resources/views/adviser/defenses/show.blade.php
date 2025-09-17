@@ -4,9 +4,18 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Defense Details') }}
             </h2>
-            <a href="{{ route('adviser.defenses.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900">
-                &larr; Back to Defenses
-            </a>
+            <div class="flex items-center space-x-4">
+                <form action="{{ route('adviser.defenses.destroy', $defense) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this defense? This action cannot be undone.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="text-sm text-red-600 hover:text-red-900">
+                        Delete Defense
+                    </button>
+                </form>
+                <a href="{{ route('adviser.defenses.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900">
+                    &larr; Back to Defenses
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -37,13 +46,13 @@
                                     <div>
                                         <h4 class="text-sm font-medium text-gray-500">Date</h4>
                                         <p class="mt-1 text-sm text-gray-900">
-                                            {{ $defense->scheduled_at->format('F j, Y') }}
+                                            {{ $defense->created_at->format('F j, Y') }}
                                         </p>
                                     </div>
                                     <div>
                                         <h4 class="text-sm font-medium text-gray-500">Time</h4>
                                         <p class="mt-1 text-sm text-gray-900">
-                                            {{ $defense->scheduled_at->format('h:i A') }}
+                                            {{ $defense->created_at->format('h:i A') }}
                                         </p>
                                     </div>
                                 </div>

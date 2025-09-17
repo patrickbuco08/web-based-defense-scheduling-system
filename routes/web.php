@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
     // Adviser-only
     Route::middleware('role:adviser')->prefix('adviser')->name('adviser.')->group(function () {
         Route::resource('groups', AdviserGroupController::class)->only(['index', 'create', 'store', 'edit', 'update']);
-        Route::resource('defenses', AdviserDefenseController::class)->only(['index', 'show']);
+        Route::resource('defenses', AdviserDefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy']);
     });
 });
 

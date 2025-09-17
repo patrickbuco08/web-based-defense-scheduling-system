@@ -14,6 +14,7 @@ class Defense extends Model
     protected $fillable = [
         'room_id',
         'term_id',
+        'group_id',
         'adviser_id',
         'proposed_by_id',
         'approved_by_id',
