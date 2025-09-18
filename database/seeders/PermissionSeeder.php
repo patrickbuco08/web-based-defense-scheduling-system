@@ -21,7 +21,7 @@ class PermissionSeeder extends Seeder
             'edit defenses',
             'delete defenses',
             'manage schedule',
-            'view calendar'
+            'view calendar',
         ];
 
         foreach ($permissions as $permission) {

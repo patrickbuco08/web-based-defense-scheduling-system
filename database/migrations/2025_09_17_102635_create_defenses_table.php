@@ -27,6 +27,7 @@ return new class extends Migration
             $table->dateTime('end_at');
             $table->string('status')->default('approved'); // MVP: approved/pending
             $table->string('description')->nullable();
+            $table->string('rejection_note')->nullable();
         
             $table->timestamps();
         

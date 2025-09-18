@@ -433,6 +433,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fullcalendar/core@npm:^6.1.19":
+  version: 6.1.19
+  resolution: "@fullcalendar/core@npm:6.1.19"
+  dependencies:
+    preact: "npm:~10.12.1"
+  checksum: 10c0/0baf5df761fd59f2e4c274c08badef96f41229c0b2be587ed1067f163b4eda0d4c0dec7f90aa3549db11cd60c4c0d9f77d8aa7387aa7e5c7ab02d5d4fb7b048b
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/daygrid@npm:^6.1.19, @fullcalendar/daygrid@npm:~6.1.19":
+  version: 6.1.19
+  resolution: "@fullcalendar/daygrid@npm:6.1.19"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.19
+  checksum: 10c0/542a1e816013dce0744dd31c3f7765379144bd5d6f6777885528e31558dead0bb21f3a5f85d75e35c48fc6216901909c58bd20fdde44ced06685ec79e1d4ed1e
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/interaction@npm:^6.1.19":
+  version: 6.1.19
+  resolution: "@fullcalendar/interaction@npm:6.1.19"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.19
+  checksum: 10c0/b5d5a2dfa54992e2f4506015c6822ff8d6f3493351396d1d2623324f59a211bc5cf87165cec368919099ebe304a0553381bf9fd4e53797f26ad5027ac597f743
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/react@npm:^6.1.19":
+  version: 6.1.19
+  resolution: "@fullcalendar/react@npm:6.1.19"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.19
+    react: ^16.7.0 || ^17 || ^18 || ^19
+    react-dom: ^16.7.0 || ^17 || ^18 || ^19
+  checksum: 10c0/644b7e07a52fd0540a6e6b2d45c0eabc2885dc179687fb11dcdab6a8c6189c742c44900a11918b3d1035a58ea2d5bb69a417be4c9b605c27a6503be12141cc4f
+  languageName: node
+  linkType: hard
+
+"@fullcalendar/timegrid@npm:^6.1.19":
+  version: 6.1.19
+  resolution: "@fullcalendar/timegrid@npm:6.1.19"
+  dependencies:
+    "@fullcalendar/daygrid": "npm:~6.1.19"
+  peerDependencies:
+    "@fullcalendar/core": ~6.1.19
+  checksum: 10c0/83e60539a049cc7270af924cfa04efea41e35b3d9bb21bb4decc8300c5c93283670ed2132f2236c4b93a29af126c3c7b5279ba32827993d74841d8b366b8c741
+  languageName: node
+  linkType: hard
+
 "@inertiajs/core@npm:2.1.6":
   version: 2.1.6
   resolution: "@inertiajs/core@npm:2.1.6"
@@ -442,6 +491,29 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     qs: "npm:^6.9.0"
   checksum: 10c0/b22640a825e1479e190094a0608f77eafbeb6f9bcb90e04ab90459a69a83a2446f49bce6abc328796139a76d4ee611c408a54a4eb0d0aff363bd5bb129b17e25
+  languageName: node
+  linkType: hard
+
+"@inertiajs/inertia-react@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@inertiajs/inertia-react@npm:0.8.1"
+  dependencies:
+    lodash.isequal: "npm:^4.5.0"
+  peerDependencies:
+    "@inertiajs/inertia": ^0.11.0
+    react: ^16.9.0 || ^17.0.0 || ^18.0.0
+  checksum: 10c0/a5dd6109ac42bc80532ef1b253dc5d4badf91da5a63126a337186afec538f127086c15513f4f2fac3dec61f9cd8f31eb27c59b1517f12e4159d7a2c300167bf6
+  languageName: node
+  linkType: hard
+
+"@inertiajs/inertia@npm:^0.11.1":
+  version: 0.11.1
+  resolution: "@inertiajs/inertia@npm:0.11.1"
+  dependencies:
+    axios: "npm:^0.21.1"
+    deepmerge: "npm:^4.0.0"
+    qs: "npm:^6.9.0"
+  checksum: 10c0/0151359d97c51b86e257bc9fa69a069e8c46a1618310db002e810eb266e7bea8a922a7353cfaa47a0e6397f4bb8e749d687f95ebbcb5b239d8e2bd68e8744685
   languageName: node
   linkType: hard
 
@@ -956,6 +1028,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^0.21.1":
+  version: 0.21.4
+  resolution: "axios@npm:0.21.4"
+  dependencies:
+    follow-redirects: "npm:^1.14.0"
+  checksum: 10c0/fbcff55ec68f71f02d3773d467db2fcecdf04e749826c82c2427a232f9eba63242150a05f15af9ef15818352b814257541155de0281f8fb2b7e8a5b79f7f2142
+  languageName: node
+  linkType: hard
+
 "axios@npm:^1.11.0, axios@npm:^1.7.4":
   version: 1.12.2
   resolution: "axios@npm:1.12.2"
@@ -1216,6 +1297,13 @@ __metadata:
     supports-color:
       optional: true
   checksum: 10c0/d79136ec6c83ecbefd0f6a5593da6a9c91ec4d7ddc4b54c883d6e71ec9accb5f67a1a5e96d00a328196b5b5c86d365e98d8a3a70856aaf16b4e7b1985e67f5a6
+  languageName: node
+  linkType: hard
+
+"deepmerge@npm:^4.0.0":
+  version: 4.3.1
+  resolution: "deepmerge@npm:4.3.1"
+  checksum: 10c0/e53481aaf1aa2c4082b5342be6b6d8ad9dfe387bc92ce197a66dea08bd4265904a087e75e464f14d1347cf2ac8afe1e4c16b266e0561cc5df29382d3c5f80044
   languageName: node
   linkType: hard
 
@@ -1483,7 +1571,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.15.6":
+"follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.15.6":
   version: 1.15.11
   resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
@@ -1887,6 +1975,13 @@ __metadata:
   version: 4.17.21
   resolution: "lodash-es@npm:4.17.21"
   checksum: 10c0/fb407355f7e6cd523a9383e76e6b455321f0f153a6c9625e21a8827d10c54c2a2341bd2ae8d034358b60e07325e1330c14c224ff582d04612a46a4f0479ff2f2
+  languageName: node
+  linkType: hard
+
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: 10c0/dfdb2356db19631a4b445d5f37868a095e2402292d59539a987f134a8778c62a2810c2452d11ae9e6dcac71fc9de40a6fedcb20e2952a15b431ad8b29e50e28f
   languageName: node
   linkType: hard
 
@@ -2336,6 +2431,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"preact@npm:~10.12.1":
+  version: 10.12.1
+  resolution: "preact@npm:10.12.1"
+  checksum: 10c0/c77a55e897dcf298b7aa13637fed29744d3cf6c083f2832856e8551dbf27303c8b6946569736de16b05cba15c0e44ad404beb236ad9e36583a6fc5e2efad7777
+  languageName: node
+  linkType: hard
+
 "proc-log@npm:^5.0.0":
   version: 5.0.0
   resolution: "proc-log@npm:5.0.0"
@@ -2563,6 +2665,13 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.28.4"
     "@babel/plugin-transform-react-jsx": "npm:^7.27.1"
+    "@fullcalendar/core": "npm:^6.1.19"
+    "@fullcalendar/daygrid": "npm:^6.1.19"
+    "@fullcalendar/interaction": "npm:^6.1.19"
+    "@fullcalendar/react": "npm:^6.1.19"
+    "@fullcalendar/timegrid": "npm:^6.1.19"
+    "@inertiajs/inertia": "npm:^0.11.1"
+    "@inertiajs/inertia-react": "npm:^0.8.1"
     "@inertiajs/react": "npm:^2.1.6"
     "@prettier/plugin-php": "npm:^0.24.0"
     "@tailwindcss/forms": "npm:^0.5.2"

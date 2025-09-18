@@ -30,6 +30,13 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@babel/core", "npm:7.28.4"],\
           ["@babel/plugin-transform-react-jsx", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:7.27.1"],\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["@fullcalendar/daygrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/interaction", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/timegrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@inertiajs/inertia", "npm:0.11.1"],\
+          ["@inertiajs/inertia-react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.8.1"],\
           ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.6"],\
           ["@prettier/plugin-php", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.24.0"],\
           ["@tailwindcss/forms", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.5.10"],\
@@ -614,6 +621,113 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@fullcalendar/core", [\
+      ["npm:6.1.19", {\
+        "packageLocation": "../../../.yarn/berry/cache/@fullcalendar-core-npm-6.1.19-11a6530053-10c0.zip/node_modules/@fullcalendar/core/",\
+        "packageDependencies": [\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["preact", "npm:10.12.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@fullcalendar/daygrid", [\
+      ["npm:6.1.19", {\
+        "packageLocation": "../../../.yarn/berry/cache/@fullcalendar-daygrid-npm-6.1.19-7693fff707-10c0.zip/node_modules/@fullcalendar/daygrid/",\
+        "packageDependencies": [\
+          ["@fullcalendar/daygrid", "npm:6.1.19"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19", {\
+        "packageLocation": "./.yarn/__virtual__/@fullcalendar-daygrid-virtual-97e13ba9f3/4/.yarn/berry/cache/@fullcalendar-daygrid-npm-6.1.19-7693fff707-10c0.zip/node_modules/@fullcalendar/daygrid/",\
+        "packageDependencies": [\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["@fullcalendar/daygrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@types/fullcalendar__core", null]\
+        ],\
+        "packagePeers": [\
+          "@fullcalendar/core",\
+          "@types/fullcalendar__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@fullcalendar/interaction", [\
+      ["npm:6.1.19", {\
+        "packageLocation": "../../../.yarn/berry/cache/@fullcalendar-interaction-npm-6.1.19-0a71fd2bcf-10c0.zip/node_modules/@fullcalendar/interaction/",\
+        "packageDependencies": [\
+          ["@fullcalendar/interaction", "npm:6.1.19"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19", {\
+        "packageLocation": "./.yarn/__virtual__/@fullcalendar-interaction-virtual-1b059a9522/4/.yarn/berry/cache/@fullcalendar-interaction-npm-6.1.19-0a71fd2bcf-10c0.zip/node_modules/@fullcalendar/interaction/",\
+        "packageDependencies": [\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["@fullcalendar/interaction", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@types/fullcalendar__core", null]\
+        ],\
+        "packagePeers": [\
+          "@fullcalendar/core",\
+          "@types/fullcalendar__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@fullcalendar/react", [\
+      ["npm:6.1.19", {\
+        "packageLocation": "../../../.yarn/berry/cache/@fullcalendar-react-npm-6.1.19-d7b22f883f-10c0.zip/node_modules/@fullcalendar/react/",\
+        "packageDependencies": [\
+          ["@fullcalendar/react", "npm:6.1.19"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19", {\
+        "packageLocation": "./.yarn/__virtual__/@fullcalendar-react-virtual-35dca4fc9b/4/.yarn/berry/cache/@fullcalendar-react-npm-6.1.19-d7b22f883f-10c0.zip/node_modules/@fullcalendar/react/",\
+        "packageDependencies": [\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["@fullcalendar/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@types/fullcalendar__core", null],\
+          ["@types/react", null],\
+          ["@types/react-dom", null],\
+          ["react", "npm:19.1.1"],\
+          ["react-dom", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:19.1.1"]\
+        ],\
+        "packagePeers": [\
+          "@fullcalendar/core",\
+          "@types/fullcalendar__core",\
+          "@types/react-dom",\
+          "@types/react",\
+          "react-dom",\
+          "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@fullcalendar/timegrid", [\
+      ["npm:6.1.19", {\
+        "packageLocation": "../../../.yarn/berry/cache/@fullcalendar-timegrid-npm-6.1.19-007e9a1a61-10c0.zip/node_modules/@fullcalendar/timegrid/",\
+        "packageDependencies": [\
+          ["@fullcalendar/timegrid", "npm:6.1.19"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19", {\
+        "packageLocation": "./.yarn/__virtual__/@fullcalendar-timegrid-virtual-01b1a83184/4/.yarn/berry/cache/@fullcalendar-timegrid-npm-6.1.19-007e9a1a61-10c0.zip/node_modules/@fullcalendar/timegrid/",\
+        "packageDependencies": [\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["@fullcalendar/daygrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/timegrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@types/fullcalendar__core", null]\
+        ],\
+        "packagePeers": [\
+          "@fullcalendar/core",\
+          "@types/fullcalendar__core"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@inertiajs/core", [\
       ["npm:2.1.6", {\
         "packageLocation": "../../../.yarn/berry/cache/@inertiajs-core-npm-2.1.6-bfea9f8ea7-10c0.zip/node_modules/@inertiajs/core/",\
@@ -623,6 +737,45 @@ const RAW_RUNTIME_STATE =
           ["axios", "npm:1.12.2"],\
           ["lodash-es", "npm:4.17.21"],\
           ["qs", "npm:6.14.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@inertiajs/inertia", [\
+      ["npm:0.11.1", {\
+        "packageLocation": "../../../.yarn/berry/cache/@inertiajs-inertia-npm-0.11.1-646fb0744d-10c0.zip/node_modules/@inertiajs/inertia/",\
+        "packageDependencies": [\
+          ["@inertiajs/inertia", "npm:0.11.1"],\
+          ["axios", "npm:0.21.4"],\
+          ["deepmerge", "npm:4.3.1"],\
+          ["qs", "npm:6.14.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@inertiajs/inertia-react", [\
+      ["npm:0.8.1", {\
+        "packageLocation": "../../../.yarn/berry/cache/@inertiajs-inertia-react-npm-0.8.1-73dbc903de-10c0.zip/node_modules/@inertiajs/inertia-react/",\
+        "packageDependencies": [\
+          ["@inertiajs/inertia-react", "npm:0.8.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.8.1", {\
+        "packageLocation": "./.yarn/__virtual__/@inertiajs-inertia-react-virtual-7cff19367c/4/.yarn/berry/cache/@inertiajs-inertia-react-npm-0.8.1-73dbc903de-10c0.zip/node_modules/@inertiajs/inertia-react/",\
+        "packageDependencies": [\
+          ["@inertiajs/inertia", "npm:0.11.1"],\
+          ["@inertiajs/inertia-react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.8.1"],\
+          ["@types/inertiajs__inertia", null],\
+          ["@types/react", null],\
+          ["lodash.isequal", "npm:4.5.0"],\
+          ["react", "npm:19.1.1"]\
+        ],\
+        "packagePeers": [\
+          "@inertiajs/inertia",\
+          "@types/inertiajs__inertia",\
+          "@types/react",\
+          "react"\
         ],\
         "linkType": "HARD"\
       }]\
@@ -1294,11 +1447,19 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["axios", [\
+      ["npm:0.21.4", {\
+        "packageLocation": "../../../.yarn/berry/cache/axios-npm-0.21.4-e278873748-10c0.zip/node_modules/axios/",\
+        "packageDependencies": [\
+          ["axios", "npm:0.21.4"],\
+          ["follow-redirects", "virtual:e278873748b4e9d158db595d2f6cb0351c74052f52b53924aec4d9299e7b6babfb62aead374cf2f6e453bc8bea3b052380dc6b1137a162bbfc102bbb1c8cac42#npm:1.15.11"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:1.12.2", {\
         "packageLocation": "../../../.yarn/berry/cache/axios-npm-1.12.2-cdb8ea6c90-10c0.zip/node_modules/axios/",\
         "packageDependencies": [\
           ["axios", "npm:1.12.2"],\
-          ["follow-redirects", "virtual:cdb8ea6c90bba762bf2366a1a88869c55a09bf9d9076ce8fcccf1e27011bd6d92acc154b2b250d8981e0c9daf722c96602b003df3b346cc7d59ad22f6b68080f#npm:1.15.11"],\
+          ["follow-redirects", "virtual:e278873748b4e9d158db595d2f6cb0351c74052f52b53924aec4d9299e7b6babfb62aead374cf2f6e453bc8bea3b052380dc6b1137a162bbfc102bbb1c8cac42#npm:1.15.11"],\
           ["form-data", "npm:4.0.4"],\
           ["proxy-from-env", "npm:1.1.0"]\
         ],\
@@ -1591,6 +1752,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["deepmerge", [\
+      ["npm:4.3.1", {\
+        "packageLocation": "../../../.yarn/berry/cache/deepmerge-npm-4.3.1-4f751a0844-10c0.zip/node_modules/deepmerge/",\
+        "packageDependencies": [\
+          ["deepmerge", "npm:4.3.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["delayed-stream", [\
       ["npm:1.0.0", {\
         "packageLocation": "../../../.yarn/berry/cache/delayed-stream-npm-1.0.0-c5a4c4cc02-10c0.zip/node_modules/delayed-stream/",\
@@ -1850,12 +2020,12 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:cdb8ea6c90bba762bf2366a1a88869c55a09bf9d9076ce8fcccf1e27011bd6d92acc154b2b250d8981e0c9daf722c96602b003df3b346cc7d59ad22f6b68080f#npm:1.15.11", {\
-        "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-1c36f0670e/4/.yarn/berry/cache/follow-redirects-npm-1.15.11-ae7b2db266-10c0.zip/node_modules/follow-redirects/",\
+      ["virtual:e278873748b4e9d158db595d2f6cb0351c74052f52b53924aec4d9299e7b6babfb62aead374cf2f6e453bc8bea3b052380dc6b1137a162bbfc102bbb1c8cac42#npm:1.15.11", {\
+        "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-0a0a1aec51/4/.yarn/berry/cache/follow-redirects-npm-1.15.11-ae7b2db266-10c0.zip/node_modules/follow-redirects/",\
         "packageDependencies": [\
           ["@types/debug", null],\
           ["debug", null],\
-          ["follow-redirects", "virtual:cdb8ea6c90bba762bf2366a1a88869c55a09bf9d9076ce8fcccf1e27011bd6d92acc154b2b250d8981e0c9daf722c96602b003df3b346cc7d59ad22f6b68080f#npm:1.15.11"]\
+          ["follow-redirects", "virtual:e278873748b4e9d158db595d2f6cb0351c74052f52b53924aec4d9299e7b6babfb62aead374cf2f6e453bc8bea3b052380dc6b1137a162bbfc102bbb1c8cac42#npm:1.15.11"]\
         ],\
         "packagePeers": [\
           "@types/debug",\
@@ -2321,6 +2491,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../.yarn/berry/cache/lodash-es-npm-4.17.21-b45832dfce-10c0.zip/node_modules/lodash-es/",\
         "packageDependencies": [\
           ["lodash-es", "npm:4.17.21"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["lodash.isequal", [\
+      ["npm:4.5.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/lodash.isequal-npm-4.5.0-f8b0f64d63-10c0.zip/node_modules/lodash.isequal/",\
+        "packageDependencies": [\
+          ["lodash.isequal", "npm:4.5.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2870,6 +3049,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["preact", [\
+      ["npm:10.12.1", {\
+        "packageLocation": "../../../.yarn/berry/cache/preact-npm-10.12.1-fdb903e9a5-10c0.zip/node_modules/preact/",\
+        "packageDependencies": [\
+          ["preact", "npm:10.12.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["proc-log", [\
       ["npm:5.0.0", {\
         "packageLocation": "../../../.yarn/berry/cache/proc-log-npm-5.0.0-405173f9b4-10c0.zip/node_modules/proc-log/",\
@@ -3084,6 +3272,13 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@babel/core", "npm:7.28.4"],\
           ["@babel/plugin-transform-react-jsx", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:7.27.1"],\
+          ["@fullcalendar/core", "npm:6.1.19"],\
+          ["@fullcalendar/daygrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/interaction", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@fullcalendar/timegrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
+          ["@inertiajs/inertia", "npm:0.11.1"],\
+          ["@inertiajs/inertia-react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.8.1"],\
           ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.6"],\
           ["@prettier/plugin-php", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.24.0"],\
           ["@tailwindcss/forms", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.5.10"],\

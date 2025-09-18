@@ -14,6 +14,7 @@
 </head>
 
 <body class="font-sans antialiased">
+    @include('layouts.navigation')
     <main class="w-full container mx-auto px-4">
         @yield('content')
     </main>
