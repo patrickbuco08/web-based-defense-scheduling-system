@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AppProviders } from "@/providers";
 import { AppRoutes } from "./routes";
 import { App } from "./App";
+import { Toaster } from "@/components/ui/sonner"
 
 // Get the root element
 const container = document.getElementById("root");
@@ -16,6 +17,7 @@ if (container) {
   root.render(
     <React.StrictMode>
       <App />
+      <Toaster />
     </React.StrictMode>
   );
 }

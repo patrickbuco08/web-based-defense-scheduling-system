@@ -10,7 +10,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized (e.g., redirect to login)
       //   window.location.href = "/login";
-      alert("unauthorized");
+      alert('unauthorized');
     }
     // return Promise.reject(error);
   }

@@ -13,8 +13,10 @@ class RoomController extends Controller
      */
     public function index()
     {
-        $rooms = Room::latest()->paginate(10);
-        return view('admin.rooms.index', compact('rooms'));
+        $rooms = Room::latest()->get();
+
+        return response()->json($rooms);
+        // return view('admin.rooms.index', compact('rooms'));
     }
 
     /**
@@ -66,8 +68,10 @@ class RoomController extends Controller
 
         $room->update($validated);
 
-        return redirect()->route('admin.rooms.index')
-            ->with('status', 'Room updated successfully.');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Room updated successfully.',
+        ]);
     }
 
     /**

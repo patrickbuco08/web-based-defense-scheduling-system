@@ -6,17 +6,13 @@ import { SiteHeader } from "@/components/ui/site-header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="w-full flex min-h-screen">
       <AppSidebar variant="inset" />
 
       <SidebarInset>
         <SiteHeader />
-        <main className="flex-1">
-          {/* <SidebarTrigger /> */}
-          {/* top bar / breadcrumbs here if needed */}
-          <div className="p-4">
-            <Outlet />
-          </div>
+        <main className="flex flex-1 flex-col">
+          <Outlet />
         </main>
       </SidebarInset>
     </div>

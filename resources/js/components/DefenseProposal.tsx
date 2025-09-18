@@ -27,7 +27,7 @@ export function DefenseProposal() {
           onClick={() => setIsOpen(true)}
         >
           <IconCirclePlusFilled />
-          <span>Create Defense Proposal</span>
+          <span>Schedule New Defense</span>
         </SidebarMenuButton>
 
       </DialogTrigger>

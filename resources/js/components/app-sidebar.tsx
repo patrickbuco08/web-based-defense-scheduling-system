@@ -45,8 +45,8 @@ const data = {
       icon: IconListDetails,
     },
     {
-      title: "Analytics",
-      url: "#",
+      title: "Manage Rooms",
+      url: "/app/admin/rooms",
       icon: IconChartBar,
     },
     {
