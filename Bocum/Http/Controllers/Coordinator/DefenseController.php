@@ -86,7 +86,6 @@ class DefenseController extends Controller
             // Create the defense with the provided data
             $defense = Defense::create([
                 'title' => $request->title,
-                'group_code' => $request->group_code,
                 'room_id' => $request->room_id,
                 'term_id' => $request->term_id,
                 'adviser_id' => $request->adviser_id,
@@ -184,7 +183,6 @@ class DefenseController extends Controller
             // Update the defense
             $defense->update([
                 'title' => $request->title,
-                'group_code' => $request->group_code,
                 'room_id' => $request->room_id,
                 'adviser_id' => $request->adviser_id,
                 'start_at' => $startAt,

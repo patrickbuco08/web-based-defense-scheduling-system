@@ -27,16 +27,15 @@ class GroupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'group_code' => 'required|string|max:50|unique:groups,group_code',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
-            'members.*.student_no' => 'required|string|max:50',
             'term_id' => 'required|exists:terms,id',
         ]);
 
         // Create the group
         $group = Group::create([
-            'title' => $validated['title'],
+            'group_code' => $validated['group_code'],
             'term_id' => $validated['term_id'],
             'adviser_id' => Auth::id(),
             'code' => 'GRP-' . strtoupper(Str::random(6)),
@@ -46,7 +45,6 @@ class GroupController extends Controller
         foreach ($validated['members'] as $memberData) {
             $group->members()->create([
                 'student_name' => $memberData['name'],
-                'student_no' => $memberData['student_no'],
             ]);
         }
 
@@ -79,16 +77,15 @@ class GroupController extends Controller
         }
 
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'group_code' => 'required|string|max:50|unique:groups,group_code',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
-            'members.*.student_no' => 'required|string|max:50',
             'term_id' => 'required|exists:terms,id',
         ]);
 
         // Update the group
         $group->update([
-            'title' => $validated['title'],
+            'group_code' => $validated['group_code'],
             'term_id' => $validated['term_id'],
         ]);
 
@@ -99,7 +96,6 @@ class GroupController extends Controller
         foreach ($validated['members'] as $memberData) {
             $group->members()->create([
                 'student_name' => $memberData['name'],
-                'student_no' => $memberData['student_no'],
             ]);
         }
 

@@ -33,7 +33,7 @@
                                 <div class="mt-2 space-y-1">
                                     @foreach($group->members as $member)
                                         <div class="text-sm text-gray-600">
-                                            • {{ $member->student_name }} ({{ $member->student_no }})
+                                            • {{ $member->student_name }}
                                         </div>
                                     @endforeach
                                 </div>

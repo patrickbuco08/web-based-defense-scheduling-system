@@ -42,21 +42,6 @@
                             @enderror
                         </div>
 
-                        <!-- Capacity -->
-                        <div class="mb-4">
-                            <label for="capacity" class="block text-sm font-medium text-gray-700">{{ __('Capacity') }}</label>
-                            <input id="capacity" 
-                                   class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" 
-                                   type="number" 
-                                   name="capacity" 
-                                   min="1" 
-                                   value="{{ old('capacity', $room->capacity) }}" 
-                                   required>
-                            @error('capacity')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
                         <!-- Is Active -->
                         <div class="block mb-4">
                             <label for="is_active" class="inline-flex items-center">

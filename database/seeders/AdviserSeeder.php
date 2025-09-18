@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Bocum\Models\Department;
 
 class AdviserSeeder extends Seeder
 {
@@ -22,30 +23,34 @@ class AdviserSeeder extends Seeder
         }
 
         $advisers = [
-            ['name' => 'Test Adviser', 'email' => 'adviser@example.com'],
-            ['name' => 'Prof. Ricardo Cruz', 'email' => 'rcruz@example.com'],
-            ['name' => 'Dr. Melissa Lim', 'email' => 'mlim@example.com'],
-            ['name' => 'Prof. Daniel Reyes', 'email' => 'dreyes@example.com'],
-            ['name' => 'Dr. Jennifer Sy', 'email' => 'jsy@example.com'],
-            ['name' => 'Prof. Antonio Garcia', 'email' => 'agarcia@example.com'],
-            ['name' => 'Dr. Caroline Wong', 'email' => 'cwong@example.com'],
-            ['name' => 'Prof. Miguel Santos', 'email' => 'msantos@example.com'],
-            ['name' => 'Dr. Patricia Go', 'email' => 'pgo@example.com'],
-            ['name' => 'Prof. Ferdinand Ong', 'email' => 'fong@example.com'],
+            ['name' => 'Adviser', 'email' => 'adviser@example.com'],
+            ['name' => 'Adviser 1', 'email' => 'adviser1@example.com'],
+            ['name' => 'Adviser 2', 'email' => 'adviser2@example.com'],
+            ['name' => 'Adviser 3', 'email' => 'adviser3@example.com'],
+            ['name' => 'Adviser 4', 'email' => 'adviser4@example.com'],
+            ['name' => 'Adviser 5', 'email' => 'adviser5@example.com'],
+            ['name' => 'Adviser 6', 'email' => 'adviser6@example.com'],
+            ['name' => 'Adviser 7', 'email' => 'adviser7@example.com'],
+            ['name' => 'Adviser 8', 'email' => 'adviser8@example.com'],
+            ['name' => 'Adviser 9', 'email' => 'adviser9@example.com'],
         ];
 
         foreach ($advisers as $adviser) {
+            // Get a random department
+            $department = Department::inRandomOrder()->first();
+            
             $user = User::firstOrCreate(
                 ['email' => $adviser['email']],
                 [
                     'name' => $adviser['name'],
                     'password' => Hash::make('password'), // Default password
                     'email_verified_at' => now(),
+                    'department_id' => $department ? $department->id : null,
                 ]
             );
-
+        
             $user->assignRole($adviserRole);
-            $user->syncPermissions($adviserPermissions);    
+            $user->syncPermissions($adviserPermissions);
         }
     }
 }

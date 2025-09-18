@@ -21,17 +21,6 @@
                             @enderror
                         </div>
 
-                        <!-- Group Code -->
-                        <div>
-                            <label for="group_code" class="block text-sm font-medium text-gray-700">Group Code</label>
-                            <input type="text" name="group_code" id="group_code" value="{{ old('group_code', $defense->group_code) }}" 
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                   required>
-                            @error('group_code')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
                         <!-- Term -->
                         <div>
                             <label for="term_id" class="block text-sm font-medium text-gray-700">Term</label>

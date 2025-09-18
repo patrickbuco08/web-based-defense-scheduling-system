@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('term_id')->nullable()->constrained('terms')->nullOnDelete();
-            $table->string('title');                            // thesis/capstone title
+            $table->string('group_code')->unique();                            // thesis/capstone title
             $table->foreignId('adviser_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('critic_id')->nullable()->constrained('users')->nullOnDelete();   // or statistician_id
             $table->timestamps();

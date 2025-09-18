@@ -15,7 +15,6 @@ class Room extends Model
     protected $fillable = [
         'room_number',
         'building',
-        'capacity',
         'is_active',
     ];
 
@@ -25,7 +24,6 @@ class Room extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'capacity' => 'integer',
         'is_active' => 'boolean',
     ];
 

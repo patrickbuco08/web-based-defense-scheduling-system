@@ -36,7 +36,6 @@ class RoomController extends Controller
         $validated = $request->validate([
             'room_number' => 'required|string|max:50|unique:rooms,room_number',
             'building' => 'required|string|max:100',
-            'capacity' => 'required|integer|min:1',
             'is_active' => 'boolean',
         ]);
 
@@ -62,7 +61,6 @@ class RoomController extends Controller
         $validated = $request->validate([
             'room_number' => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'building' => 'required|string|max:100',
-            'capacity' => 'required|integer|min:1',
             'is_active' => 'boolean',
         ]);
 

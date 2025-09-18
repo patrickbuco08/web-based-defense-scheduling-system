@@ -33,9 +33,6 @@
                                         {{ __('Building') }}
                                     </th>
                                     <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
-                                        {{ __('Capacity') }}
-                                    </th>
-                                    <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
                                         {{ __('Status') }}
                                     </th>
                                     <th scope="col" class="relative px-6 py-3">
@@ -51,9 +48,6 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-gray-900">{{ $room->building }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ $room->capacity }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="inline-flex px-2 text-xs font-semibold leading-5 rounded-full {{ $room->is_active ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">

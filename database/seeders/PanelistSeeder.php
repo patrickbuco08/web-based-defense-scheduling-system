@@ -12,9 +12,11 @@ class PanelistSeeder extends Seeder
     public function run(): void
     {
         $panelistRole = Role::firstOrCreate(['name' => 'panelist']);
-        
+        $criticRole = Role::firstOrCreate(['name' => 'critic']);
+
+
         $panelists = [
-            ['name' => 'Dr. Maria Santos', 'email' => 'msantos@example.com'],
+            ['name' => 'Dr. Maria Santos', 'email' => 'msantos@example.com', 'is_critic' => true],
             ['name' => 'Prof. Juan Dela Cruz', 'email' => 'jdelacruz@example.com'],
             ['name' => 'Dr. Robert Lim', 'email' => 'rlim@example.com'],
             ['name' => 'Prof. Anna Reyes', 'email' => 'areyes@example.com'],
@@ -23,7 +25,7 @@ class PanelistSeeder extends Seeder
             ['name' => 'Dr. Carlos Ramirez', 'email' => 'cramirez@example.com'],
             ['name' => 'Prof. Lourdes Mendoza', 'email' => 'lmendoza@example.com'],
             ['name' => 'Dr. Richard Chen', 'email' => 'rchen@example.com'],
-            ['name' => 'Prof. Patricia Ong', 'email' => 'pong@example.com'],
+            ['name' => 'Prof. Patricia Ong', 'email' => 'pong@example.com', 'is_critic' => true],
         ];
 
         foreach ($panelists as $panelist) {
@@ -35,8 +37,12 @@ class PanelistSeeder extends Seeder
                     'email_verified_at' => now(),
                 ]
             );
-            
+
             $user->assignRole($panelistRole);
+
+            if (isset($panelist['is_critic'])) {
+                $user->assignRole($criticRole);
+            }
         }
     }
 }

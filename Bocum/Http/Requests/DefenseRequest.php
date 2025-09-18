@@ -23,7 +23,6 @@ class DefenseRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'group_code' => ['required', 'string', 'max:50'],
             'room_id' => ['required', 'exists:rooms,id'],
             'term_id' => ['required', 'exists:terms,id'],
             'date' => ['required', 'date', 'after_or_equal:today'],

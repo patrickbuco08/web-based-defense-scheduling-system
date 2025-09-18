@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Core setup
             PermissionSeeder::class,
+            DepartmentSeeder::class,
             
             // Create users and roles
             AdminUserSeeder::class,

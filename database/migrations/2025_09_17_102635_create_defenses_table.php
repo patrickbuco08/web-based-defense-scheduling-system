@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('term_id')->nullable()->constrained('terms')->nullOnDelete();
         
             $table->string('title');         // thesis/capstone title
-            $table->string('group_code')->nullable(); // identifier if you want
             $table->dateTime('start_at');
             $table->dateTime('end_at');
             $table->string('status')->default('approved'); // MVP: approved/pending

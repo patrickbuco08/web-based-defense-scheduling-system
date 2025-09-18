@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rooms', function (Blueprint $table) {
+        Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->string('room_number');
-            $table->string('building');
-            $table->boolean('is_active')->default(true);
+            $table->string('code')->unique();
+            $table->string('name')->unique();
             $table->timestamps();
-            
-            // Add composite unique constraint on room_number and building
-            $table->unique(['room_number', 'building']);
         });
     }
 
@@ -28,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rooms');
+        Schema::dropIfExists('departments');
     }
 };

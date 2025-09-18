@@ -108,11 +108,6 @@
                                                     <p class="text-sm font-medium text-indigo-600 truncate">
                                                         {{ $member->student_name }}
                                                     </p>
-                                                    <div class="ml-2 flex-shrink-0 flex">
-                                                        <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                            {{ $member->student_no }}
-                                                        </p>
-                                                    </div>
                                                 </div>
                                             </li>
                                         @endforeach

@@ -8,6 +8,7 @@ use Bocum\Models\Term;
 use Bocum\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Bocum\Models\Department;
 
 class GroupSeeder extends Seeder
 {
@@ -30,30 +31,58 @@ class GroupSeeder extends Seeder
             return;
         }
 
-        // Create a group
-        $group = Group::create([
+        $csDepartment = Department::inRandomOrder()->first();
+
+        // Create CS Thesis Group
+        $csGroup = Group::create([
+            'department_id' => $csDepartment->id,
             'term_id' => $term->id,
-            'title' => 'Smart Campus Navigation System',
+            'group_code' => 'CS-THESIS-2025',
             'adviser_id' => $adviser->id,
-            'critic_id' => null, // Can be set later if needed
+            'critic_id' => null,
         ]);
 
-        // Add members to the group
-        $members = [
-            ['name' => 'Juan Dela Cruz', 'student_no' => '2023-0001'],
-            ['name' => 'Maria Santos', 'student_no' => '2023-0002'],
-            ['name' => 'Jose Reyes', 'student_no' => '2023-0003'],
-            ['name' => 'Ana Martinez', 'student_no' => '2023-0004'],
+        // Add members to CS group
+        $csMembers = [
+            ['name' => 'Juan Dela Cruz'],
+            ['name' => 'Maria Santos'],
+            ['name' => 'Jose Reyes'],
+            ['name' => 'Ana Martinez'],
         ];
 
-        foreach ($members as $member) {
+        foreach ($csMembers as $member) {
             GroupMember::create([
-                'group_id' => $group->id,
+                'group_id' => $csGroup->id,
                 'student_name' => $member['name'],
-                'student_no' => $member['student_no'],
             ]);
         }
 
-        $this->command->info('Successfully created group with members.');
+        $itDepartment = Department::inRandomOrder()->first();
+
+        // Create IT Thesis Group
+        $itGroup = Group::create([
+            'department_id' => $itDepartment->id,
+            'term_id' => $term->id,
+            'group_code' => 'IT-THESIS-2025',
+            'adviser_id' => $adviser->id,
+            'critic_id' => null,
+        ]);
+
+        // Add members to IT group
+        $itMembers = [
+            ['name' => 'Pedro Bautista'],
+            ['name' => 'Sofia Reyes'],
+            ['name' => 'Miguel Santiago'],
+            ['name' => 'Isabella Cruz'],
+        ];
+
+        foreach ($itMembers as $member) {
+            GroupMember::create([
+                'group_id' => $itGroup->id,
+                'student_name' => $member['name'],
+            ]);
+        }
+
+        $this->command->info('Successfully created 2 groups with members.');
     }
 }
