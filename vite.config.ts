@@ -21,6 +21,7 @@ export default defineConfig({
                 'resources/js/app.ts',
 
                 "resources/js/Pages/Calendar/index.tsx",
+                "resources/js/Pages/App/index.tsx",
             ],
             refresh: true,
         }),

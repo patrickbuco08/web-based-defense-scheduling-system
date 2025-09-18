@@ -5,21 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Laravel + React</title>
+    <title>Defense Schedule</title>
 
     @viteReactRefresh
-    @vite(['resources/css/app.css', 'resources/js/app.ts'])
-
-    @stack('head')
+    @vite(['resources/css/app.css', 'resources/js/app.ts', 'resources/js/Pages/App/index.tsx'])
 </head>
 
 <body class="font-sans antialiased">
-    {{-- @include('layouts.navigation') --}}
-    <main class="w-full container mx-auto px-4">
-        @yield('content')
-    </main>
-
-    @stack('scripts')
+    <div id="root"></div>
 </body>
 
 </html>

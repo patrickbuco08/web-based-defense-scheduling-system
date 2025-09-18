@@ -1,27 +1,89 @@
-import { createRoot } from "react-dom/client";
-// import { StrictMode } from "react";
-import * as React from "react";
-import Calendar from "./Calendar.jsx";
-import Layout from "../../layouts/AppLayout.tsx";
+import React, { useRef, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCaption,
+} from "@/components/ui/table";
+import {Input} from "@/components/ui/input";
 
-function App() {
+function Calendar() {
+  const calendarRef = useRef(null);
+
+  useEffect(() => {
+    // Component mounted
+    return () => {
+      // Cleanup on unmount if needed
+    };
+  }, []);
+
+  const fetchEvents = async (info, successCallback, failureCallback) => {
+    try {
+      const res = await fetch("/api/defenses");
+      const events = await res.json();
+      successCallback(events);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      failureCallback(error);
+    }
+  };
+
   return (
-    <Layout>
-      <div className="p-4">
-        <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
-        <p className="text-muted-foreground">This is your main content area.</p>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <Button variant="default">Default</Button>
+      <Input/>
+
+      <div>
+        <Table>
+          <TableCaption>A list of your recent invoices.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Invoice</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Method</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">INV001</TableCell>
+              <TableCell>Paid</TableCell>
+              <TableCell>Credit Card</TableCell>
+              <TableCell className="text-right">$250.00</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
       </div>
-    </Layout>
+
+      <div className="bg-white p-6 rounded-lg">
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          events={fetchEvents}
+          eventTimeFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }}
+          height="auto"
+        />
+      </div>
+    </div>
   );
 }
 
-// Get the root element
-const container = document.getElementById("calendar");
-const root = createRoot(container);
-
-// Render the TestReact component
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+export default Calendar;

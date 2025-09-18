@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 
 import {
@@ -15,8 +16,8 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Home",
-    url: "#",
+    title: "Dashboard",
+    url: "/app",
     icon: Home,
   },
   {
@@ -26,7 +27,7 @@ const items = [
   },
   {
     title: "Calendar",
-    url: "#",
+    url: "/app/calendar",
     icon: Calendar,
   },
   {
@@ -52,10 +53,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <Link to={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
