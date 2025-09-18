@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import React from 'react';
-import TestReact from './TestReact';
+import TestReact from './TestReact.js';
 
 // Get the root element
 const container = document.getElementById('app');

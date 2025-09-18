@@ -18,18 +18,27 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/js/app.tsx',
+                'resources/js/app.ts',
+
+                "resources/js/Pages/Calendar/index.tsx",
             ],
             refresh: true,
         }),
-        react()
+        react({
+            // enables React fast refresh + removes "missing React import" noise
+            jsxImportSource: "react",
+            babel: {
+                plugins: ["@babel/plugin-transform-react-jsx"],
+            },
+        }),
     ],
     resolve: {
         alias: {
-            '@': path.resolve('resources/js'),
-            '@css': path.resolve('resources/css'),
-            '@pages': path.resolve('resources/js/Pages'),
-            '@components': path.resolve('resources/js/Components'),
+            '@': path.resolve(__dirname, "resources/js"),
+            '@css': path.resolve(__dirname, "resources/css"),
+            '@pages': path.resolve(__dirname, "resources/js/Pages"),
+            '@components': path.resolve(__dirname, "resources/js/Components"),
+            '@layouts': path.resolve(__dirname, "resources/js/layouts"),
         },
     },
 });
