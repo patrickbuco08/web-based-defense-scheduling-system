@@ -1,6 +1,7 @@
 // resources/js/Pages/Home/index.tsx
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { DialogCloseButton } from "@/components/DialogCloseButton";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
             <Button variant="outline" className="w-full">
               View Upcoming Defenses
             </Button>
+            <DialogCloseButton />
           </div>
         </div>
         <div className="p-6 bg-white rounded-lg shadow md:col-span-2">
