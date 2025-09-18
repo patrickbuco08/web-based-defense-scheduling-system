@@ -17,4 +17,8 @@ export const roomsApi = {
         const response = await apiClient.put(`/admin/rooms/${id}`, data);
         return response.data;
     },
+    deleteRoom: async (id: number) => {
+        const response = await apiClient.delete(`/admin/rooms/${id}`);
+        return response.data;
+    },
 };

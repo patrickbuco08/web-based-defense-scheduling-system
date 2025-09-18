@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditRoomButton } from "./EditRoomButton";
+import { DeleteRoomButton } from "./DeleteRoomButton";
 
 const ManageRoom = () => {
   const { data: rooms, isLoading, error } = useRooms();
@@ -123,6 +124,10 @@ const ManageRoom = () => {
                 <TableCell>
                   <div className="flex space-x-2">
                     <EditRoomButton room={room} />
+                    <DeleteRoomButton
+                      id={room.id}
+                      roomNumber={room.room_number}
+                    />
                   </div>
                 </TableCell>
               </TableRow>

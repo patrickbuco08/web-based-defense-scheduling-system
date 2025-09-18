@@ -95,13 +95,17 @@ class RoomController extends Controller
     {
         // Check if the room has any scheduled defenses
         if ($room->defenses()->exists()) {
-            return redirect()->route('admin.rooms.index')
-                ->with('error', 'Cannot delete room with scheduled defenses.');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot delete room with scheduled defenses.',
+            ], 500);
         }
 
         $room->delete();
 
-        return redirect()->route('admin.rooms.index')
-            ->with('status', 'Room deleted successfully.');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Room deleted successfully',
+        ]);
     }
 }
