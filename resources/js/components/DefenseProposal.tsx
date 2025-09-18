@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,26 +12,24 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SidebarMenuButton } from "@/components/ui/sidebar";
+import { IconCirclePlusFilled } from "@tabler/icons-react";
 
-export function DialogCloseButton() {
+export function DefenseProposal() {
   const [isOpen, setIsOpen] = React.useState(false);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isOpen) {
-      timer = setTimeout(() => {
-        setIsOpen(false);
-      }, 3000); // Close after 3 seconds
-    }
-    return () => clearTimeout(timer); // Clean up the timer on unmount
-  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline"  onClick={() => setIsOpen(true)}>
-          Share
-        </Button>
+        <SidebarMenuButton
+          tooltip="Quick Create"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+          onClick={() => setIsOpen(true)}
+        >
+          <IconCirclePlusFilled />
+          <span>Create Defense Proposal</span>
+        </SidebarMenuButton>
+
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

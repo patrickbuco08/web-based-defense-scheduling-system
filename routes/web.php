@@ -10,6 +10,7 @@ use Bocum\Http\Controllers\CalendarController;
 use Bocum\Http\Controllers\Coordinator\DefenseController;
 use Bocum\Http\Controllers\Adviser\DefenseController as AdviserDefenseController;
 use Bocum\Http\Controllers\Adviser\GroupController as AdviserGroupController;
+use Illuminate\Http\Request;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -32,6 +33,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/app/{any?}', function () {
         return view('app.index');
     })->where('any', '.*');
+
+    Route::get('/user', function (Request $request) {
+        return response()->json($request->user());
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

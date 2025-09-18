@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Bocum\Models\Defense;
+use Illuminate\Http\Request;
 
 Route::get('/defenses', function () {
     $events = Defense::where('status', 'approved')
@@ -13,4 +14,8 @@ Route::get('/defenses', function () {
             'end'   => $d->end_at->toIso8601String(),
         ]);
     return response()->json($events);
+});
+
+Route::middleware('auth:web')->get('/user', function (Request $request) {
+    return response()->json($request->user());
 });
