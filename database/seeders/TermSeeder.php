@@ -10,7 +10,7 @@ class TermSeeder extends Seeder
     public function run(): void
     {
         Term::firstOrCreate(
-            ['school_year' => '2025-2026', 'semester' => '1st'],
+            ['school_year' => '2025-2026', 'semester' => '1st Semester'],
             ['is_current' => true]
         );
     }

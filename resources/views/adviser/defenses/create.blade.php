@@ -73,18 +73,6 @@
                                 @enderror
                             </div>
 
-                            <!-- Group Code -->
-                            <div class="col-span-2">
-                                <label for="group_code" class="block text-sm font-medium text-gray-700 mb-1">Group
-                                    Code</label>
-                                <input type="text" id="group_code" name="group_code" value="{{ old('group_code') }}"
-                                    required
-                                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                @error('group_code')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
                             <!-- Description -->
                             <div class="col-span-2">
                                 <label for="description"

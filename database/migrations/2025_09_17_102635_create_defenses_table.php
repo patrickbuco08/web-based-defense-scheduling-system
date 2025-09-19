@@ -13,19 +13,17 @@ return new class extends Migration
     {
         Schema::create('defenses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('room_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('group_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('adviser_id')->nullable()->constrained('users');
             $table->foreignId('proposed_by_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('approved_by_id')->nullable()->constrained('users')->nullOnDelete();
-
-            $table->foreignId('term_id')->nullable()->constrained('terms')->nullOnDelete();
-        
-            $table->string('title');         // thesis/capstone title
+    
+            $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->string('status')->default('approved'); // MVP: approved/pending
-            $table->string('description')->nullable();
+            $table->string('status')->default('pending');
+            $table->string('notes')->nullable();
             $table->string('rejection_note')->nullable();
         
             $table->timestamps();

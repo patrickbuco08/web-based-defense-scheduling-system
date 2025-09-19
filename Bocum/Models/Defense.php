@@ -13,7 +13,6 @@ class Defense extends Model
 
     protected $fillable = [
         'room_id',
-        'term_id',
         'group_id',
         'adviser_id',
         'proposed_by_id',
@@ -22,7 +21,7 @@ class Defense extends Model
         'start_at',
         'end_at',
         'status',
-        'description'
+        'notes'
     ];
 
     protected $casts = [
@@ -103,11 +102,6 @@ class Defense extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
-    }
-
-    public function term()
-    {
-        return $this->belongsTo(Term::class);
     }
 
     public function getFormattedDateAttribute()

@@ -48,9 +48,8 @@ class DefenseSeeder extends Seeder
             'start_at' => Carbon::now()->addDays(2)->setTime(9, 0),
             'end_at' => Carbon::now()->addDays(2)->setTime(10, 30),
             'room_id' => $room->id,
-            'term_id' => $term->id,
             'status' => 'approved',
-            'description' => 'Initial proposal defense for the Smart Campus Navigation System project.',
+            'notes' => 'Initial proposal defense for the Smart Campus Navigation System project.',
         ];
 
         // Create final defense (for future use)
@@ -63,9 +62,8 @@ class DefenseSeeder extends Seeder
             'start_at' => Carbon::now()->addDays(30)->setTime(9, 0),
             'end_at' => Carbon::now()->addDays(30)->setTime(11, 0),
             'room_id' => $room->id,
-            'term_id' => $term->id,
             'status' => 'pending',
-            'description' => 'Final defense for the Smart Campus Navigation System project.',
+            'notes' => 'Final defense for the Smart Campus Navigation System project.',
         ];
 
         $defenses = [$proposalDefense, $finalDefense];
@@ -81,9 +79,8 @@ class DefenseSeeder extends Seeder
                 'start_at' => $defenseData['start_at'],
                 'end_at' => $defenseData['end_at'],
                 'room_id' => $defenseData['room_id'],
-                'term_id' => $defenseData['term_id'],
                 'status' => $defenseData['status'],
-                'description' => $defenseData['description'],
+                'notes' => $defenseData['notes'],
             ]);
 
             // Assign 3 random panelists to the defense

@@ -23,14 +23,13 @@ class DefenseRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'room_id' => ['required', 'exists:rooms,id'],
-            'term_id' => ['required', 'exists:terms,id'],
+            'group_id' => ['required'],
+            'room_id' => ['exists:rooms,id'],
             'date' => ['required', 'date', 'after_or_equal:today'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
-            'description' => ['nullable', 'string'],
-            'adviser_id' => ['required', 'exists:users,id'],
-            'panelists' => ['required', 'array', 'min:1'],
+            'notes' => ['nullable', 'string'],
+            'panelists' => ['array', 'min:1'],
             'panelists.*' => ['exists:users,id'],
         ];
     }

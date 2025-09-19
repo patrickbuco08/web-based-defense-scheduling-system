@@ -24,11 +24,11 @@ class DefenseController extends Controller
     public function index()
     {
         // Get defenses where the authenticated user is the adviser
-        $defenses = Defense::whereHas('group', function($query) {
+        $defenses = Defense::whereHas('group', function ($query) {
             $query->where('adviser_id', Auth::id());
         })->with(['group', 'room', 'term'])
-          ->orderBy('created_at', 'desc')
-          ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('adviser.defenses.index', compact('defenses'));
     }
@@ -41,7 +41,7 @@ class DefenseController extends Controller
         }
 
         $defense->load(['group.members', 'room', 'term', 'panelists']);
-        
+
         return view('adviser.defenses.show', compact('defense'));
     }
 
@@ -73,7 +73,7 @@ class DefenseController extends Controller
         ];
 
         // return $datas;
-        
+
         return view('adviser.defenses.create', $datas);
     }
 
@@ -86,12 +86,6 @@ class DefenseController extends Controller
      */
     public function store(DefenseRequest $request)
     {
-
-        // return [
-        //     'request' => $request->all(),
-        //     'auth_id' => Auth::id()
-        // ];
-
         try {
             DB::beginTransaction();
 
@@ -106,16 +100,16 @@ class DefenseController extends Controller
 
             // Create the defense with the provided data
             $defense = Defense::create([
-                'title' => $request->title,
-                'group_id' => $group->id,
                 'room_id' => $request->room_id,
-                'term_id' => $request->term_id,
+                'group_id' => $group->id,
                 'adviser_id' => Auth::id(),
                 'proposed_by_id' => Auth::id(),
+                'term_id' => $request->term_id,
+                'title' => $request->title,
                 'start_at' => $startAt,
                 'end_at' => $endAt,
-                'description' => $request->description,
-                'status' => 'pending', // Set status to pending for adviser-created defenses
+                'status' => 'pending',
+                'notes' => $request->notes,
             ]);
 
             // Attach panelists
@@ -124,11 +118,11 @@ class DefenseController extends Controller
             }
 
             DB::commit();
-            
-            return redirect()
-                ->route('adviser.defenses.index')
-                ->with('success', 'Defense proposal submitted successfully. Waiting for coordinator approval.');
-                
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Defense proposal submitted successfully. Waiting for coordinator approval.',
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             // Log the error
@@ -136,10 +130,11 @@ class DefenseController extends Controller
                 'exception' => $e,
                 'request' => $request->except(['_token', 'panelists'])
             ]);
-            
-            return back()
-                ->with('error', 'An error occurred while submitting the defense proposal. Please try again.')
-                ->withInput();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while submitting the defense proposal. Please try again.',
+            ]);
         }
     }
 
@@ -168,13 +163,12 @@ class DefenseController extends Controller
             return redirect()
                 ->route('adviser.defenses.index')
                 ->with('success', 'Defense has been deleted successfully.');
-                
         } catch (\Exception $e) {
             Log::error('Error deleting defense: ' . $e->getMessage(), [
                 'defense_id' => $defense->id,
                 'user_id' => Auth::id()
             ]);
-            
+
             return back()
                 ->with('error', 'An error occurred while deleting the defense. Please try again.');
         }

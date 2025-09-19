@@ -8,10 +8,10 @@ Route::get('/defenses', function () {
     $defenses = Defense::with([
         'room',
         'group',
+        'group.term',
         'adviser',
         'proposedBy',
         'approvedBy',
-        'term',
         'panelists',
         'group.members',
     ])->where('status', 'approved')->get();
