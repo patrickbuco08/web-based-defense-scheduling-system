@@ -9,20 +9,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-type TableProps = React.HTMLAttributes<HTMLTableElement> & {
-  className?: string;
-};
-
-type TableRowProps = React.HTMLAttributes<HTMLTableRowElement> & {
-  className?: string;
-};
-
-type TableCellProps = React.TdHTMLAttributes<HTMLTableCellElement> & {
-  className?: string;
-};
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditAccountButton } from "./EditAccountButton";
 import { DeleteAccountButton } from "./DeleteAccountButton";
+import { AddAccountButton } from "./AddAccountButton";
 
 const Account = () => {
   const { data: accounts, isLoading, error } = useAccounts();
@@ -104,11 +94,14 @@ const Account = () => {
 
   return (
     <div className="w-full max-w-full px-6 py-8 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Manage Accounts</h1>
-        <p className="text-muted-foreground">
-          View and manage all user accounts in the system
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold tracking-tight">Manage Accounts</h1>
+          <p className="text-muted-foreground">
+            View and manage all user accounts in the system
+          </p>
+        </div>
+        <AddAccountButton />
       </div>
 
       <div className="rounded-md border">

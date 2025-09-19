@@ -23,7 +23,8 @@ export function DeleteAccountButton({ id, name }: DeleteAccountButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const deleteAccountMutation = useDeleteAccount();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
     try {
       await deleteAccountMutation.mutateAsync(id);
       setIsOpen(false);
@@ -52,16 +53,24 @@ export function DeleteAccountButton({ id, name }: DeleteAccountButtonProps) {
             be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            className="bg-red-600 hover:bg-red-700"
-            disabled={deleteAccountMutation.isPending}
-          >
-            {deleteAccountMutation.isPending ? "Deleting..." : "Delete"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteAccountMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              asChild
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <button 
+                onClick={handleDelete}
+                disabled={deleteAccountMutation.isPending}
+              >
+                {deleteAccountMutation.isPending ? "Deleting..." : "Delete"}
+              </button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </form>
       </AlertDialogContent>
     </AlertDialog>
   );

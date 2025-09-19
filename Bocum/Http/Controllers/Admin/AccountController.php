@@ -48,18 +48,43 @@ class AccountController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'department_id' => 'nullable|exists:departments,id',
+            'role' => 'required|string|exists:roles,name'
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
+        // Start a database transaction
+        DB::beginTransaction();
 
-        return response()->json([
-            'data' => $user,
-            'message' => 'User created successfully.'
-        ], 201);
+        try {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+                'department_id' => $validated['department_id'] ?? null,
+            ]);
+
+            // Assign the role to the user
+            $user->assignRole($validated['role']);
+
+            // Commit the transaction
+            DB::commit();
+
+            // Load the role and department relationships for the response
+            $user->load('roles', 'department');
+
+            return response()->json([
+                'data' => $user,
+                'message' => 'User created successfully.'
+            ], 201);
+            
+        } catch (\Exception $e) {
+            // Rollback the transaction on error
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to create user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -81,7 +106,7 @@ class AccountController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'department_id' => 'sometimes|nullable|exists:departments,id',
-            'role' => 'sometimes|required|string|exists:roles,name'
+            'role' => 'sometimes|string|exists:roles,name'
         ]);
 
         // Start a database transaction
