@@ -31,14 +31,18 @@ class GroupController extends Controller
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
             'term_id' => 'required|exists:terms,id',
+            'department_id' => 'required|exists:departments,id',
+            'critic_id' => 'nullable|exists:users,id',
         ]);
 
         // Create the group
         $group = Group::create([
             'group_code' => $validated['group_code'],
             'term_id' => $validated['term_id'],
+            'department_id' => $validated['department_id'],
+            'critic_id' => $validated['critic_id'] ?? null,
             'adviser_id' => Auth::id(),
-            'code' => 'GRP-' . strtoupper(Str::random(6)),
+            'code' => $validated['group_code'],
         ]);
 
         // Add group members
@@ -48,8 +52,10 @@ class GroupController extends Controller
             ]);
         }
 
-        return redirect()->route('adviser.groups.index')
-            ->with('success', 'Group created successfully!');
+        return response()->json([
+            'message' => 'Group created successfully!',
+            'group' => $group->load('members')
+        ]);
     }
 
     /**
@@ -77,16 +83,18 @@ class GroupController extends Controller
         }
 
         $validated = $request->validate([
-            'group_code' => 'required|string|max:50|unique:groups,group_code',
+            'group_code' => 'required|string|max:50|unique:groups,group_code,' . $group->id,
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
             'term_id' => 'required|exists:terms,id',
+            'critic_id' => 'nullable|exists:users,id',
         ]);
 
         // Update the group
         $group->update([
             'group_code' => $validated['group_code'],
             'term_id' => $validated['term_id'],
+            'critic_id' => $validated['critic_id'] ?? null,
         ]);
 
         // Delete existing members
@@ -99,8 +107,10 @@ class GroupController extends Controller
             ]);
         }
 
-        return redirect()->route('adviser.groups.index')
-            ->with('success', 'Group updated successfully!');
+        return response()->json([
+            'message' => 'Group updated successfully!',
+            'group' => $group->load('members')
+        ]);
     }
 
     /**
@@ -108,11 +118,31 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::with(['term', 'members'])
+        $groups = Group::with(['term', 'members', 'department', 'adviser', 'critic'])
             ->where('adviser_id', Auth::id())
             ->latest()
-            ->paginate(10);
+            ->get();
+
+        // If request expects JSON (for API calls)
+        if (request()->expectsJson()) {
+            return response()->json($groups);
+        }
 
         return view('adviser.groups.index', compact('groups'));
+    }
+
+    public function destroy(Group $group)
+    {
+        // Ensure the authenticated user is the owner of the group
+        if ($group->adviser_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $group->delete();
+
+        return response()->json([
+            'message' => 'Group deleted successfully!',
+            'group' => $group
+        ]);
     }
 }

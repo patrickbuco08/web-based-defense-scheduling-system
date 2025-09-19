@@ -5,7 +5,7 @@ export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
-      const { data } = await axios.get("/admin/departments");
+      const { data } = await axios.get("/departments");
       return data.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

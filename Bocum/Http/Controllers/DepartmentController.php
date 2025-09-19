@@ -1,10 +1,9 @@
 <?php
 
-namespace Bocum\Http\Controllers\Admin;
+namespace Bocum\Http\Controllers;
 
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Department;
-use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {

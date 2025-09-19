@@ -22,6 +22,14 @@ class TermController extends Controller
         return view('admin.terms.index', compact('terms'));
     }
 
+    // lets create a new endpoint to get the active term
+    public function activeTerm()
+    {
+        $term = Term::where('is_current', true)->first();
+
+        return response()->json($term);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

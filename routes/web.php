@@ -12,9 +12,10 @@ use Bocum\Http\Controllers\Adviser\DefenseController as AdviserDefenseController
 use Bocum\Http\Controllers\Adviser\GroupController as AdviserGroupController;
 use Illuminate\Http\Request;
 use Bocum\Http\Controllers\Admin\AccountController;
-use Bocum\Http\Controllers\Admin\DepartmentController;
+use Bocum\Http\Controllers\DepartmentController;
 use Bocum\Http\Controllers\Admin\PermissionController;
 use Bocum\Http\Controllers\Admin\RoleController;
+use Bocum\Http\Controllers\CriticController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -49,11 +50,17 @@ Route::middleware('auth')->group(function () {
     // Calendar (visible to all authenticated for MVP)
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
+    Route::resource('terms', TermController::class)->except(['show']);
+    Route::get('terms/active', [TermController::class, 'activeTerm'])->name('terms.active');
+
+    Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
+
+    Route::get('critics', [CriticController::class, 'index'])->name('critics.index');
+
     // Admin-only
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::resource('rooms', RoomController::class)->except(['show']);
         Route::patch('rooms/{room}/toggle-status', [RoomController::class, 'toggleStatus'])->name('rooms.toggle-status');
-        Route::resource('terms', TermController::class)->except(['show']);
         Route::resource('coordinators', CoordinatorController::class)->only(['index', 'create', 'store', 'destroy']);
 
         Route::resource('accounts', AccountController::class)
@@ -65,7 +72,6 @@ Route::middleware('auth')->group(function () {
 
         // Permissions & Departments API
         Route::get('permissions', [PermissionController::class, 'index']);
-        Route::get('departments', [DepartmentController::class, 'index']);
     });
 
     // Coordinator-only
@@ -75,7 +81,7 @@ Route::middleware('auth')->group(function () {
 
     // Adviser-only
     Route::middleware('role:adviser')->prefix('adviser')->name('adviser.')->group(function () {
-        Route::resource('groups', AdviserGroupController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::resource('groups', AdviserGroupController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         Route::resource('defenses', AdviserDefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy']);
     });
 });

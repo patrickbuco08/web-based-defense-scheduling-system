@@ -59,6 +59,11 @@ const data = {
       url: "#",
       icon: IconUsers,
     },
+    {
+      title: "Group Registration",
+      url: "/app/adviser/groups",
+      icon: IconUsers,
+    },
   ],
   navClouds: [
     {

@@ -1,10 +1,10 @@
+import React from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
-import React from "react";
 import { Outlet } from "react-router-dom";
 import { SiteHeader } from "@/components/ui/site-header";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function AppLayout() {
   return (
     <div className="w-full flex min-h-screen">
       <AppSidebar variant="inset" />
