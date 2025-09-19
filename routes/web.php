@@ -11,6 +11,10 @@ use Bocum\Http\Controllers\Coordinator\DefenseController;
 use Bocum\Http\Controllers\Adviser\DefenseController as AdviserDefenseController;
 use Bocum\Http\Controllers\Adviser\GroupController as AdviserGroupController;
 use Illuminate\Http\Request;
+use Bocum\Http\Controllers\Admin\AccountController;
+use Bocum\Http\Controllers\Admin\DepartmentController;
+use Bocum\Http\Controllers\Admin\PermissionController;
+use Bocum\Http\Controllers\Admin\RoleController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -51,6 +55,17 @@ Route::middleware('auth')->group(function () {
         Route::patch('rooms/{room}/toggle-status', [RoomController::class, 'toggleStatus'])->name('rooms.toggle-status');
         Route::resource('terms', TermController::class)->except(['show']);
         Route::resource('coordinators', CoordinatorController::class)->only(['index', 'create', 'store', 'destroy']);
+
+        Route::resource('accounts', AccountController::class)
+            ->parameters(['accounts' => 'user'])
+            ->except(['show']);
+
+        // Roles API
+        Route::resource('roles', RoleController::class)->except(['edit', 'create']);
+
+        // Permissions & Departments API
+        Route::get('permissions', [PermissionController::class, 'index']);
+        Route::get('departments', [DepartmentController::class, 'index']);
     });
 
     // Coordinator-only

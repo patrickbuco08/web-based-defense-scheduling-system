@@ -5,6 +5,7 @@ import AppLayout from "@/layouts/AppLayout";
 import Calendar from "@/Pages/Calendar";
 import Home from "@/Pages/Home";
 import Room from "@/Pages/Room";
+import Account from "@/Pages/Account";
 
 export function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ export function AppRoutes() {
         <Route index element={<Home />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="admin/rooms" element={<Room />} />
+        <Route path="admin/accounts" element={<Account />} />
       </Route>
     </Routes>
   );

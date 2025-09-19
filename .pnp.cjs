@@ -36,7 +36,7 @@ const RAW_RUNTIME_STATE =
           ["@fullcalendar/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
           ["@fullcalendar/timegrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
           ["@inertiajs/inertia", "npm:0.11.1"],\
-          ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.6"],\
+          ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.7"],\
           ["@prettier/plugin-php", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.24.0"],\
           ["@radix-ui/react-alert-dialog", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:1.1.15"],\
           ["@radix-ui/react-avatar", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:1.1.10"],\
@@ -994,10 +994,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@inertiajs/core", [\
-      ["npm:2.1.6", {\
-        "packageLocation": "../../../.yarn/berry/cache/@inertiajs-core-npm-2.1.6-bfea9f8ea7-10c0.zip/node_modules/@inertiajs/core/",\
+      ["npm:2.1.7", {\
+        "packageLocation": "../../../.yarn/berry/cache/@inertiajs-core-npm-2.1.7-a532097aec-10c0.zip/node_modules/@inertiajs/core/",\
         "packageDependencies": [\
-          ["@inertiajs/core", "npm:2.1.6"],\
+          ["@inertiajs/core", "npm:2.1.7"],\
           ["@types/lodash-es", "npm:4.17.12"],\
           ["axios", "npm:1.12.2"],\
           ["lodash-es", "npm:4.17.21"],\
@@ -1019,18 +1019,18 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@inertiajs/react", [\
-      ["npm:2.1.6", {\
-        "packageLocation": "../../../.yarn/berry/cache/@inertiajs-react-npm-2.1.6-3693e85179-10c0.zip/node_modules/@inertiajs/react/",\
+      ["npm:2.1.7", {\
+        "packageLocation": "../../../.yarn/berry/cache/@inertiajs-react-npm-2.1.7-67b1a43d73-10c0.zip/node_modules/@inertiajs/react/",\
         "packageDependencies": [\
-          ["@inertiajs/react", "npm:2.1.6"]\
+          ["@inertiajs/react", "npm:2.1.7"]\
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.6", {\
-        "packageLocation": "./.yarn/__virtual__/@inertiajs-react-virtual-edd798e3f0/4/.yarn/berry/cache/@inertiajs-react-npm-2.1.6-3693e85179-10c0.zip/node_modules/@inertiajs/react/",\
+      ["virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.7", {\
+        "packageLocation": "./.yarn/__virtual__/@inertiajs-react-virtual-2873fb4c91/4/.yarn/berry/cache/@inertiajs-react-npm-2.1.7-67b1a43d73-10c0.zip/node_modules/@inertiajs/react/",\
         "packageDependencies": [\
-          ["@inertiajs/core", "npm:2.1.6"],\
-          ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.6"],\
+          ["@inertiajs/core", "npm:2.1.7"],\
+          ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.7"],\
           ["@types/lodash-es", "npm:4.17.12"],\
           ["@types/react", "npm:19.1.13"],\
           ["lodash-es", "npm:4.17.21"],\
@@ -3406,10 +3406,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["baseline-browser-mapping", [\
-      ["npm:2.8.5", {\
-        "packageLocation": "../../../.yarn/berry/cache/baseline-browser-mapping-npm-2.8.5-b6683ca54a-10c0.zip/node_modules/baseline-browser-mapping/",\
+      ["npm:2.8.6", {\
+        "packageLocation": "../../../.yarn/berry/cache/baseline-browser-mapping-npm-2.8.6-e7ad57610f-10c0.zip/node_modules/baseline-browser-mapping/",\
         "packageDependencies": [\
-          ["baseline-browser-mapping", "npm:2.8.5"]\
+          ["baseline-browser-mapping", "npm:2.8.6"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -3456,10 +3456,10 @@ const RAW_RUNTIME_STATE =
       ["npm:4.26.2", {\
         "packageLocation": "../../../.yarn/berry/cache/browserslist-npm-4.26.2-713d4a89d1-10c0.zip/node_modules/browserslist/",\
         "packageDependencies": [\
-          ["baseline-browser-mapping", "npm:2.8.5"],\
+          ["baseline-browser-mapping", "npm:2.8.6"],\
           ["browserslist", "npm:4.26.2"],\
           ["caniuse-lite", "npm:1.0.30001743"],\
-          ["electron-to-chromium", "npm:1.5.221"],\
+          ["electron-to-chromium", "npm:1.5.222"],\
           ["node-releases", "npm:2.0.21"],\
           ["update-browserslist-db", "virtual:713d4a89d17b986cd049d55a31a81dbec1caf092e3b6ed463f353fd4a3246417e821b15d7340b32b15a56077d915deb33f1731028a98a2619d7175c986a372d0#npm:1.1.3"]\
         ],\
@@ -3931,10 +3931,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["electron-to-chromium", [\
-      ["npm:1.5.221", {\
-        "packageLocation": "../../../.yarn/berry/cache/electron-to-chromium-npm-1.5.221-d466f71bf1-10c0.zip/node_modules/electron-to-chromium/",\
+      ["npm:1.5.222", {\
+        "packageLocation": "../../../.yarn/berry/cache/electron-to-chromium-npm-1.5.222-b1fdcbe0b2-10c0.zip/node_modules/electron-to-chromium/",\
         "packageDependencies": [\
-          ["electron-to-chromium", "npm:1.5.221"]\
+          ["electron-to-chromium", "npm:1.5.222"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6417,7 +6417,7 @@ const RAW_RUNTIME_STATE =
           ["@fullcalendar/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
           ["@fullcalendar/timegrid", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:6.1.19"],\
           ["@inertiajs/inertia", "npm:0.11.1"],\
-          ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.6"],\
+          ["@inertiajs/react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:2.1.7"],\
           ["@prettier/plugin-php", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.24.0"],\
           ["@radix-ui/react-alert-dialog", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:1.1.15"],\
           ["@radix-ui/react-avatar", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:1.1.10"],\

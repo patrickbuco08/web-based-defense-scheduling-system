@@ -50,8 +50,8 @@ const data = {
       icon: IconChartBar,
     },
     {
-      title: "Projects",
-      url: "#",
+      title: "Accounts",
+      url: "/app/admin/accounts",
       icon: IconFolder,
     },
     {

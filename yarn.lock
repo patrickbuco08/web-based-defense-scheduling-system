@@ -665,15 +665,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inertiajs/core@npm:2.1.6":
-  version: 2.1.6
-  resolution: "@inertiajs/core@npm:2.1.6"
+"@inertiajs/core@npm:2.1.7":
+  version: 2.1.7
+  resolution: "@inertiajs/core@npm:2.1.7"
   dependencies:
     "@types/lodash-es": "npm:^4.17.12"
-    axios: "npm:^1.11.0"
+    axios: "npm:^1.12.0"
     lodash-es: "npm:^4.17.21"
     qs: "npm:^6.9.0"
-  checksum: 10c0/b22640a825e1479e190094a0608f77eafbeb6f9bcb90e04ab90459a69a83a2446f49bce6abc328796139a76d4ee611c408a54a4eb0d0aff363bd5bb129b17e25
+  checksum: 10c0/a15dc2544fffa8da3bb36e9d8226cad2194a1da98845f569612778810bee7c7c9146c233a9d69778569a03e0662d3ff7191ba247384836ee09964b59942bb758
   languageName: node
   linkType: hard
 
@@ -689,15 +689,15 @@ __metadata:
   linkType: hard
 
 "@inertiajs/react@npm:^2.1.6":
-  version: 2.1.6
-  resolution: "@inertiajs/react@npm:2.1.6"
+  version: 2.1.7
+  resolution: "@inertiajs/react@npm:2.1.7"
   dependencies:
-    "@inertiajs/core": "npm:2.1.6"
+    "@inertiajs/core": "npm:2.1.7"
     "@types/lodash-es": "npm:^4.17.12"
     lodash-es: "npm:^4.17.21"
   peerDependencies:
     react: ^16.9.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-  checksum: 10c0/108507db306b0aa61ef086362b3ec3ff0cbb7097047912567e241b3deacc376eee50c618a501d3798c3a2b32ec09af48ebd69776e63ebb94fd9549b3d1561085
+  checksum: 10c0/a54af1328620291797396c8cc0b4c052d4743f8020f4572bb9b3123165d295fb755ab6e993620b734a2635c98103b36596da65104162d5d876c1fa676f1e9350
   languageName: node
   linkType: hard
 
@@ -2451,7 +2451,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.11.0, axios@npm:^1.7.4":
+"axios@npm:^1.12.0, axios@npm:^1.7.4":
   version: 1.12.2
   resolution: "axios@npm:1.12.2"
   dependencies:
@@ -2470,11 +2470,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.8.3":
-  version: 2.8.5
-  resolution: "baseline-browser-mapping@npm:2.8.5"
+  version: 2.8.6
+  resolution: "baseline-browser-mapping@npm:2.8.6"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/550987bd4fa37e421b1c1a4dd2cd5381ba72351c6baaf6239ca479e8ae5090bbb57e26110606926d9907567dc2ebd3e048615c95572acaccd12586eb110195fd
+  checksum: 10c0/ea628db5048d1e5c0251d4783e0496f5ce8de7a0e20ea29c8876611cb0acf58ffc76bf6561786c6388db22f130646e3ecb91eebc1c03954552a21d38fa38320f
   languageName: node
   linkType: hard
 
@@ -2930,9 +2930,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.218":
-  version: 1.5.221
-  resolution: "electron-to-chromium@npm:1.5.221"
-  checksum: 10c0/d8d8c146d9e53251c85829bdf4f212b55459b8b260e714a55789b244f6d9319ecdeb3b1e27f347461bf40b4c8707bbfd3322e2603afe643c05995eb1ffb9e058
+  version: 1.5.222
+  resolution: "electron-to-chromium@npm:1.5.222"
+  checksum: 10c0/a81eb8d2b171236884faf9b5dd382c66d9250283032cb89a3e555d788bf3956f7f4f6bf7bf30b3daf9e5c945ef837bfcd1be21b3f41cfe186ed2f25da13c9af3
   languageName: node
   linkType: hard
 

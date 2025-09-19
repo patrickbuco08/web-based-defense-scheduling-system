@@ -69,3 +69,8 @@ php artisan make:seeder RolesAndAdminSeeder
 php artisan db:seed
 php artisan db:seed --class=RolesAndAdminSeeder
 ```
+
+## Fix IDE Typescript errors under Yarn
+```
+yarn dlx @yarnpkg/sdks vscode
+```
