@@ -5,15 +5,18 @@ use Bocum\Models\Defense;
 use Illuminate\Http\Request;
 
 Route::get('/defenses', function () {
-    $events = Defense::where('status', 'approved')
-        ->get()
-        ->map(fn($d) => [
-            'id'    => $d->id,
-            'title' => $d->title.' · '.$d->room->name,
-            'start' => $d->start_at->toIso8601String(),
-            'end'   => $d->end_at->toIso8601String(),
-        ]);
-    return response()->json($events);
+    $defenses = Defense::with([
+        'room',
+        'group',
+        'adviser',
+        'proposedBy',
+        'approvedBy',
+        'term',
+        'panelists',
+        'group.members',
+    ])->where('status', 'approved')->get();
+
+    return response()->json($defenses);
 });
 
 Route::middleware('auth:web')->get('/user', function (Request $request) {
