@@ -32,8 +32,6 @@ export function AddAccountButton() {
   const { data: departments } = useDepartments();
   const createAccount = useCreateAccount();
 
-  console.log(departments);
-  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -137,7 +135,7 @@ export function AddAccountButton() {
               <Label htmlFor="department_id">Department (Optional)</Label>
               <Select
                 value={formData.department_id?.toString() || ""}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   handleSelectChange("department_id", value ? parseInt(value) : null)
                 }
               >

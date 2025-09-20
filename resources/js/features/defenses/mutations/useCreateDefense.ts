@@ -9,7 +9,10 @@ export const useCreateDefense = () => {
     mutationFn: defensesApi.createDefense,
     onSuccess: () => {
       // Invalidate and refetch the defenses list
-      queryClient.invalidateQueries({ queryKey: ['defenses'] });
+      return queryClient.invalidateQueries({ 
+        queryKey: ['defenses'],
+        refetchType: 'active',
+      });
     },
     onError: (error) => {
       console.error("Error creating defense:", error);

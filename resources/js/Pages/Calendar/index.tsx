@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
+import { useDefenses } from "@/features/defenses/queries/useDefenses";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -20,9 +21,6 @@ import {
   FileTextIcon,
   GraduationCapIcon,
 } from "lucide-react";
-import { fetchDefenses } from "@/features/defenses/api";
-import { defensesApi } from "@/features/defenses/api";
-
 interface Defense {
   id: number;
   room_id: number;
@@ -64,7 +62,6 @@ interface Defense {
       id: number;
       group_id: number;
       student_name: string;
-      student_no: string | null;
       created_at: string;
       updated_at: string;
     }>;
@@ -126,16 +123,12 @@ function Calendar() {
   const [selectedDefense, setSelectedDefense] = useState<Defense | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const fetchEvents = async (
-    info: any,
-    successCallback: Function,
-    failureCallback: Function
-  ) => {
-    try {
-      const defenses = await defensesApi.getDefenses();
+  const { data: defenses = [], refetch } = useDefenses();
+  const [events, setEvents] = useState<any[]>([]);
 
-      // Transform defenses into FullCalendar events
-      const events = defenses.map((defense: any) => ({
+  useEffect(() => {
+    if (defenses) {
+      const mappedEvents = defenses.map((defense: any) => ({
         id: defense.id.toString(),
         title: defense.title,
         start: defense.start_at,
@@ -144,10 +137,28 @@ function Calendar() {
           ...defense,
           location: defense.room
             ? `${defense.room.building} ${defense.room.room_number}`
-            : "N/A",
+            : "Pending",
         },
       }));
+      setEvents(mappedEvents);
 
+      // If we have a calendar ref, update the events
+      if (calendarRef.current) {
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.removeAllEvents();
+        calendarApi.addEventSource(mappedEvents);
+      }
+    }
+  }, [defenses]);
+
+  const fetchEvents = async (
+    info: any,
+    successCallback: Function,
+    failureCallback: Function
+  ) => {
+    try {
+      // Refetch data when the calendar view changes
+      await refetch();
       successCallback(events);
     } catch (error) {
       console.error("Error fetching events:", error);
@@ -200,17 +211,16 @@ function Calendar() {
               <div className="flex items-center gap-2 mt-2">
                 <CheckCircleIcon className="h-4 w-4 text-green-600" />
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedDefense.status === "approved"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${selectedDefense.status === "approved"
                       ? "bg-green-100 text-green-800"
                       : selectedDefense.status === "completed"
-                      ? "bg-blue-100 text-blue-800"
-                      : selectedDefense.status === "scheduled"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : selectedDefense.status === "rejected"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
+                        ? "bg-blue-100 text-blue-800"
+                        : selectedDefense.status === "scheduled"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : selectedDefense.status === "rejected"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-gray-100 text-gray-800"
+                    }`}
                 >
                   {selectedDefense.status.charAt(0).toUpperCase() +
                     selectedDefense.status.slice(1)}
@@ -294,7 +304,7 @@ function Calendar() {
                     <p className="text-sm font-semibold text-gray-900">
                       {selectedDefense.room
                         ? `${selectedDefense.room.building}`
-                        : "N/A"}
+                        : "Pending"}
                     </p>
                     <p className="text-xs text-gray-600">
                       {selectedDefense.room
@@ -344,11 +354,6 @@ function Calendar() {
                             <p className="text-sm font-medium text-gray-900">
                               {member.student_name}
                             </p>
-                            {member.student_no && (
-                              <p className="text-xs text-gray-500">
-                                {member.student_no}
-                              </p>
-                            )}
                           </div>
                         </div>
                       ))}
@@ -439,7 +444,7 @@ function Calendar() {
                         Approved By
                       </p>
                       <p className="text-sm font-semibold text-gray-900">
-                        {selectedDefense.approved_by?.name || "N/A"}
+                        {selectedDefense.approved_by?.name || "Pending"}
                       </p>
                       {selectedDefense.approved_by?.email && (
                         <p className="text-xs text-gray-600">

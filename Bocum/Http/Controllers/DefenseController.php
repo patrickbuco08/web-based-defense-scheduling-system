@@ -1,6 +1,6 @@
 <?php
 
-namespace Bocum\Http\Controllers\Adviser;
+namespace Bocum\Http\Controllers;
 
 use Bocum\Http\Controllers\Controller;
 use Bocum\Http\Requests\DefenseRequest;
@@ -16,21 +16,26 @@ use Illuminate\Support\Facades\Log;
 
 class DefenseController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:adviser');
-    }
-
     public function index()
     {
         // Get defenses where the authenticated user is the adviser
         $defenses = Defense::whereHas('group', function ($query) {
-            $query->where('adviser_id', Auth::id());
-        })->with(['group', 'room', 'term'])
+            $query->where('adviser_id', Auth::id())
+                ->orWhere('critic_id', Auth::id());
+        })->with([
+            'room',
+            'group',
+            'group.term',
+            'adviser',
+            'proposedBy',
+            'approvedBy',
+            'panelists',
+            'group.members',
+        ])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('adviser.defenses.index', compact('defenses'));
+        return response()->json($defenses);
     }
 
     public function show(Defense $defense)

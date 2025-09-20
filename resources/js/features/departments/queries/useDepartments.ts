@@ -1,13 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { departmentsApi } from "../api";
 
 export function useDepartments() {
   return useQuery({
     queryKey: ["departments"],
-    queryFn: async () => {
-      const { data } = await axios.get("/departments");
-      return data.data;
-    },
+    queryFn: () => departmentsApi.getDepartments(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });

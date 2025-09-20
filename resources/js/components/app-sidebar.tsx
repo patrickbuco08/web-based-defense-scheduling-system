@@ -35,34 +35,55 @@ import { useAuthUser } from "@/features/auth/queries/useAuthUser";
 const data = {
   navMain: [
     {
-      title: "Dashboard",
+      title: "My Defense Schedule",
       url: "/app",
       icon: IconDashboard,
     },
+  ],
+  adviser: [
     {
-      title: "Calendar",
-      url: "/app/calendar",
-      icon: IconListDetails,
+      name: "Group Registration",
+      url: "/app/adviser/groups",
+      icon: IconUsers,
     },
     {
-      title: "Manage Rooms",
+      name: "Data Library",
+      url: "#",
+      icon: IconDatabase,
+    },
+    {
+      name: "Reports",
+      url: "#",
+      icon: IconReport,
+    },
+    {
+      name: "Word Assistant",
+      url: "#",
+      icon: IconFileWord,
+    },
+  ],
+  coordinator: [
+    {
+      name: "Manage Rooms",
       url: "/app/admin/rooms",
       icon: IconChartBar,
     },
+  ],
+  admin: [
     {
-      title: "Accounts",
+      name: "Accounts",
       url: "/app/admin/accounts",
       icon: IconFolder,
     },
     {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
+      name: "Manage Rooms",
+      url: "/app/admin/rooms",
+      icon: IconChartBar,
     },
     {
-      title: "Group Registration",
-      url: "/app/adviser/groups",
-      icon: IconUsers,
+      name: "Manage Departments",
+      url: "/app/admin/departments",
+      icon: IconChartBar,
     },
   ],
   navClouds: [
@@ -130,23 +151,6 @@ const data = {
       icon: IconSearch,
     },
   ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
-  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -177,7 +181,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        <NavDocuments title="Adviser" items={data.adviser} />
+        <NavDocuments title="Coordinator" items={data.coordinator} />
+        <NavDocuments title="Admin" items={data.admin} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

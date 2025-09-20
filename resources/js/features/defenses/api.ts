@@ -12,12 +12,12 @@ interface CreateDefensePayload {
 
 export const defensesApi = {
     getDefenses: async () => {
-        const response = await apiClient.get("/api/defenses");
+        const response = await apiClient.get("/defenses");
         return response.data;
     },
     
     createDefense: async (data: CreateDefensePayload) => {
-        const response = await apiClient.post("/adviser/defenses", {
+        const response = await apiClient.post("/defenses", {
             ...data,
             group_id: Number(data.group_id), // Ensure group_id is a number
             // Combine date and time for the API

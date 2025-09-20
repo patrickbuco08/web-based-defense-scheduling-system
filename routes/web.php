@@ -7,8 +7,8 @@ use Bocum\Http\Controllers\Admin\RoomController;
 use Bocum\Http\Controllers\Admin\TermController;
 use Bocum\Http\Controllers\Admin\CoordinatorController;
 use Bocum\Http\Controllers\CalendarController;
-use Bocum\Http\Controllers\Coordinator\DefenseController;
-use Bocum\Http\Controllers\Adviser\DefenseController as AdviserDefenseController;
+// use Bocum\Http\Controllers\Coordinator\DefenseController;
+use Bocum\Http\Controllers\DefenseController;
 use Bocum\Http\Controllers\Adviser\GroupController as AdviserGroupController;
 use Illuminate\Http\Request;
 use Bocum\Http\Controllers\Admin\AccountController;
@@ -53,9 +53,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('terms', TermController::class)->except(['show']);
     Route::get('terms/active', [TermController::class, 'activeTerm'])->name('terms.active');
 
-    Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
+    Route::resource('departments', DepartmentController::class)->except(['show', 'create', 'edit']);
 
     Route::get('critics', [CriticController::class, 'index'])->name('critics.index');
+
+    Route::resource('defenses', DefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy']);
 
     // Admin-only
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
@@ -75,14 +77,13 @@ Route::middleware('auth')->group(function () {
     });
 
     // Coordinator-only
-    Route::middleware('role:coordinator')->prefix('coordinator')->name('coordinator.')->group(function () {
-        Route::resource('defenses', DefenseController::class)->except(['show']);
-    });
+    // Route::middleware('role:coordinator')->prefix('coordinator')->name('coordinator.')->group(function () {
+    //     Route::resource('defenses', DefenseController::class)->except(['show']);
+    // });
 
     // Adviser-only
     Route::middleware('role:adviser')->prefix('adviser')->name('adviser.')->group(function () {
         Route::resource('groups', AdviserGroupController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-        Route::resource('defenses', AdviserDefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy']);
     });
 });
 

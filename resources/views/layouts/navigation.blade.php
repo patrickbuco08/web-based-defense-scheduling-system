@@ -21,7 +21,7 @@
                     </x-nav-link>
 
                     @can('manage terms')
-                        <x-nav-link :href="route('admin.terms.index')" :active="request()->routeIs('admin.terms.*')">
+                        <x-nav-link :href="route('terms.index')" :active="request()->routeIs('terms.*')">
                             {{ __('Terms') }}
                         </x-nav-link>
                     @endcan
@@ -38,18 +38,12 @@
                         </x-nav-link>
                     @endcan
 
-                    @can('manage defenses')
-                        <x-nav-link :href="route('coordinator.defenses.index')" :active="request()->routeIs('coordinator.defenses.*')">
-                            {{ __('Defenses') }}
-                        </x-nav-link>
-                    @endcan
-
                     @can('manage groups')
                         <x-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
                             {{ __('Groups') }}
                         </x-nav-link>
 
-                        <x-nav-link :href="route('adviser.defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
+                        <x-nav-link :href="route('defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
                             {{ __('My Defenses') }}
                         </x-nav-link>
                     @endcan
@@ -122,7 +116,7 @@
             </x-responsive-nav-link>
 
             @can('manage terms')
-                <x-responsive-nav-link :href="route('admin.terms.index')" :active="request()->routeIs('admin.terms.*')">
+                <x-responsive-nav-link :href="route('terms.index')" :active="request()->routeIs('terms.*')">
                     {{ __('Terms') }}
                 </x-responsive-nav-link>
             @endcan
@@ -139,18 +133,12 @@
                 </x-responsive-nav-link>
             @endcan
 
-            @can('manage defenses')
-                <x-responsive-nav-link :href="route('coordinator.defenses.index')" :active="request()->routeIs('coordinator.defenses.*')">
-                    {{ __('Defenses') }}
-                </x-responsive-nav-link>
-            @endcan
-
             @can('manage groups')
                 <x-responsive-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
                     {{ __('Groups') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('adviser.defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
+                <x-responsive-nav-link :href="route('defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
                     {{ __('My Defenses') }}
                 </x-responsive-nav-link>
             @endcan
