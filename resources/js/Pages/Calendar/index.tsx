@@ -8,6 +8,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -17,10 +18,25 @@ import {
   UserIcon,
   UsersIcon,
   CheckCircleIcon,
+  XCircleIcon,
+  Trash2,
   UserCheckIcon,
   FileTextIcon,
   GraduationCapIcon,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useDeleteDefense } from "@/features/defenses/mutations/useDeleteDefense";
+import { toast } from "sonner";
 interface Defense {
   id: number;
   room_id: number;
@@ -122,6 +138,8 @@ function Calendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const [selectedDefense, setSelectedDefense] = useState<Defense | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const deleteDefense = useDeleteDefense();
 
   const { data: defenses = [], refetch } = useDefenses();
   const [events, setEvents] = useState<any[]>([]);
@@ -209,18 +227,21 @@ function Calendar() {
             </DialogTitle>
             {selectedDefense?.status && (
               <div className="flex items-center gap-2 mt-2">
-                <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                {selectedDefense.status === "approved" ? (
+                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                ) : selectedDefense.status === "rejected" ? (
+                  <XCircleIcon className="h-4 w-4 text-red-600" />
+                ) : (
+                  <ClockIcon className="h-4 w-4 text-yellow-600" />
+                )}
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${selectedDefense.status === "approved"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    selectedDefense.status === "approved"
                       ? "bg-green-100 text-green-800"
-                      : selectedDefense.status === "completed"
-                        ? "bg-blue-100 text-blue-800"
-                        : selectedDefense.status === "scheduled"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : selectedDefense.status === "rejected"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-gray-100 text-gray-800"
-                    }`}
+                      : selectedDefense.status === "rejected"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }`}
                 >
                   {selectedDefense.status.charAt(0).toUpperCase() +
                     selectedDefense.status.slice(1)}
@@ -470,8 +491,54 @@ function Calendar() {
               )}
             </div>
           )}
+          <DialogFooter className="sm:justify-between">
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setIsDialogOpen(false);
+                setIsDeleteDialogOpen(true);
+              }}
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Defense
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this defense?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the defense and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (selectedDefense?.id) {
+                  try {
+                    await deleteDefense.mutateAsync(selectedDefense.id);
+                    toast.success("Defense deleted successfully");
+                  } catch (error: any) {
+                    const message = error?.response?.data?.message || error?.message || "Failed to delete defense";
+                    toast.error(message);
+                  } finally {
+                    setIsDeleteDialogOpen(false);
+                  }
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteDefense.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

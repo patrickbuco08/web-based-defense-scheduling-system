@@ -10,9 +10,26 @@ interface CreateDefensePayload {
     notes?: string;
 }
 
+interface UpdateDefensePayload {
+    title: string;
+    group_id: string | number;
+    room_id?: string | number;
+    date: string;
+    start_time: string;
+    end_time: string;
+    notes?: string;
+    status: string;
+    panelists?: number[];
+}
+
 export const defensesApi = {
     getDefenses: async () => {
         const response = await apiClient.get("/defenses");
+        return response.data;
+    },
+
+    getDepartmentDefenses: async () => {
+        const response = await apiClient.get("/defenses/departments");
         return response.data;
     },
     
@@ -24,6 +41,21 @@ export const defensesApi = {
             start_at: `${data.date} ${data.start_time}`,
             end_at: `${data.date} ${data.end_time}`,
         });
+        return response.data;
+    },
+
+    updateDefense: async (id: number, data: UpdateDefensePayload) => {
+        const response = await apiClient.put(`/defenses/${id}`, {
+            ...data,
+            group_id: Number(data.group_id),
+            room_id: data.room_id ? Number(data.room_id) : null,
+            panelists: data.panelists || [],
+        });
+        return response.data;
+    },
+
+    deleteDefense: async (id: number) => {
+        const response = await apiClient.delete(`/defenses/${id}`);
         return response.data;
     },
 };

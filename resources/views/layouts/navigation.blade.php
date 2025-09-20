@@ -16,9 +16,9 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     
-                    <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.index')">
+                    {{-- <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.index')">
                         {{ __('Calendar') }}
-                    </x-nav-link>
+                    </x-nav-link> --}}
 
                     @can('manage terms')
                         <x-nav-link :href="route('terms.index')" :active="request()->routeIs('terms.*')">
@@ -111,9 +111,9 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             
-            <x-responsive-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.index')">
+            {{-- <x-responsive-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.index')">
                 {{ __('Calendar') }}
-            </x-responsive-nav-link>
+            </x-responsive-nav-link> --}}
 
             @can('manage terms')
                 <x-responsive-nav-link :href="route('terms.index')" :active="request()->routeIs('terms.*')">

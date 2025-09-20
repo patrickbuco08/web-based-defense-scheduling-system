@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('title');
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->string('status')->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
             $table->string('notes')->nullable();
             $table->string('rejection_note')->nullable();
         

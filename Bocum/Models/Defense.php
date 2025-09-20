@@ -21,7 +21,8 @@ class Defense extends Model
         'start_at',
         'end_at',
         'status',
-        'notes'
+        'notes',
+        'rejection_note'
     ];
 
     protected $casts = [

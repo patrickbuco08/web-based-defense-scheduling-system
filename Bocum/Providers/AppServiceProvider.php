@@ -3,7 +3,7 @@
 namespace Bocum\Providers;
 
 use Bocum\Models\Defense;
-use App\Policies\DefensePolicy;
+use Bocum\Policies\DefensePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 

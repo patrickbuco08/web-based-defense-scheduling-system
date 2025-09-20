@@ -38,6 +38,26 @@ class DefenseController extends Controller
         return response()->json($defenses);
     }
 
+    public function departmentIndex()
+    {
+        $defenses = Defense::whereHas('group', function ($query) {
+            $query->where('department_id', Auth::user()->department_id);
+        })->with([
+            'room',
+            'group',
+            'group.term',
+            'adviser',
+            'proposedBy',
+            'approvedBy',
+            'panelists',
+            'group.members',
+        ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($defenses);
+    }
+
     public function show(Defense $defense)
     {
         // Verify the authenticated user is the adviser for this defense's group
@@ -80,6 +100,64 @@ class DefenseController extends Controller
         // return $datas;
 
         return view('adviser.defenses.create', $datas);
+    }
+
+    /**
+     * Update the specified defense in storage.
+     *
+     * @param  \Bocum\Http\Requests\DefenseRequest  $request
+     * @param  \Bocum\Models\Defense  $defense
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(DefenseRequest $request, Defense $defense)
+    {
+        try {
+            // Check if status is being changed
+            $newStatus = $request->status;
+            
+            // Authorize the update action using the policy, passing the new status
+            $this->authorize('update', [$defense, $newStatus]);
+
+            // Prepare the data for update
+            $data = [
+                'title' => $request->title,
+                'group_id' => $request->group_id,
+                'room_id' => $request->room_id,
+                'start_at' => Carbon::parse($request->date . ' ' . $request->start_time),
+                'end_at' => Carbon::parse($request->date . ' ' . $request->end_time),
+                'status' => $request->status,
+                'notes' => $request->notes,
+                // approved_by_id and rejection_note would be handled by separate approval endpoints
+            ];
+
+            // If status is being updated to approved, verify the user is a coordinator
+            if ($request->status === 'approved' && Auth::user()->hasRole('coordinator')) {
+                $data['approved_by_id'] = Auth::id();
+            }
+
+            if ($request->rejection_note) {
+                $data['rejection_note'] = $request->rejection_note;
+            }
+
+            // Update the defense
+            $defense->update($data);
+
+            // Sync panelists if provided
+            if ($request->has('panelists')) {
+                $defense->panelists()->sync($request->panelists);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Defense updated successfully',
+                'data' => $defense->fresh(['room', 'group', 'panelists'])
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the defense. Please try again.' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -159,23 +237,28 @@ class DefenseController extends Controller
 
             // Only allow deletion if defense is still pending
             if ($defense->status !== 'pending') {
-                return back()
-                    ->with('error', 'Only pending defenses can be deleted.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Only pending defenses can be deleted.'
+                ], 400);
             }
 
             $defense->delete();
 
-            return redirect()
-                ->route('adviser.defenses.index')
-                ->with('success', 'Defense has been deleted successfully.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Defense has been deleted successfully.'
+            ]);
         } catch (\Exception $e) {
             Log::error('Error deleting defense: ' . $e->getMessage(), [
                 'defense_id' => $defense->id,
                 'user_id' => Auth::id()
             ]);
 
-            return back()
-                ->with('error', 'An error occurred while deleting the defense. Please try again.');
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while deleting the defense. Please try again.'
+            ]);
         }
     }
 }

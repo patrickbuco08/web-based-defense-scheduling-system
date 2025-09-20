@@ -35,7 +35,7 @@ import { useAuthUser } from "@/features/auth/queries/useAuthUser";
 const data = {
   navMain: [
     {
-      title: "My Defense Schedule",
+      title: "My Defense Schedules",
       url: "/app",
       icon: IconDashboard,
     },
@@ -64,8 +64,8 @@ const data = {
   ],
   coordinator: [
     {
-      name: "Manage Rooms",
-      url: "/app/admin/rooms",
+      name: "Department Defense Calendar",
+      url: "/app/coordinators/calendar",
       icon: IconChartBar,
     },
   ],

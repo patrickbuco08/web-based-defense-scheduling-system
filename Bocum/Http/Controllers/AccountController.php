@@ -1,6 +1,6 @@
 <?php
 
-namespace Bocum\Http\Controllers\Admin;
+namespace Bocum\Http\Controllers;
 
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\User;
@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class AccountController extends Controller
 {
@@ -16,8 +17,13 @@ class AccountController extends Controller
      */
     public function index()
     {
+        $currentUser = Auth::user();
         $users = User::with(['roles', 'department'])
-            ->where('id', '!=', Auth::id())
+            ->where('id', '!=', $currentUser->id)
+            ->where('department_id', $currentUser->department_id)
+            ->whereDoesntHave('roles', function($query) {
+                $query->where('name', 'admin');
+            })
             ->latest()
             ->get()
             ->map(function ($user) {
@@ -44,6 +50,7 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -103,6 +110,7 @@ class AccountController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'department_id' => 'sometimes|nullable|exists:departments,id',
@@ -167,6 +175,7 @@ class AccountController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
         $user->delete();
 
         return response()->json([

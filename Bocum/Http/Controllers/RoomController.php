@@ -1,10 +1,11 @@
 <?php
 
-namespace Bocum\Http\Controllers\Admin;
+namespace Bocum\Http\Controllers;
 
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
@@ -20,39 +21,25 @@ class RoomController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    /**
-     * Show the form for creating a new room.
-     */
-    public function create()
-    {
-        return view('admin.rooms.create');
-    }
-
-    /**
      * Store a newly created room in storage.
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Room::class);
+        
         $validated = $request->validate([
             'room_number' => 'required|string|max:50|unique:rooms,room_number',
             'building' => 'required|string|max:100',
             'is_active' => 'boolean',
         ]);
-
-        Room::create($validated);
-
-        return redirect()->route('admin.rooms.index')
-            ->with('status', 'Room created successfully.');
-    }
-
-    /**
-     * Show the form for editing the specified room.
-     */
-    public function edit(Room $room)
-    {
-        return view('admin.rooms.edit', compact('room'));
+        
+        $room = Room::create($validated);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Room created successfully',
+            'data' => $room
+        ], 201);
     }
 
     /**
@@ -60,17 +47,20 @@ class RoomController extends Controller
      */
     public function update(Request $request, Room $room)
     {
+        $this->authorize('update', $room);
+        
         $validated = $request->validate([
             'room_number' => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'building' => 'required|string|max:100',
             'is_active' => 'boolean',
         ]);
-
+        
         $room->update($validated);
-
+        
         return response()->json([
             'status' => 'success',
-            'message' => 'Room updated successfully.',
+            'message' => 'Room updated successfully',
+            'data' => $room
         ]);
     }
 
@@ -79,13 +69,19 @@ class RoomController extends Controller
      */
     public function toggleStatus(Room $room)
     {
+        $this->authorize('toggleStatus', $room);
+        
         $room->update([
             'is_active' => !$room->is_active
         ]);
-
+        
         $status = $room->is_active ? 'activated' : 'deactivated';
-        return redirect()->route('admin.rooms.index')
-            ->with('status', "Room {$status} successfully.");
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => "Room {$status} successfully",
+            'data' => $room
+        ]);
     }
 
     /**
@@ -93,16 +89,18 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
+        $this->authorize('delete', $room);
+        
         // Check if the room has any scheduled defenses
         if ($room->defenses()->exists()) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Cannot delete room with scheduled defenses.',
-            ], 500);
+            ], 422);
         }
-
+        
         $room->delete();
-
+        
         return response()->json([
             'status' => 'success',
             'message' => 'Room deleted successfully',
