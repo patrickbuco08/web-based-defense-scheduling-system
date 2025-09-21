@@ -13,9 +13,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Bocum\Services\DefenseConflictService;
+use Illuminate\Http\JsonResponse;
 
 class DefenseController extends Controller
 {
+
+    public function __construct(protected DefenseConflictService $conflictService) {}
+
     public function index()
     {
         // Get defenses where the authenticated user is the adviser, critic, or a panelist
@@ -46,13 +51,15 @@ class DefenseController extends Controller
     public function departmentIndex()
     {
         $this->authorize('departmentIndex', Defense::class);
-        
+
         $defenses = Defense::whereHas('group', function ($query) {
             $query->where('department_id', Auth::user()->department_id);
         })->with([
             'room',
             'group',
             'group.term',
+            'group.adviser',
+            'group.critic',
             'adviser',
             'proposedBy',
             'approvedBy',
@@ -63,6 +70,27 @@ class DefenseController extends Controller
             ->get();
 
         return response()->json($defenses);
+    }
+
+    /**
+     * Check for conflicts for a specific defense
+     *
+     * @param \Bocum\Models\Defense $defense
+     * @return JsonResponse
+     */
+    public function checkConflicts(Defense $defense): JsonResponse
+    {
+        $roomConflicts = $this->conflictService->checkRoomConflict($defense->id);
+        $panelistConflicts = $this->conflictService->checkPanelistConflict($defense->id);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'room_conflicts' => $roomConflicts,
+                'panelist_conflicts' => $panelistConflicts,
+                'has_any_conflicts' => $roomConflicts['has_conflict'] || $panelistConflicts['has_conflict']
+            ]
+        ]);
     }
 
     public function show(Defense $defense)

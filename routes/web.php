@@ -36,6 +36,10 @@ Route::middleware('auth')->group(function () {
         return response()->json($request->user());
     });
 
+    Route::resource('accounts', AccountController::class)
+        ->parameters(['accounts' => 'user'])
+        ->except(['show']);
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -50,14 +54,12 @@ Route::middleware('auth')->group(function () {
 
     Route::get('critics', [CriticController::class, 'index'])->name('critics.index');
 
+    Route::get('defenses/conflicts/check/{defense}', [DefenseController::class, 'checkConflicts'])
+    ->name('defenses.conflicts.check');
     Route::get('defenses/departments', [DefenseController::class, 'departmentIndex'])->name('defenses.departmentIndex');
     Route::resource('defenses', DefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy', 'update']);
 
     Route::resource('rooms', RoomController::class)->except(['show']);
-
-    Route::resource('accounts', AccountController::class)
-        ->parameters(['accounts' => 'user'])
-        ->except(['show']);
 
     // Admin-only
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
