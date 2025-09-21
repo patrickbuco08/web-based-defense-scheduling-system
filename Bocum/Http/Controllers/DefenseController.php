@@ -18,20 +18,25 @@ class DefenseController extends Controller
 {
     public function index()
     {
-        // Get defenses where the authenticated user is the adviser
-        $defenses = Defense::whereHas('group', function ($query) {
-            $query->where('adviser_id', Auth::id())
-                ->orWhere('critic_id', Auth::id());
-        })->with([
-            'room',
-            'group',
-            'group.term',
-            'adviser',
-            'proposedBy',
-            'approvedBy',
-            'panelists',
-            'group.members',
-        ])
+        // Get defenses where the authenticated user is the adviser, critic, or a panelist
+        $defenses = Defense::where(function ($query) {
+            $query->whereHas('group', function ($q) {
+                $q->where('adviser_id', Auth::id())
+                    ->orWhere('critic_id', Auth::id());
+            })->orWhereHas('panelists', function ($q) {
+                $q->where('panelist_id', Auth::id());
+            });
+        })
+            ->with([
+                'room',
+                'group',
+                'group.term',
+                'adviser',
+                'proposedBy',
+                'approvedBy',
+                'panelists',
+                'group.members',
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -40,6 +45,8 @@ class DefenseController extends Controller
 
     public function departmentIndex()
     {
+        $this->authorize('departmentIndex', Defense::class);
+        
         $defenses = Defense::whereHas('group', function ($query) {
             $query->where('department_id', Auth::user()->department_id);
         })->with([
@@ -114,7 +121,7 @@ class DefenseController extends Controller
         try {
             // Check if status is being changed
             $newStatus = $request->status;
-            
+
             // Authorize the update action using the policy, passing the new status
             $this->authorize('update', [$defense, $newStatus]);
 

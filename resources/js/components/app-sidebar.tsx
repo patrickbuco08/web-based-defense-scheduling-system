@@ -30,7 +30,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useAuthUser } from "@/features/auth/queries/useAuthUser";
+import { useAuth } from "@/hooks/useAuth";
 
 const data = {
   navMain: [
@@ -154,9 +154,9 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: user, isLoading, isError } = useAuthUser();
+  const { user, loading, error } = useAuth();
 
-  if (isLoading || isError) {
+  if (loading || error) {
     return false;
   }
 

@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useDeleteDefense } from "@/features/defenses/mutations/useDeleteDefense";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 interface Defense {
   id: number;
   room_id: number;
@@ -140,6 +141,9 @@ function Calendar() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const deleteDefense = useDeleteDefense();
+  const { user } = useAuth();
+
+  console.log('delete defense', user?.id);
 
   const { data: defenses = [], refetch } = useDefenses();
   const [events, setEvents] = useState<any[]>([]);
@@ -235,13 +239,12 @@ function Calendar() {
                   <ClockIcon className="h-4 w-4 text-yellow-600" />
                 )}
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedDefense.status === "approved"
-                      ? "bg-green-100 text-green-800"
-                      : selectedDefense.status === "rejected"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${selectedDefense.status === "approved"
+                    ? "bg-green-100 text-green-800"
+                    : selectedDefense.status === "rejected"
                       ? "bg-red-100 text-red-800"
                       : "bg-yellow-100 text-yellow-800"
-                  }`}
+                    }`}
                 >
                   {selectedDefense.status.charAt(0).toUpperCase() +
                     selectedDefense.status.slice(1)}
@@ -491,19 +494,23 @@ function Calendar() {
               )}
             </div>
           )}
-          <DialogFooter className="sm:justify-between">
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setIsDialogOpen(false);
-                setIsDeleteDialogOpen(true);
-              }}
-              className="gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Defense
-            </Button>
-          </DialogFooter>
+
+          {user?.id === selectedDefense?.approved_by_id && (
+
+            <DialogFooter className="sm:justify-between">
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setIsDialogOpen(false);
+                  setIsDeleteDialogOpen(true);
+                }}
+                className="gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete Defense
+              </Button>
+            </DialogFooter>
+          )}
         </DialogContent>
       </Dialog>
 

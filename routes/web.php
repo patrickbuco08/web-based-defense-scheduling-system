@@ -21,13 +21,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/', fn() => redirect()->route('calendar.index'));
-
-
-Route::get('/test-react', function () {
-    return view('test-react');
-})->name('test-react');
-
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

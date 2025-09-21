@@ -10,6 +10,13 @@ use Illuminate\Auth\Access\AuthorizationException;
 class DefensePolicy
 {
     /**
+     * Determine whether the user can view the department index of defenses.
+     */
+    public function departmentIndex(User $user): bool
+    {
+        return $user->hasRole('coordinator');
+    }
+    /**
      * Determine whether the user can view the defense.
      */
     public function view(User $user, Defense $defense): bool
