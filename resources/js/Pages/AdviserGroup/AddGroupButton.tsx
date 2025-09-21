@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
 
 // Types
 interface Department {
@@ -49,18 +50,20 @@ interface Member {
 
 export const AddGroupButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    group_code: "",
-    department_id: "",
-    term_id: "",
-    critic_id: "",
-  });
   const [members, setMembers] = useState<Member[]>([{ id: Date.now(), name: "" }]);
 
   const createGroupMutation = useCreateGroup();
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
   const { data: activeTerm } = useActiveTerm();
   const { data: critics } = useCritics();
+  const { user } = useAuth();
+
+  const [formData, setFormData] = useState({
+    group_code: "",
+    department_id: user?.department_id?.toString() || '',
+    term_id: "",
+    critic_id: "",
+  });
 
   // Set active term when loaded
   useEffect(() => {
@@ -83,7 +86,7 @@ export const AddGroupButton = () => {
   };
 
   const handleMemberChange = (id: number, value: string) => {
-    setMembers(members.map(member => 
+    setMembers(members.map(member =>
       member.id === id ? { ...member, name: value } : member
     ));
   };
@@ -105,10 +108,10 @@ export const AddGroupButton = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Filter out empty member names
     const validMembers = members.filter(member => member.name.trim() !== '');
-    
+
     if (validMembers.length === 0) {
       toast.error("Please add at least one group member");
       return;
@@ -154,7 +157,7 @@ export const AddGroupButton = () => {
             Fill in the details below to create a new group.
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="group_code" className="text-right">
@@ -179,6 +182,7 @@ export const AddGroupButton = () => {
               value={formData.department_id}
               onValueChange={(value) => handleSelectChange("department_id", value)}
               required
+              disabled={!!user?.department_id}
             >
               <SelectTrigger className="col-span-3 w-full">
                 <SelectValue placeholder="Select department" />
@@ -235,10 +239,10 @@ export const AddGroupButton = () => {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <Label>Members</Label>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
                 onClick={handleAddMember}
                 className="h-8"
               >

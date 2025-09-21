@@ -69,6 +69,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/app/admin/departments",
         icon: IconBuilding,
       },
+      {
+        name: "Manage Terms",
+        url: "#",
+        icon: IconBuilding,
+      },
     ],
     navClouds: [
       {
@@ -127,6 +132,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
   };
 
+  const isAdviser = user.roles.includes('admin');
+  console.log(isAdviser);
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -137,10 +145,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/app" className="flex items-center gap-2">
-                <img 
-                  src="/images/cct-logo.png" 
-                  alt="CCT Logo" 
-                  className="h-8 w-auto" 
+                <img
+                  src="/images/cct-logo.png"
+                  alt="CCT Logo"
+                  className="h-8 w-auto"
                 />
                 <span className="text-base font-semibold">
                   CCT Defense Scheduling
@@ -151,7 +159,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {!user.roles.includes('admin') && <NavMain items={data.navMain} />}
+        {isAdviser && <NavMain items={data.navMain} />}
         {user.roles.includes('adviser') && <NavDocuments title="Adviser" items={data.adviser} />}
         {user.roles.includes('coordinator') && <NavDocuments title="Coordinator" items={data.coordinator} />}
         {user.roles.includes('admin') && <NavDocuments title="Admin" items={data.admin} />}

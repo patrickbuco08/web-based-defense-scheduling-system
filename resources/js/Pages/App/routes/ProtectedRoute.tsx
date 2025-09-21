@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children, allowedRoles, userRoles }: Pr
         return <Navigate to="/login" replace />;
     }
 
-    if (userRoles.includes('admin') && currentPath === '/app') {
+    if (userRoles.includes('admin') && userRoles.length === 1 && currentPath === '/app') {
         return <Navigate to="/app/admin/accounts" replace />;
     } else {
         const hasRequiredRole = userRoles.some(role => allowedRoles.includes(role));
