@@ -19,9 +19,6 @@ class AccountController extends Controller
         $currentUser = Auth::user();
         $users = User::with(['roles', 'department'])
             ->where('id', '!=', $currentUser->id)
-            ->whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'admin');
-            })
             ->latest()
             ->get()
             ->map(function ($user) {
@@ -29,7 +26,7 @@ class AccountController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'role' => $user->roles->first()?->name ?? 'user',
+                    'roles' => $user->roles->pluck('name')->toArray(),
                     'department' => $user->department ? [
                         'id' => $user->department->id,
                         'name' => $user->department->name,
@@ -47,7 +44,7 @@ class AccountController extends Controller
         $currentUser = Auth::user();
         $users = User::with(['roles', 'department'])
             ->where('id', '!=', $currentUser->id)
-            ->where('department_id', $currentUser->department_id) //todo: remove this and implement  getAccountsByDepartment
+            ->where('department_id', $currentUser->department_id)
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'admin');
             })
@@ -58,7 +55,7 @@ class AccountController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,
-                    'role' => $user->roles->first()?->name ?? 'user',
+                    'roles' => $user->roles->pluck('name')->toArray(),
                     'department' => $user->department ? [
                         'id' => $user->department->id,
                         'name' => $user->department->name,
@@ -84,7 +81,8 @@ class AccountController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'department_id' => 'nullable|exists:departments,id',
-            'role' => 'required|string|exists:roles,name'
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'required|string|exists:roles,name'
         ]);
 
         // Start a database transaction
@@ -99,8 +97,8 @@ class AccountController extends Controller
                 'department_id' => $validated['department_id'] ?? null,
             ]);
 
-            // Assign the role to the user
-            $user->assignRole($validated['role']);
+            // Assign the roles to the user
+            $user->assignRole($validated['roles']);
 
             // Commit the transaction
             DB::commit();
@@ -142,7 +140,8 @@ class AccountController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'department_id' => 'sometimes|nullable|exists:departments,id',
-            'role' => 'sometimes|string|exists:roles,name'
+            'roles' => 'sometimes|array|min:1',
+            'roles.*' => 'required|string|exists:roles,name'
         ]);
 
         // Start a database transaction
@@ -161,9 +160,9 @@ class AccountController extends Controller
 
             $user->update($updateData);
 
-            // Update role if provided
-            if (isset($validated['role'])) {
-                $user->syncRoles([$validated['role']]);
+            // Update roles if provided
+            if (isset($validated['roles'])) {
+                $user->syncRoles($validated['roles']);
             }
 
             // Commit the transaction
@@ -177,7 +176,7 @@ class AccountController extends Controller
                     'id' => $user->id,
                     'name' => $user->name,
                     'email' => $user->email,  // This will always be the original email
-                    'role' => $user->roles->first()?->name ?? 'user',
+                    'roles' => $user->roles->pluck('name')->toArray(),
                     'department' => $user->department ? [
                         'id' => $user->department->id,
                         'name' => $user->department->name,

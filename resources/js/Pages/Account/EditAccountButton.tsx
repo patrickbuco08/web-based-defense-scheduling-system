@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +22,7 @@ interface EditAccountButtonProps {
     id: number;
     name: string;
     email: string;
-    role: string;
+    roles: string[];
     department?: {
       id: number;
       name: string;
@@ -34,7 +35,7 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
   const [formData, setFormData] = useState({
     name: account.name,
     email: account.email,
-    role: account.role,
+    roles: account.roles || [],
     department_id: account.department?.id || null,
   });
 
@@ -47,7 +48,7 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
       setFormData({
         name: account.name,
         email: account.email,
-        role: account.role,
+        roles: account.roles || [],
         department_id: account.department?.id || null,
       });
     }
@@ -63,15 +64,29 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
     }));
   };
 
+  const handleRoleToggle = (role: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: checked 
+        ? [...prev.roles, role]
+        : prev.roles.filter(r => r !== role)
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.roles.length === 0) {
+      toast.error("Please select at least one role");
+      return;
+    }
 
     // Prepare the data to send
     const updateData = {
       id: account.id,
       name: formData.name,
       email: formData.email,
-      role: formData.role,
+      roles: formData.roles,
       department_id: formData.department_id || null,
     };
 
@@ -135,23 +150,24 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
                 disabled
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="role" className="text-right">
-                Role
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">
+                Roles
               </Label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
+              <div className="col-span-3 space-y-2">
                 {roles?.map((role) => (
-                  <option key={role.id} value={role.name}>
-                    {role.name}
-                  </option>
+                  <div key={role.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`role-${role.id}`}
+                      checked={formData.roles.includes(role.name)}
+                      onCheckedChange={(checked) => handleRoleToggle(role.name, checked as boolean)}
+                    />
+                    <Label htmlFor={`role-${role.id}`} className="capitalize cursor-pointer">
+                      {role.name}
+                    </Label>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="department_id" className="text-right">

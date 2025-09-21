@@ -110,7 +110,7 @@ const Account = () => {
             <TableRow>
               <TableHead className="w-[200px]">Name</TableHead>
               <TableHead className="min-w-[200px]">Email</TableHead>
-              <TableHead className="w-[120px]">Role</TableHead>
+              <TableHead className="w-[120px]">Roles</TableHead>
               <TableHead className="w-[150px]">Department</TableHead>
               <TableHead className="w-[120px]">Joined Date</TableHead>
               <TableHead className="w-[150px] text-right">Actions</TableHead>
@@ -121,7 +121,18 @@ const Account = () => {
               <TableRow key={account.id}>
                 <TableCell className="font-medium">{account.name}</TableCell>
                 <TableCell>{account.email}</TableCell>
-                <TableCell className="capitalize">{account.role}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {account.roles?.map((role, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize"
+                      >
+                        {role}
+                      </span>
+                    ))}
+                  </div>
+                </TableCell>
                 <TableCell>{account.department?.name || '-'}</TableCell>
                 <TableCell>{formatDate(account.created_at)}</TableCell>
                 <TableCell className="text-right">

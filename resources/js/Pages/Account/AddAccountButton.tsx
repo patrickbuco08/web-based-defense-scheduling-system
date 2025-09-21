@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { useCreateAccount } from "@/features/accounts/mutations/useCreateAccount";
 import { useDepartments } from "@/features/departments/queries/useDepartments";
+import { useRoles } from "@/features/roles/queries/useRoles";
 import React, { useState } from "react";
 import { toast } from "sonner";
 
@@ -31,11 +33,13 @@ export function AddAccountButton() {
   const [open, setOpen] = useState(false);
   const { data: departments } = useDepartments();
   const createAccount = useCreateAccount();
+  const { data: roles, isLoading: isLoadingRoles } = useRoles();
+
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: null as string | null,
+    roles: [] as string[],
     department_id: null as number | null,
     password: "",
     password_confirmation: "",
@@ -56,12 +60,24 @@ export function AddAccountButton() {
     }));
   };
 
+  const handleRoleToggle = (role: string, checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: checked
+        ? [...prev.roles, role]
+        : prev.roles.filter(r => r !== role)
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.roles.length === 0) {
+      toast.error("Please select at least one role");
+      return;
+    }
     try {
       await createAccount.mutateAsync({
         ...formData,
-        role: formData.role || "", // Ensure role is not null when submitting
         department_id: formData.department_id,
       });
       setOpen(false);
@@ -69,14 +85,14 @@ export function AddAccountButton() {
       setFormData({
         name: "",
         email: "",
-        role: null,
+        roles: [],
         department_id: null,
         password: "",
         password_confirmation: "",
       });
       toast.success("Account created successfully");
     } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "Failed to delete defense";
+      const message = error?.response?.data?.message || error?.message || "Failed to create account";
 
       toast.error(message);
     }
@@ -115,23 +131,21 @@ export function AddAccountButton() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={formData.role || ""}
-                onValueChange={(value) => handleSelectChange("role", value || null)}
-                required
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="coordinator">Coordinator</SelectItem>
-                  <SelectItem value="adviser">Adviser</SelectItem>
-                  <SelectItem value="panelist">Panelist</SelectItem>
-                  <SelectItem value="student">Student</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>Roles (Select at least one)</Label>
+              <div className="space-y-2">
+                {roles?.map((role: any) => (
+                  <div key={role.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={role.id}
+                      checked={formData.roles.includes(role.name)}
+                      onCheckedChange={(checked) => handleRoleToggle(role.name, checked as boolean)}
+                    />
+                    <Label htmlFor={role.id} className="capitalize cursor-pointer">
+                      {role.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="department_id">Department</Label>

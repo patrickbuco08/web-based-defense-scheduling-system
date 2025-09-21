@@ -5,7 +5,7 @@ import { toast } from "sonner";
 export interface CreateAccountData {
   name: string;
   email: string;
-  role: string;
+  roles: string[];
   department_id?: number | null;
   password: string;
   password_confirmation: string;

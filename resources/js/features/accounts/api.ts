@@ -4,9 +4,9 @@ import { apiClient } from "@/lib/api-client";
 export interface AccountData {
   name: string;
   email: string;
-  role: string;
+  roles: string[];
   department_id?: number | null;
-  department: {
+  department?: {
     id: number;
     name: string;
   };
@@ -30,7 +30,7 @@ export const accountsApi = {
     data: {
       name?: string;
       email?: string;
-      role?: string;
+      roles?: string[];
       department_id?: number | null;
       department?: {
         id: number;
