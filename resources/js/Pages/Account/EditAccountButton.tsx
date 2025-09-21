@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -11,11 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { useRoles } from "@/features/roles/queries/useRoles";
-import { useDepartments } from "@/features/departments/queries/useDepartments";
-import { Loader2, Pencil } from "lucide-react";
 import { useUpdateAccount } from "@/features/accounts/mutations/useUpdateAccount";
+import { useDepartments } from "@/features/departments/queries/useDepartments";
+import { useRoles } from "@/features/roles/queries/useRoles";
+import { Loader2, Pencil } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface EditAccountButtonProps {
   account: {

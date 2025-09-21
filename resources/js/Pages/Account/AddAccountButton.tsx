@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,8 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDepartments } from "@/features/departments/queries/useDepartments";
 import { useCreateAccount } from "@/features/accounts/mutations/useCreateAccount";
+import { useDepartments } from "@/features/departments/queries/useDepartments";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
 interface Department {
@@ -75,8 +75,10 @@ export function AddAccountButton() {
         password_confirmation: "",
       });
       toast.success("Account created successfully");
-    } catch (error) {
-      console.error("Error creating account:", error);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || "Failed to delete defense";
+
+      toast.error(message);
     }
   };
 
@@ -132,7 +134,7 @@ export function AddAccountButton() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="department_id">Department (Optional)</Label>
+              <Label htmlFor="department_id">Department</Label>
               <Select
                 value={formData.department_id?.toString() || ""}
                 onValueChange={(value) =>

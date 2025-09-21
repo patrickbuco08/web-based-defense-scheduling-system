@@ -19,7 +19,7 @@ class AuthenticatedSessionController extends Controller
         if (Auth::check()) {
             return redirect()->intended('/app');
         }
-        
+
         return view('auth.login');
     }
 
@@ -33,6 +33,22 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         return redirect()->intended('/app');
+    }
+
+    /**
+     * Destroy an authenticated session.
+     */
+    /**
+     * Get the authenticated user with their roles.
+     */
+    public function getUser(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = $request->user();
+
+        return response()->json(array_merge($user->toArray(), [
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name')
+        ]));
     }
 
     /**

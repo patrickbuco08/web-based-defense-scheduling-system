@@ -12,6 +12,7 @@ use Bocum\Http\Controllers\DefenseController;
 use Bocum\Http\Controllers\Adviser\GroupController as AdviserGroupController;
 use Illuminate\Http\Request;
 use Bocum\Http\Controllers\AccountController;
+use Bocum\Http\Controllers\Auth\AuthenticatedSessionController;
 use Bocum\Http\Controllers\DepartmentController;
 use Bocum\Http\Controllers\Admin\PermissionController;
 use Bocum\Http\Controllers\Admin\RoleController;
@@ -35,10 +36,9 @@ Route::middleware('auth')->group(function () {
         return view('app.index');
     })->where('any', '.*')->name('app');
 
-    Route::get('/user', function (Request $request) {
-        return response()->json($request->user());
-    });
+    Route::get('/user', [AuthenticatedSessionController::class, 'getUser']);
 
+    Route::get('/accounts/departments', [AccountController::class, 'getAccountsByDepartment'])->name('accounts.index');
     Route::resource('accounts', AccountController::class)
         ->parameters(['accounts' => 'user'])
         ->except(['show']);

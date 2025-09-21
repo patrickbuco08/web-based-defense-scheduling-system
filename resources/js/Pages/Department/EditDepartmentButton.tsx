@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Edit } from "lucide-react";
+import { Edit, Pencil } from "lucide-react";
 import { useUpdateDepartment } from "@/features/departments/mutations/useUpdateDepartment";
 import { toast } from "sonner";
 
@@ -79,8 +79,9 @@ export function EditDepartmentButton({ department }: EditDepartmentButtonProps) 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Edit className="h-4 w-4" />
+      <Button variant="ghost" size="icon" className="text-blue-600 hover:text-blue-700">
+          <Pencil className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

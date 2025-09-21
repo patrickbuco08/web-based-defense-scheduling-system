@@ -5,3 +5,19 @@ $user->can('manage groups');  // Returns true if user has 'manage groups' permis
 $user->roles->pluck('name');
 $user->getAllPermissions()->pluck('name');
 exit
+Auth::id()
+$user = \Bocum]Models\User::find(1)
+$user = \Bocum]Models\User::find(1);
+$user = \Bocum\Models\User::find(1);
+$user->getRoleNames();
+$user->hasRole('admin');
+exit
+auth()->id()
+$user = Bocum\Models\User::find(1); // or the admin id
+$user->hasRole('admin');        // should be true
+$user->getRoleNames(); 
+composer dump-autoload
+php artisan permission:cache-reset
+clear
+php artisan permission:cache-reset
+exit

@@ -6,12 +6,12 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 $app = BocumApplication::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
+        web: __DIR__ . '/../routes/web.php',
         api: __DIR__ . '/../routes/api.php',
-        commands: __DIR__.'/../routes/console.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
-            require __DIR__.'/../routes/test.php';
+            require __DIR__ . '/../routes/test.php';
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -21,7 +21,9 @@ $app = BocumApplication::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest' => \Bocum\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
-    })
+    })->withProviders([
+        \Bocum\Providers\AuthServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
@@ -29,4 +31,3 @@ $app = BocumApplication::configure(basePath: dirname(__DIR__))
 $app->useAppPath($app->basePath('Bocum'));
 
 return $app;
-

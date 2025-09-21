@@ -4,11 +4,10 @@ namespace Bocum\Http\Controllers;
 
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class AccountController extends Controller
 {
@@ -20,8 +19,36 @@ class AccountController extends Controller
         $currentUser = Auth::user();
         $users = User::with(['roles', 'department'])
             ->where('id', '!=', $currentUser->id)
-            ->where('department_id', $currentUser->department_id)
-            ->whereDoesntHave('roles', function($query) {
+            ->whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'admin');
+            })
+            ->latest()
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->roles->first()?->name ?? 'user',
+                    'department' => $user->department ? [
+                        'id' => $user->department->id,
+                        'name' => $user->department->name,
+                    ] : null,
+                    'created_at' => $user->created_at,
+                    'email_verified_at' => $user->email_verified_at,
+                ];
+            });
+
+        return response()->json($users);
+    }
+
+    public function getAccountsByDepartment()
+    {
+        $currentUser = Auth::user();
+        $users = User::with(['roles', 'department'])
+            ->where('id', '!=', $currentUser->id)
+            ->where('department_id', $currentUser->department_id) //todo: remove this and implement  getAccountsByDepartment
+            ->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'admin');
             })
             ->latest()
@@ -51,6 +78,7 @@ class AccountController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', User::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -84,7 +112,6 @@ class AccountController extends Controller
                 'data' => $user,
                 'message' => 'User created successfully.'
             ], 201);
-            
         } catch (\Exception $e) {
             // Rollback the transaction on error
             DB::rollBack();

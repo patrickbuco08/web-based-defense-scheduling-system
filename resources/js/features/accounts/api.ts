@@ -6,6 +6,10 @@ export interface AccountData {
   email: string;
   role: string;
   department_id?: number | null;
+  department: {
+    id: number;
+    name: string;
+  };
   password: string;
   password_confirmation: string;
 }
@@ -17,6 +21,10 @@ export const accountsApi = {
     const response = await apiClient.get(API_BASE_URL);
     return response.data;
   },
+  getAccountsByDepartment: async () => {
+    const response = await apiClient.get(API_BASE_URL + '/departments');
+    return response.data;
+  },
   updateAccount: async (
     id: number,
     data: {
@@ -24,6 +32,10 @@ export const accountsApi = {
       email?: string;
       role?: string;
       department_id?: number | null;
+      department?: {
+        id: number;
+        name: string;
+      };
     }
   ) => {
     const response = await apiClient.put(`${API_BASE_URL}/${id}`, data);

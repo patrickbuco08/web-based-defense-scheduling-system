@@ -143,8 +143,6 @@ function Calendar() {
   const deleteDefense = useDeleteDefense();
   const { user } = useAuth();
 
-  console.log('delete defense', user?.id);
-
   const { data: defenses = [], refetch } = useDefenses();
   const [events, setEvents] = useState<any[]>([]);
 

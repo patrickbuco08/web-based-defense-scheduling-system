@@ -4,7 +4,7 @@ import { accountsApi } from "../api";
 export interface User {
     id: number;
     department_id: number;
-    
+
     name: string;
     email: string;
     email_verified_at: string | null;
@@ -12,10 +12,10 @@ export interface User {
     updated_at: string;
 }
 
-export function useAccounts() {
+export function useAccountByDepartments() {
     return useQuery<User[]>({
         queryKey: ['accounts'],
-        queryFn: () => accountsApi.getAccounts(),
+        queryFn: () => accountsApi.getAccountsByDepartment(),
         staleTime: 5 * 60 * 1000, // 5 minutes
         refetchOnWindowFocus: false,
     });

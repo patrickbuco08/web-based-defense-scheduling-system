@@ -94,7 +94,7 @@ const AdviserGroup = () => {
     };
 
     return (
-        <div className="w-full max-w-full px-6 py-8 space-y-6">
+        <div className="w-full max-w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
             <div className="flex justify-between items-center">
                 <div className="space-y-2">
                     <h1 className="text-2xl font-bold tracking-tight">Manage Groups</h1>
@@ -141,7 +141,7 @@ const AdviserGroup = () => {
                                                 {group.members?.length ? (
                                                     <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
                                                         {group.members.map((member, index) => (
-                                                            <div 
+                                                            <div
                                                                 key={member.id || index}
                                                                 className="flex items-center gap-3 p-2 rounded-md bg-muted/50 hover:bg-muted transition-colors"
                                                             >

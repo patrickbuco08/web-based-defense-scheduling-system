@@ -9,35 +9,32 @@ class AccountPolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function before(User $user, string $ability): ?bool
     {
-        return true; // Any authenticated user can view accounts
+        return $user->hasRole('admin') ? true : null;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return false; // non-admins denied; admins pass via before()
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user): bool
+    public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return true;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user): bool
+    public function view(User $user, User $target): bool
     {
-        return $user->hasRole('admin');
+        return $user->id === $target->id;
+    }
+
+    public function update(User $user, User $target): bool
+    {
+        return false;
+    }
+    public function delete(User $user, User $target): bool
+    {
+        return false;
     }
 }

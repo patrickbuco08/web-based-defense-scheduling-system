@@ -85,7 +85,7 @@ const ManageRoom = () => {
   }
 
   return (
-    <div className="w-full max-w-full px-6 py-8 space-y-6">
+    <div className="w-full max-w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Manage Rooms</h1>
         <p className="text-muted-foreground">
@@ -112,11 +112,10 @@ const ManageRoom = () => {
                 <TableCell>{room.building}</TableCell>
                 <TableCell>
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      room.is_active
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${room.is_active
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
-                    }`}
+                      }`}
                   >
                     {room.is_active ? "Active" : "Inactive"}
                   </span>

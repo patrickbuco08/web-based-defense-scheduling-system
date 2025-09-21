@@ -90,7 +90,7 @@ const ManageDepartment = () => {
     }
 
     return (
-        <div className="w-full max-w-full px-6 py-8 space-y-6">
+        <div className="w-full max-w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
             <div className="flex justify-between items-start">
                 <div className="space-y-2">
                     <h1 className="text-2xl font-bold tracking-tight">Manage Departments</h1>

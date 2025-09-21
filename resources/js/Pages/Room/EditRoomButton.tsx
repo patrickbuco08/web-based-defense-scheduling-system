@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { useUpdateRoom } from "@/features/rooms/mutations";
+import { Pencil } from "lucide-react";
 
 interface EditRoomButtonProps {
   room: {
@@ -59,8 +60,9 @@ export function EditRoomButton({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
-          Edit
+        <Button variant="ghost" size="icon" className="text-blue-600 hover:text-blue-700">
+          <Pencil className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
