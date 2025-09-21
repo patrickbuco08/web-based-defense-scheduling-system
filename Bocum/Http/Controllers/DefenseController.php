@@ -78,10 +78,32 @@ class DefenseController extends Controller
      * @param \Bocum\Models\Defense $defense
      * @return JsonResponse
      */
-    public function checkConflicts(Defense $defense): JsonResponse
+    public function checkConflicts(Request $request, Defense $defense): JsonResponse
     {
-        $roomConflicts = $this->conflictService->checkRoomConflict($defense->id);
-        $panelistConflicts = $this->conflictService->checkPanelistConflict($defense->id);
+        $validated = $request->validate([
+            'panelist_ids' => 'required|array',
+            'panelist_ids.*' => 'exists:users,id',
+            'proposed_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+            'room_id' => 'required|exists:rooms,id',
+        ]);
+
+        $roomConflicts = $this->conflictService->checkRoomConflict(
+            $defense,
+            $validated['room_id'],
+            $validated['proposed_date'],
+            $validated['start_time'],
+            $validated['end_time']
+        );
+
+        $panelistConflicts = $this->conflictService->checkPanelistConflict(
+            $defense->id,
+            $validated['panelist_ids'],
+            $validated['proposed_date'],
+            $validated['start_time'],
+            $validated['end_time']
+        );
 
         return response()->json([
             'success' => true,

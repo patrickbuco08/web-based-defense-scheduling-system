@@ -55,6 +55,7 @@ const RAW_RUNTIME_STATE =
           ["@tailwindcss/postcss", "npm:4.1.13"],\
           ["@tailwindcss/postcss7-compat", "npm:2.2.17"],\
           ["@tanstack/react-query", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:5.89.0"],\
+          ["@types/lodash", "npm:4.17.20"],\
           ["@types/node", "npm:24.5.2"],\
           ["@types/react", "npm:19.1.13"],\
           ["@types/react-dom", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:19.1.9"],\
@@ -71,6 +72,7 @@ const RAW_RUNTIME_STATE =
           ["date-fns", "npm:4.1.0"],\
           ["eslint", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:9.36.0"],\
           ["laravel-vite-plugin", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:1.3.0"],\
+          ["lodash", "npm:4.17.21"],\
           ["lucide-react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.544.0"],\
           ["next-themes", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.4.6"],\
           ["postcss", "npm:8.5.6"],\
@@ -6634,6 +6636,7 @@ const RAW_RUNTIME_STATE =
           ["@tailwindcss/postcss", "npm:4.1.13"],\
           ["@tailwindcss/postcss7-compat", "npm:2.2.17"],\
           ["@tanstack/react-query", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:5.89.0"],\
+          ["@types/lodash", "npm:4.17.20"],\
           ["@types/node", "npm:24.5.2"],\
           ["@types/react", "npm:19.1.13"],\
           ["@types/react-dom", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:19.1.9"],\
@@ -6650,6 +6653,7 @@ const RAW_RUNTIME_STATE =
           ["date-fns", "npm:4.1.0"],\
           ["eslint", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:9.36.0"],\
           ["laravel-vite-plugin", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:1.3.0"],\
+          ["lodash", "npm:4.17.21"],\
           ["lucide-react", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.544.0"],\
           ["next-themes", "virtual:dc3fc578bfa5e06182a4d2be39ede0bc5b74940b1ffe0d70c26892ab140a4699787750fba175dc306292e80b4aa2c8c5f68c2a821e69b2c37e360c0dff36ff66#npm:0.4.6"],\
           ["postcss", "npm:8.5.6"],\

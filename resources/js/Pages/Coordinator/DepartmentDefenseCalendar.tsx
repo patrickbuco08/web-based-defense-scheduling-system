@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useCallback, useMemo, useState } from "react"
 import FullCalendar from "@fullcalendar/react";
 import { useDefenseDepartments } from "@/features/defenses/queries/useDefenseDepartments";
 import { useUpdateDefense } from "@/features/defenses/mutations/useUpdateDefense";
+import { useCheckDefenseConflicts } from "@/features/defenses/mutations/useCheckDefenseConflicts";
 import { useRooms } from "@/features/rooms/queries/useRooms";
 import { useAccounts } from "@/features/accounts/queries/useAccounts";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -18,6 +19,7 @@ import {
     CalendarIcon,
     EditIcon,
     GraduationCapIcon,
+    AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { format, parseISO, formatISO } from "date-fns";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import debounce from 'lodash/debounce';
 
 interface FormData {
     title: string;
@@ -63,13 +66,45 @@ function DepartmentDefenseCalendar() {
         rejection_note: '',
     });
 
-    console.log(selectedDefense)
-
     const { data: defenses = [], refetch } = useDefenseDepartments();
     const { data: rooms = [] } = useRooms();
     const { data: accounts = [] } = useAccounts();
     const updateDefense = useUpdateDefense();
+    const checkConflicts = useCheckDefenseConflicts();
     const [events, setEvents] = useState<any[]>([]);
+    const [conflicts, setConflicts] = useState<{
+        room_conflicts: { has_conflict: boolean; message: string; conflicts: any[] };
+        panelist_conflicts: { has_conflict: boolean; message: string; conflicts: any[] };
+        has_any_conflicts: boolean;
+    } | null>(null);
+    const [isCheckingConflicts, setIsCheckingConflicts] = useState(false);
+    // Debounced check conflicts function using lodash
+    const debouncedCheckRef = useRef(
+        debounce(async (defenseId: number, formData: any) => {
+            if (!formData.room_id || !formData.date || !formData.start_time || !formData.end_time) {
+                setConflicts(null);
+                return;
+            }
+
+            setIsCheckingConflicts(true);
+            try {
+                const result = await checkConflicts.mutateAsync({
+                    defenseId,
+                    panelist_ids: formData.panelists,
+                    proposed_date: formData.date,
+                    start_time: formData.start_time,
+                    end_time: formData.end_time,
+                    room_id: parseInt(formData.room_id),
+                });
+                setConflicts(result.data);
+            } catch (error) {
+                console.error('Error checking conflicts:', error);
+                setConflicts(null);
+            } finally {
+                setIsCheckingConflicts(false);
+            }
+        }, 500) // 500ms debounce
+    );
 
     // Memoize the getEventColor function since it doesn't depend on component state/props
     const getEventColor = useCallback((status: string) => {
@@ -80,6 +115,26 @@ function DepartmentDefenseCalendar() {
             default: return '#f59e0b';
         }
     }, []);
+
+    // useEffect to trigger the debounced conflict check
+    useEffect(() => {
+        if (isDialogOpen && selectedDefense?.id) {
+            debouncedCheckRef.current(selectedDefense.id, formData);
+        }
+
+        // Cleanup function to cancel any pending debounced calls
+        return () => {
+            debouncedCheckRef.current.cancel();
+        };
+    }, [
+        formData.room_id,
+        formData.date,
+        formData.start_time,
+        formData.end_time,
+        formData.panelists,
+        isDialogOpen,
+        selectedDefense?.id
+    ]);
 
     // Memoize the potential panelists to prevent unnecessary recalculations
 
@@ -132,6 +187,7 @@ function DepartmentDefenseCalendar() {
         setIsDialogOpen(true);
         setIsEditMode(false);
         setInitialStatus(defense.status);
+        setConflicts(null); // Reset conflicts when opening dialog
     };
 
     const handleSaveChanges = async () => {
@@ -265,6 +321,19 @@ function DepartmentDefenseCalendar() {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Room Conflict Display */}
+                            {conflicts?.room_conflicts?.has_conflict && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                    <div className="flex items-start gap-2">
+                                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <h4 className="text-sm font-medium text-red-800">Room Conflict Detected</h4>
+                                            <p className="text-sm text-red-700 mt-1">{conflicts.room_conflicts.message}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="space-y-2">
                                 <div className="flex flex-col md:flex-row gap-4">
@@ -433,6 +502,19 @@ function DepartmentDefenseCalendar() {
                                 </div>
                             </div>
 
+                            {/* Panelist Conflict Display */}
+                            {conflicts?.panelist_conflicts?.has_conflict && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                    <div className="flex items-start gap-2">
+                                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                            <h4 className="text-sm font-medium text-red-800">Panelist Conflict Detected</h4>
+                                            <p className="text-sm text-red-700 mt-1">{conflicts.panelist_conflicts.message}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Notes - Disabled */}
                             <div className="space-y-2">
                                 <Label htmlFor="notes">Notes</Label>
@@ -448,12 +530,20 @@ function DepartmentDefenseCalendar() {
                     )}
 
                     {!['rejected', 'cancelled'].includes(initialStatus) && (
-                        <DialogFooter>
+                        <DialogFooter className="flex flex-col gap-2">
+                            {isCheckingConflicts && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                                    Checking for conflicts...
+                                </div>
+                            )}
                             <Button
                                 onClick={handleSaveChanges}
-                                disabled={updateDefense.isPending}
+                                disabled={updateDefense.isPending || conflicts?.has_any_conflicts || isCheckingConflicts}
                             >
                                 {updateDefense.isPending ? "Saving..." :
+                                    isCheckingConflicts ? "Checking..." :
+                                    conflicts?.has_any_conflicts ? "Cannot Save - Conflicts Detected" :
                                     initialStatus === 'approved' && formData.status === 'cancelled' ? "Cancel Defense" :
                                         "Save Changes"}
                             </Button>

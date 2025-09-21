@@ -54,8 +54,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('critics', [CriticController::class, 'index'])->name('critics.index');
 
-    Route::get('defenses/conflicts/check/{defense}', [DefenseController::class, 'checkConflicts'])
-    ->name('defenses.conflicts.check');
+    Route::post('defenses/{defense}/check-conflicts', [DefenseController::class, 'checkConflicts'])->name('defenses.conflicts.check');
     Route::get('defenses/departments', [DefenseController::class, 'departmentIndex'])->name('defenses.departmentIndex');
     Route::resource('defenses', DefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy', 'update']);
 
