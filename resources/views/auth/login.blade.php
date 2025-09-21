@@ -1,47 +1,92 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.ts'])
+</head>
+<body class="font-sans text-gray-900 antialiased">
+    <div class="min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-fixed"
+         style="background-image: url('{{ asset('images/background.webp') }}');">
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        <div class="w-full max-w-md p-8 space-y-6 bg-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/20">
+            <!-- Logo and Title -->
+            <div class="flex flex-col items-center justify-center mb-6">
+                <img src="{{ asset('images/cct-logo.png') }}" alt="CCT Logo" class="h-20 w-auto mb-4">
+                <h1 class="text-2xl font-bold text-white tracking-wider text-center">
+                    CCT DEFENSE SCHEDULING
+                </h1>
+            </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <!-- Welcome Message -->
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-white">Welcome back</h2>
+                <p class="text-white/80">Please enter your credentials to log in.</p>
+            </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+            <!-- Session Status -->
+            @if (session('status'))
+                <div class="mb-4 font-medium text-sm text-green-300">
+                    {{ session('status') }}
+                </div>
             @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                @csrf
+
+                <!-- Email Address -->
+                <div>
+                    <label for="email" class="block mb-2 text-sm font-medium text-white/80">Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username"
+                           class="w-full px-4 py-2 text-gray-900 bg-white/50 border border-transparent rounded-lg focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500"
+                           placeholder="you@example.com">
+                    @error('email')
+                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block mb-2 text-sm font-medium text-white/80">Password</label>
+                    <input id="password" type="password" name="password" required autocomplete="current-password"
+                           class="w-full px-4 py-2 text-gray-900 bg-white/50 border border-transparent rounded-lg focus:ring-indigo-500 focus:border-indigo-500 placeholder-gray-500"
+                           placeholder="••••••••">
+                    @error('password')
+                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label for="remember_me" class="inline-flex items-center">
+                        <input id="remember_me" type="checkbox" name="remember" class="rounded h-4 w-4 text-indigo-600 bg-white/30 border-transparent focus:ring-indigo-500">
+                        <span class="ms-2 text-sm text-white/80">Remember me</span>
+                    </label>
+
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="text-sm text-indigo-300 hover:text-indigo-100 underline">
+                            Forgot your password?
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Log in Button -->
+                <div>
+                    <button type="submit" class="w-full px-4 py-3 font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-900 transition-colors duration-300">
+                        Log in
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
-</x-guest-layout>
+    </div>
+</body>
+</html>

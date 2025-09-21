@@ -172,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <a href="#">
                 <IconInnerShadowTop className="!size-5" />
                 <span className="text-base font-semibold">
-                  Thesis Defense Schedule
+                  CCT Defense Scheduling
                 </span>
               </a>
             </SidebarMenuButton>

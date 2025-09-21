@@ -66,6 +66,7 @@ class AccountController extends Controller
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
+                'email_verified_at' => now(),
                 'password' => bcrypt($validated['password']),
                 'department_id' => $validated['department_id'] ?? null,
             ]);

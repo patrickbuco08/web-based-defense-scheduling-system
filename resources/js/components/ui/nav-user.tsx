@@ -1,18 +1,17 @@
 import React from "react";
 
 import {
-  IconCreditCard,
   IconDotsVertical,
-  IconLogout,
-  IconNotification,
   IconUserCircle,
-} from "@tabler/icons-react"
+} from "@tabler/icons-react";
+
+import { Loader2, LogOut } from 'lucide-react';
 
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar"
+} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,13 +20,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { useLogoutMutation } from "@/features/auth/mutations/useLogout";
 
 export function NavUser({
   user,
@@ -39,6 +39,12 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const logoutMutation = useLogoutMutation();
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    logoutMutation.mutate();
+  };
 
   return (
     <SidebarMenu>
@@ -86,21 +92,22 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <IconUserCircle />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
+                <a href="/profile">
+                  Profile
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Log out
+            <DropdownMenuItem
+              onClick={handleLogout}
+              disabled={logoutMutation.isPending}
+            >
+              {logoutMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="mr-2 h-4 w-4" />
+              )}
+              <span>{logoutMutation.isPending ? 'Logging out...' : 'Log out'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

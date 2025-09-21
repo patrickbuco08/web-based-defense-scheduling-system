@@ -18,7 +18,10 @@ use Bocum\Http\Controllers\Admin\RoleController;
 use Bocum\Http\Controllers\CriticController;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect('/app');
+    }
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
@@ -30,7 +33,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/app/{any?}', function () {
         return view('app.index');
-    })->where('any', '.*');
+    })->where('any', '.*')->name('app');
 
     Route::get('/user', function (Request $request) {
         return response()->json($request->user());

@@ -19,6 +19,7 @@ $app = BocumApplication::configure(basePath: dirname(__DIR__))
             'role' => \Bocum\Http\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'guest' => \Bocum\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

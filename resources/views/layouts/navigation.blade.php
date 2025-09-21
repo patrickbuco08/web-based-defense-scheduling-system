@@ -12,41 +12,10 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <x-nav-link :href="route('app')" :active="request()->routeIs('App')">
+                        {{ __('App') }}
                     </x-nav-link>
-                    
-                    {{-- <x-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.index')">
-                        {{ __('Calendar') }}
-                    </x-nav-link> --}}
 
-                    @can('manage terms')
-                        <x-nav-link :href="route('terms.index')" :active="request()->routeIs('terms.*')">
-                            {{ __('Terms') }}
-                        </x-nav-link>
-                    @endcan
-
-                    @can('manage rooms')
-                        <x-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')">
-                            {{ __('Rooms') }}
-                        </x-nav-link>
-                    @endcan
-
-                    @can('manage coordinators')
-                        <x-nav-link :href="route('admin.coordinators.index')" :active="request()->routeIs('admin.coordinators.*')">
-                            {{ __('Coordinators') }}
-                        </x-nav-link>
-                    @endcan
-
-                    @can('manage groups')
-                        <x-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">
-                            {{ __('Groups') }}
-                        </x-nav-link>
-
-                        <x-nav-link :href="route('defenses.index')" :active="request()->routeIs('adviser.defenses.*')">
-                            {{ __('My Defenses') }}
-                        </x-nav-link>
-                    @endcan
                 </div>
             </div>
 
@@ -110,28 +79,10 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            
+
             {{-- <x-responsive-nav-link :href="route('calendar.index')" :active="request()->routeIs('calendar.index')">
                 {{ __('Calendar') }}
             </x-responsive-nav-link> --}}
-
-            @can('manage terms')
-                <x-responsive-nav-link :href="route('terms.index')" :active="request()->routeIs('terms.*')">
-                    {{ __('Terms') }}
-                </x-responsive-nav-link>
-            @endcan
-
-            @can('manage rooms')
-                <x-responsive-nav-link :href="route('admin.rooms.index')" :active="request()->routeIs('admin.rooms.*')">
-                    {{ __('Rooms') }}
-                </x-responsive-nav-link>
-            @endcan
-
-            @can('manage coordinators')
-                <x-responsive-nav-link :href="route('admin.coordinators.index')" :active="request()->routeIs('admin.coordinators.*')">
-                    {{ __('Coordinators') }}
-                </x-responsive-nav-link>
-            @endcan
 
             @can('manage groups')
                 <x-responsive-nav-link :href="route('adviser.groups.index')" :active="request()->routeIs('adviser.groups.*')">

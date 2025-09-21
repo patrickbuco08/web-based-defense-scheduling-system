@@ -6,5 +6,9 @@ export const authApi = {
     const response = await apiClient.get("/user");
     return response.data;
   },
+  logout: async () => {
+    const response = await apiClient.post("/logout");
+    return response.data;
+  },
   // Add other auth-related API calls here
 };
