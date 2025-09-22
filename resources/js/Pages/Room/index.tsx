@@ -11,6 +11,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditRoomButton } from "./EditRoomButton";
 import { DeleteRoomButton } from "./DeleteRoomButton";
+import { AddRoomButton } from "./AddRoomButton";
 
 const ManageRoom = () => {
   const { data: rooms, isLoading, error } = useRooms();
@@ -86,11 +87,14 @@ const ManageRoom = () => {
 
   return (
     <div className="w-full max-w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Manage Rooms</h1>
-        <p className="text-muted-foreground">
-          View and manage all available rooms for defense scheduling
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">Manage Rooms</h1>
+          <p className="text-muted-foreground">
+            View and manage all available rooms for defense scheduling
+          </p>
+        </div>
+        <AddRoomButton />
       </div>
 
       <div className="rounded-md border">
