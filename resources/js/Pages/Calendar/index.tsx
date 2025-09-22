@@ -493,7 +493,7 @@ function Calendar() {
             </div>
           )}
 
-          {user?.id === selectedDefense?.approved_by_id && (
+          {user?.id === selectedDefense?.adviser_id && (
 
             <DialogFooter className="sm:justify-between">
               <Button

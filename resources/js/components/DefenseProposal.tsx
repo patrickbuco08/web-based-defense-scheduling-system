@@ -23,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ErrorResponseInterface } from "@/features/types";
+import { AxiosError } from "axios";
 
 type FormData = {
   title: string;
@@ -49,7 +51,7 @@ export function DefenseProposal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     createDefense({
       ...data,
       group_id: data.group_id,
@@ -59,9 +61,16 @@ export function DefenseProposal() {
         reset();
         toast.success("Defense scheduled successfully!");
       },
-      onError: () => {
-        toast.error("Failed to schedule defense. Please try again.");
-      }
+      onError: (error: AxiosError<ErrorResponseInterface>) => {
+        console.error("Error deleting account:", error);
+
+        const errorMessage = error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to schedule defense. Please try again.";
+
+        toast.error(errorMessage);
+      },
     });
   };
 

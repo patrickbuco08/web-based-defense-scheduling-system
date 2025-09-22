@@ -25,6 +25,21 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// routes/web.php (dev only)
+Route::get('/test-mail', function () {
+    $user = \Bocum\Models\User::first();
+    $defense = (object)[
+        'title' => 'Thesis: Smart Scheduling',
+        'scheduled_at' => now()->addDays(2),
+        'location' => 'Room 301',
+    ];
+
+    // OR Mailable variant:
+    Illuminate\Support\Facades\Mail::to($user->email)->send(new \Bocum\Mail\DefenseProposalMail($defense, $user));
+
+    return 'Sent! Check Mailtrap.';
+})->middleware('auth');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Bocum\Services\DefenseConflictService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Mail;
+use Bocum\Mail\DefenseProposalMail;
+use Bocum\Models\User;
 
 class DefenseController extends Controller
 {
@@ -257,7 +260,15 @@ class DefenseController extends Controller
                 $defense->panelists()->attach($request->panelists);
             }
 
+            $adviser = Auth::user();
+            $coordinator = User::role('coordinator')
+                ->where('department_id', $adviser->department_id)
+                ->firstOrFail();
+
+            Mail::to($coordinator->email)->send(new DefenseProposalMail($defense, $adviser));
+
             DB::commit();
+
 
             return response()->json([
                 'success' => true,
@@ -273,8 +284,8 @@ class DefenseController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while submitting the defense proposal. Please try again.',
-            ]);
+                'message' => $e->getMessage(),
+            ], 400);
         }
     }
 

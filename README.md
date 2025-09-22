@@ -74,3 +74,8 @@ php artisan db:seed --class=RolesAndAdminSeeder
 ```
 yarn dlx @yarnpkg/sdks vscode
 ```
+
+## Run Queue Worker
+```
+php artisan queue:work
+```
