@@ -217,7 +217,7 @@ function DepartmentDefenseCalendar() {
                     <p className="text-gray-600">Manage and coordinate defense schedules</p>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <div className="w-48">
+                    <div className="w-auto">
                         <Select value={statusFilter} onValueChange={setStatusFilter}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Filter by status" />

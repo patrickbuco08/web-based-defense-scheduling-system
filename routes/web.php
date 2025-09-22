@@ -51,7 +51,7 @@ Route::middleware('auth')->group(function () {
     // Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
     Route::get('terms/active', [TermController::class, 'activeTerm'])->name('terms.active');
-    Route::resource('terms', TermController::class)->except(['show']);
+    Route::resource('terms', TermController::class)->except(['show', 'create', 'edit']);
 
     Route::resource('departments', DepartmentController::class)->except(['show', 'create', 'edit']);
 

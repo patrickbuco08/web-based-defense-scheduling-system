@@ -49,10 +49,10 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
 
   const [members, setMembers] = useState<Array<{ id: number; name: string }>>(
     group.members && group.members.length > 0
-      ? group.members.map((m) => ({ 
-          id: Date.now() + Math.random(), 
-          name: m.student_name 
-        }))
+      ? group.members.map((m) => ({
+        id: Date.now() + Math.random(),
+        name: m.student_name
+      }))
       : [{ id: Date.now(), name: "" }]
   );
 
@@ -190,7 +190,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
               <Select
                 name="department_id"
                 value={formData.department_id?.toString()}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setFormData(prev => ({ ...prev, department_id: Number(value) }))
                 }
                 required
@@ -208,14 +208,14 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
               </Select>
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
+            {activeTerm && (<div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="term_id" className="text-right">
                 Term
               </Label>
               <Select
                 name="term_id"
                 value={formData.term_id?.toString()}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setFormData(prev => ({ ...prev, term_id: Number(value) }))
                 }
                 disabled={!!activeTerm}
@@ -225,20 +225,13 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
                   <SelectValue placeholder="Select Term" />
                 </SelectTrigger>
                 <SelectContent>
-                  {activeTerm ? (
-                    <SelectItem value={activeTerm.id.toString()}>
-                      {activeTerm.school_year} - {activeTerm.semester}
-                    </SelectItem>
-                  ) : (
-                    HARDCODED_TERMS.map((term) => (
-                      <SelectItem key={term.id} value={term.id.toString()}>
-                        {term.school_year} - {term.semester}
-                      </SelectItem>
-                    ))
-                  )}
+                  <SelectItem value={activeTerm.id.toString()}>
+                    {activeTerm.school_year} - {activeTerm.semester}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            )}
 
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="critic_id" className="text-right">
@@ -247,7 +240,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
               <Select
                 name="critic_id"
                 value={formData.critic_id?.toString() || "none"}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setFormData(prev => ({ ...prev, critic_id: value !== "none" ? Number(value) : null }))
                 }
               >
@@ -277,10 +270,10 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label>Members</Label>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={handleAddMember}
                   className="h-8"
                 >

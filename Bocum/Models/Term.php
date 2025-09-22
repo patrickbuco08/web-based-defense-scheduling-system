@@ -35,7 +35,12 @@ class Term extends Model
     {
         return $this->hasMany(Defense::class);
     }
-    
+
+    public function groups(): HasMany
+    {
+        return $this->hasMany(Group::class);
+    }
+
     /**
      * Scope a query to only include the current term.
      */

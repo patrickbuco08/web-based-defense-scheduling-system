@@ -15,11 +15,9 @@ class TermController extends Controller
      */
     public function index()
     {
-        $terms = Term::orderByDesc('is_current')
-            ->orderByDesc('id')
-            ->paginate(10);
+        $terms = Term::orderBy('id', 'desc')->get();
 
-        return view('admin.terms.index', compact('terms'));
+        return response()->json($terms);
     }
 
     // lets create a new endpoint to get the active term
@@ -31,21 +29,13 @@ class TermController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('admin.terms.create');
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'school_year' => 'required|string|max:9|regex:/^\d{4}-\d{4}$/',
-            'semester' => 'required|string|in:1st,2nd,Summer',
+            'semester' => 'required|string',
             'is_current' => 'sometimes|boolean',
         ]);
 
@@ -57,8 +47,10 @@ class TermController extends Controller
 
             Term::create($validated);
 
-            return redirect()->route('admin.terms.index')
-                ->with('status', 'Term created successfully.');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Term created successfully.',
+            ]);
         });
     }
 
@@ -85,7 +77,7 @@ class TermController extends Controller
     {
         $validated = $request->validate([
             'school_year' => 'required|string|max:9|regex:/^\d{4}-\d{4}$/',
-            'semester' => 'required|string|in:1st,2nd,Summer',
+            'semester' => 'required|string',
             'is_current' => 'sometimes|boolean',
         ]);
 
@@ -99,8 +91,10 @@ class TermController extends Controller
 
             $term->update($validated);
 
-            return redirect()->route('admin.terms.index')
-                ->with('status', 'Term updated successfully.');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Term updated successfully.',
+            ]);
         });
     }
 
@@ -111,17 +105,25 @@ class TermController extends Controller
     {
         // Prevent deletion if this is the current term
         if ($term->is_current) {
-            return back()->with('error', 'Cannot delete the current term. Please set another term as current first.');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot delete the current term. Please set another term as current first.',
+            ], 400);
         }
 
         // Prevent deletion if there are associated defenses
-        if ($term->defenses()->exists()) {
-            return back()->with('error', 'Cannot delete term with associated defenses.');
+        if ($term->groups()->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot delete term with associated groups.',
+            ], 400);
         }
 
         $term->delete();
 
-        return redirect()->route('admin.terms.index')
-            ->with('status', 'Term deleted successfully.');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Term deleted successfully.',
+        ]);
     }
 }

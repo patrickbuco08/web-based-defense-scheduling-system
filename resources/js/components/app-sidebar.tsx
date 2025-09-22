@@ -71,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         name: "Manage Terms",
-        url: "#",
+        url: "/app/admin/terms",
         icon: IconBuilding,
       },
     ],
@@ -133,7 +133,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   const isAdviser = user.roles.includes('admin');
-  console.log(isAdviser);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>

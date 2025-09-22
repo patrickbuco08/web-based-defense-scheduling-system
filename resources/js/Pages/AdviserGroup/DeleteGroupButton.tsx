@@ -38,7 +38,7 @@ export const DeleteGroupButton: React.FC<DeleteGroupButtonProps> = ({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="ghost" size="sm">
           <Trash2 className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>
