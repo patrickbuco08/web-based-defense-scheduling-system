@@ -28,11 +28,7 @@ Route::get('/', function () {
 // routes/web.php (dev only)
 Route::get('/test-mail', function () {
     $user = \Bocum\Models\User::first();
-    $defense = (object)[
-        'title' => 'Thesis: Smart Scheduling',
-        'scheduled_at' => now()->addDays(2),
-        'location' => 'Room 301',
-    ];
+    $defense = \Bocum\Models\Defense::where('status', 'approved')->first();
 
     // OR Mailable variant:
     Illuminate\Support\Facades\Mail::to($user->email)->send(new \Bocum\Mail\DefenseProposalMail($defense, $user));
