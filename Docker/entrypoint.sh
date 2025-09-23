@@ -23,6 +23,8 @@ if [ "$APP_ENV" = "production" ]; then
     php artisan config:cache
     php artisan route:cache
     php artisan view:cache
+
+    php artisan queue:work
 fi
 
 # if you're not using nginx

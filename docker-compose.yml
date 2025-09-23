@@ -12,7 +12,8 @@ services:
     volumes:
       - ./:/var/www
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       - APP_ENV=${APP_ENV}
       - CONTAINER_ROLE=app
@@ -48,6 +49,11 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     volumes:
       - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USERNAME}", "-p${MYSQL_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - bocum_network
 

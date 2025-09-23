@@ -265,7 +265,7 @@ class DefenseController extends Controller
                 ->where('department_id', $adviser->department_id)
                 ->firstOrFail();
 
-            Mail::to($coordinator->email)->send(new DefenseProposalMail($defense, $adviser));
+            Mail::to($coordinator->email)->queue(new DefenseProposalMail($defense, $adviser));
 
             DB::commit();
 
