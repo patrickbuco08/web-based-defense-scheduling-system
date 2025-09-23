@@ -1,13 +1,13 @@
 @extends('mail.layouts.app')
 
-@section('title', 'Defense Schedule Approved')
+@section('title', 'Defense Schedule Cancelled')
 
 @section('content')
-    <h2 style="color:#601818; margin-bottom:20px;">Defense Schedule Approved</h2>
+    <h2 style="color:#601818; margin-bottom:20px;">Defense Schedule Cancelled</h2>
 
     <p style="font-size:14px; color:#333; line-height:1.6;">
-        The defense schedule for the group below has been <strong>APPROVED</strong>.
-        Please see the finalized details and prepare accordingly.
+        The following defense schedule has been <strong style="color:#a00;">CANCELLED</strong> by the department coordinator.
+        Please disregard this schedule and wait for further instructions.
     </p>
 
     <table cellpadding="0" cellspacing="0"
@@ -22,10 +22,10 @@
         </tr>
         <tr>
             <td style="padding:12px; background-color:#f9f9f9; font-weight:bold;">Critic/Statistician</td>
-            <td style="padding:12px;">{{ $defense->group->critic?->name ?? 'Not assigned' }}</td>
+            <td style="padding:12px;">{{ $defense->group->critic->name }}</td>
         </tr>
         <tr>
-            <td style="padding:12px; background-color:#f9f9f9; font-weight:bold;">Final Schedule</td>
+            <td style="padding:12px; background-color:#f9f9f9; font-weight:bold;">Original Schedule</td>
             <td style="padding:12px;">{{ $defense->formatted_date }} &middot; {{ $defense->formatted_time }}</td>
         </tr>
         <tr>
@@ -35,35 +35,27 @@
         <tr>
             <td style="padding:12px; background-color:#f9f9f9; font-weight:bold; vertical-align:top;">Panelists</td>
             <td style="padding:12px;">
-                @if ($defense->panelists->isNotEmpty())
-                    <ul style="margin:0; padding-left:18px; font-size:14px; color:#333; line-height:1.6;">
-                        @foreach ($defense->panelists as $panelist)
-                            <li>{{ $panelist->name }}
-                                @if ($panelist->pivot->role)
-                                    &mdash; <em>{{ ucfirst($panelist->pivot->role) }}</em>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p style="margin:0; font-size:14px; color:#666;">No panelists assigned yet.</p>
-                @endif
+                <ul style="margin:0; padding-left:18px; font-size:14px; color:#333; line-height:1.6;">
+                    @foreach ($defense->panelists as $panelist)
+                        <li>{{ $panelist->name }} &mdash; <em>{{ $panelist->pivot->role }}</em></li>
+                    @endforeach
+                </ul>
             </td>
         </tr>
     </table>
 
-    <p style="font-size:14px; color:#333;">
-        For more details, please log in to the system.
+    <p style="font-size:14px; color:#333; line-height:1.6;">
+        For more details, please log in to the system or contact your coordinator.
     </p>
 
     <p style="text-align:center; margin:28px 0;">
-        <a href="{{ url('/app') }}"
+        <a href="http://127.0.0.1:8000/calendar"
             style="background-color:#601818; color:#ffffff; text-decoration:none; padding:12px 20px; border-radius:6px; font-size:14px; font-weight:bold;">
-            View Schedule
+            View Calendar
         </a>
     </p>
 
     <p style="font-size:12px; color:#666; margin-top:24px;">
-        If you have questions or scheduling concerns, please contact your department coordinator.
+        This is an automated notification. Please disregard the cancelled schedule.
     </p>
 @endsection

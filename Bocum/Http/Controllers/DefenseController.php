@@ -18,6 +18,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Bocum\Mail\DefenseProposalMail;
 use Bocum\Mail\DefenseScheduleApproved;
+use Bocum\Mail\DefenseScheduleCancelled;
+use Bocum\Mail\DefenseScheduleRejected;
 use Bocum\Models\User;
 
 class DefenseController extends Controller
@@ -168,17 +170,46 @@ class DefenseController extends Controller
                 $defense->panelists()->sync($request->panelists);
             }
 
-            // send email notification
-            $recipients = collect([$defense->adviser])
-                ->merge($defense->panelists)
-                ->filter()
-                ->pluck('email')
-                ->unique()
-                ->values()
-                ->all();
+            switch ($request->status) {
+                case 'approved':
+                    $recipients = collect([$defense->adviser, $defense->critic])
+                        ->merge($defense->panelists)
+                        ->filter()
+                        ->pluck('email')
+                        ->unique()
+                        ->values()
+                        ->all();
 
-            if (!empty($recipients)) {
-                Mail::to($recipients)->queue(new DefenseScheduleApproved($defense));
+                    if (!empty($recipients)) {
+                        Mail::to($recipients)->queue(new DefenseScheduleApproved($defense));
+                    }
+                    break;
+
+                case 'rejected':
+                    $adviser = $defense->adviser;
+                    if ($adviser && $adviser->email) {
+                        Mail::to($adviser->email)->queue(new DefenseScheduleRejected($defense, $adviser));
+                    }
+                    break;
+
+                case 'cancelled':
+                    $recipients = collect([$defense->adviser, $defense->critic])
+                        ->merge($defense->panelists)
+                        ->filter()
+                        ->pluck('email')
+                        ->unique()
+                        ->values()
+                        ->all();
+
+                    if (!empty($recipients)) {
+                        Mail::to($recipients)->queue(new DefenseScheduleCancelled($defense));
+                    }
+                    break;
+
+                // Add more cases for other statuses if needed
+                default:
+                    // No action needed for other statuses
+                    break;
             }
 
             return response()->json([

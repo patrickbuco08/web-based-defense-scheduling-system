@@ -26,7 +26,7 @@ Route::get('/', function () {
 });
 
 // routes/web.php (dev only)
-// php artisan make:mail DefenseScheduleApproved --markdown=mail.defenses.approved
+// php artisan make:mail DefenseScheduleCancelled --markdown=mail.defenses.cancelled
 Route::get('/test-mail', function () {
     $defense = \Bocum\Models\Defense::with(['adviser', 'panelists'])->where('status', 'approved')->first();
 
@@ -59,8 +59,6 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-
-
     Route::get('/app/{any?}', function () {
         return view('app.index');
     })->where('any', '.*')->name('app');
@@ -75,9 +73,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Calendar (visible to all authenticated for MVP)
-    // Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
 
     Route::get('terms/active', [TermController::class, 'activeTerm'])->name('terms.active');
     Route::resource('terms', TermController::class)->except(['show', 'create', 'edit']);
@@ -95,19 +90,9 @@ Route::middleware('auth')->group(function () {
     // Admin-only
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('rooms/{room}/toggle-status', [RoomController::class, 'toggleStatus'])->name('rooms.toggle-status');
-        Route::resource('coordinators', CoordinatorController::class)->only(['index', 'create', 'store', 'destroy']);
-
-        // Roles API
         Route::resource('roles', RoleController::class)->except(['edit', 'create']);
-
-        // Permissions & Departments API
         Route::get('permissions', [PermissionController::class, 'index']);
     });
-
-    // Coordinator-only
-    // Route::middleware('role:coordinator')->prefix('coordinator')->name('coordinator.')->group(function () {
-    //     Route::resource('defenses', DefenseController::class)->except(['show']);
-    // });
 
     // Adviser-only
     Route::middleware('role:adviser')->prefix('adviser')->name('adviser.')->group(function () {
