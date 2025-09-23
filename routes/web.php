@@ -26,14 +26,32 @@ Route::get('/', function () {
 });
 
 // routes/web.php (dev only)
+// php artisan make:mail DefenseScheduleApproved --markdown=mail.defenses.approved
 Route::get('/test-mail', function () {
-    $user = \Bocum\Models\User::first();
-    $defense = \Bocum\Models\Defense::where('status', 'approved')->first();
+    $defense = \Bocum\Models\Defense::with(['adviser', 'panelists'])->where('status', 'approved')->first();
 
-    // OR Mailable variant:
-    Illuminate\Support\Facades\Mail::to($user->email)->send(new \Bocum\Mail\DefenseProposalMail($defense, $user));
+    if (!$defense) {
+        return 'No approved defense found.';
+    }
 
-    return 'Sent! Check Mailtrap.';
+    // Get all unique recipient emails
+    $recipients = collect([$defense->adviser])
+        ->merge($defense->panelists)
+        ->filter()
+        ->pluck('email')
+        ->unique()
+        ->values()
+        ->all();
+
+    if (empty($recipients)) {
+        return 'No valid email recipients found for this defense.';
+    }
+
+    // Send a single email to all recipients
+    Illuminate\Support\Facades\Mail::to($recipients)
+        ->queue(new \Bocum\Mail\DefenseScheduleApproved($defense));
+
+    return 'Sent email to ' . count($recipients) . ' recipients. Check Mailtrap.';
 })->middleware('auth');
 
 Route::get('/dashboard', function () {

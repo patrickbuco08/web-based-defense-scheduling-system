@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import FullCalendar from "@fullcalendar/react";
 import { useDefenses } from "@/features/defenses/queries/useDefenses";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   CalendarIcon,
   ClockIcon,
@@ -140,51 +141,43 @@ function Calendar() {
   const [selectedDefense, setSelectedDefense] = useState<Defense | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const deleteDefense = useDeleteDefense();
   const { user } = useAuth();
 
-  const { data: defenses = [], refetch } = useDefenses();
-  const [events, setEvents] = useState<any[]>([]);
+  const { data: defenses = [] } = useDefenses();
 
-  useEffect(() => {
-    if (defenses) {
-      const mappedEvents = defenses.map((defense: any) => ({
+  const getEventColor = useCallback((status: string) => {
+    switch (status) {
+      case "approved":
+        return "#10b981"; // Emerald 500
+      case "rejected":
+        return "#ef4444"; // Red 500
+      case "cancelled":
+        return "#6b7280"; // Gray 500
+      default:
+        return "#f59e0b"; // Amber 500 (for pending)
+    }
+  }, []);
+
+  const mappedEvents = useMemo(() => {
+    if (!defenses) return [];
+
+    return defenses
+      .filter((defense: Defense) => {
+        if (statusFilter === 'all') return true;
+        return defense.status === statusFilter;
+      })
+      .map((defense: Defense) => ({
         id: defense.id.toString(),
         title: defense.title,
         start: defense.start_at,
         end: defense.end_at,
-        extendedProps: {
-          ...defense,
-          location: defense.room
-            ? `${defense.room.building} ${defense.room.room_number}`
-            : "Pending",
-        },
+        backgroundColor: getEventColor(defense.status),
+        borderColor: getEventColor(defense.status),
+        extendedProps: { ...defense },
       }));
-      setEvents(mappedEvents);
-
-      // If we have a calendar ref, update the events
-      if (calendarRef.current) {
-        const calendarApi = calendarRef.current.getApi();
-        calendarApi.removeAllEvents();
-        calendarApi.addEventSource(mappedEvents);
-      }
-    }
-  }, [defenses]);
-
-  const fetchEvents = async (
-    info: any,
-    successCallback: Function,
-    failureCallback: Function
-  ) => {
-    try {
-      // Refetch data when the calendar view changes
-      await refetch();
-      successCallback(events);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      failureCallback(error);
-    }
-  };
+  }, [defenses, getEventColor, statusFilter]);
 
   const handleEventClick = (clickInfo: any) => {
     const event = clickInfo.event;
@@ -199,8 +192,33 @@ function Calendar() {
     setIsDialogOpen(true);
   };
 
+  console.log(mappedEvents);
+
   return (
     <div className="p-6">
+      <div className="mb-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Defense Calendar</h1>
+          <p className="text-gray-600">Overview of your defense-related schedules</p>
+        </div>
+        <div className="flex items-center space-x-4">
+          <div className="w-auto">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="approved">Approved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -210,7 +228,7 @@ function Calendar() {
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
-        events={fetchEvents}
+        events={mappedEvents}
         eventClick={handleEventClick}
         eventTimeFormat={{
           hour: "2-digit",

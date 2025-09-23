@@ -17,34 +17,26 @@ use Bocum\Services\DefenseConflictService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Bocum\Mail\DefenseProposalMail;
+use Bocum\Mail\DefenseScheduleApproved;
 use Bocum\Models\User;
 
 class DefenseController extends Controller
 {
-
     public function __construct(protected DefenseConflictService $conflictService) {}
 
     public function index()
     {
         // Get defenses where the authenticated user is the adviser, critic, or a panelist
         $defenses = Defense::where(function ($query) {
-            $query->whereHas('group', function ($q) {
-                $q->where('adviser_id', Auth::id())
-                    ->orWhere('critic_id', Auth::id());
-            })->orWhereHas('panelists', function ($q) {
-                $q->where('panelist_id', Auth::id());
-            });
+            $query
+                ->whereHas('group', function ($q) {
+                    $q->where('adviser_id', Auth::id())->orWhere('critic_id', Auth::id());
+                })
+                ->orWhereHas('panelists', function ($q) {
+                    $q->where('panelist_id', Auth::id());
+                });
         })
-            ->with([
-                'room',
-                'group',
-                'group.term',
-                'adviser',
-                'proposedBy',
-                'approvedBy',
-                'panelists',
-                'group.members',
-            ])
+            ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -57,18 +49,8 @@ class DefenseController extends Controller
 
         $defenses = Defense::whereHas('group', function ($query) {
             $query->where('department_id', Auth::user()->department_id);
-        })->with([
-            'room',
-            'group',
-            'group.term',
-            'group.adviser',
-            'group.critic',
-            'adviser',
-            'proposedBy',
-            'approvedBy',
-            'panelists',
-            'group.members',
-        ])
+        })
+            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -92,29 +74,17 @@ class DefenseController extends Controller
             'room_id' => 'required|exists:rooms,id',
         ]);
 
-        $roomConflicts = $this->conflictService->checkRoomConflict(
-            $defense,
-            $validated['room_id'],
-            $validated['proposed_date'],
-            $validated['start_time'],
-            $validated['end_time']
-        );
+        $roomConflicts = $this->conflictService->checkRoomConflict($defense, $validated['room_id'], $validated['proposed_date'], $validated['start_time'], $validated['end_time']);
 
-        $panelistConflicts = $this->conflictService->checkPanelistConflict(
-            $defense->id,
-            $validated['panelist_ids'],
-            $validated['proposed_date'],
-            $validated['start_time'],
-            $validated['end_time']
-        );
+        $panelistConflicts = $this->conflictService->checkPanelistConflict($defense->id, $validated['panelist_ids'], $validated['proposed_date'], $validated['start_time'], $validated['end_time']);
 
         return response()->json([
             'success' => true,
             'data' => [
                 'room_conflicts' => $roomConflicts,
                 'panelist_conflicts' => $panelistConflicts,
-                'has_any_conflicts' => $roomConflicts['has_conflict'] || $panelistConflicts['has_conflict']
-            ]
+                'has_any_conflicts' => $roomConflicts['has_conflict'] || $panelistConflicts['has_conflict'],
+            ],
         ]);
     }
 
@@ -139,17 +109,9 @@ class DefenseController extends Controller
         $adviser = Auth::user();
 
         $datas = [
-            'rooms' => Room::where('is_active', true)
-                ->orderBy('building')
-                ->orderBy('room_number')
-                ->get(),
-            'groups' => Group::where('adviser_id', $adviser->id)
-                ->with('members')
-                ->orderBy('id')
-                ->get(),
-            'panelists' => \Bocum\Models\User::role('panelist')
-                ->orderBy('name')
-                ->get(),
+            'rooms' => Room::where('is_active', true)->orderBy('building')->orderBy('room_number')->get(),
+            'groups' => Group::where('adviser_id', $adviser->id)->with('members')->orderBy('id')->get(),
+            'panelists' => \Bocum\Models\User::role('panelist')->orderBy('name')->get(),
             'currentTerm' => $currentTerm,
             'minDate' => now()->format('Y-m-d'),
             'maxDate' => now()->addMonths(3)->format('Y-m-d'),
@@ -187,7 +149,6 @@ class DefenseController extends Controller
                 'end_at' => Carbon::parse($request->date . ' ' . $request->end_time),
                 'status' => $request->status,
                 'notes' => $request->notes,
-                // approved_by_id and rejection_note would be handled by separate approval endpoints
             ];
 
             // If status is being updated to approved, verify the user is a coordinator
@@ -207,16 +168,32 @@ class DefenseController extends Controller
                 $defense->panelists()->sync($request->panelists);
             }
 
+            // send email notification
+            $recipients = collect([$defense->adviser])
+                ->merge($defense->panelists)
+                ->filter()
+                ->pluck('email')
+                ->unique()
+                ->values()
+                ->all();
+
+            if (!empty($recipients)) {
+                Mail::to($recipients)->queue(new DefenseScheduleApproved($defense));
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Defense updated successfully',
-                'data' => $defense->fresh(['room', 'group', 'panelists'])
+                'data' => $defense->fresh(['room', 'group', 'panelists']),
             ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while updating the defense. Please try again.' . $e->getMessage()
-            ], 500);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => 'An error occurred while updating the defense. Please try again.' . $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 
@@ -233,9 +210,7 @@ class DefenseController extends Controller
             DB::beginTransaction();
 
             // Verify the group belongs to the authenticated adviser
-            $group = Group::where('id', $request->group_id)
-                ->where('adviser_id', Auth::id())
-                ->firstOrFail();
+            $group = Group::where('id', $request->group_id)->where('adviser_id', Auth::id())->firstOrFail();
 
             // Combine date and time fields
             $startAt = Carbon::parse($request->date . ' ' . $request->start_time);
@@ -261,14 +236,11 @@ class DefenseController extends Controller
             }
 
             $adviser = Auth::user();
-            $coordinator = User::role('coordinator')
-                ->where('department_id', $adviser->department_id)
-                ->firstOrFail();
+            $coordinator = User::role('coordinator')->where('department_id', $adviser->department_id)->firstOrFail();
 
             Mail::to($coordinator->email)->queue(new DefenseProposalMail($defense, $adviser));
 
             DB::commit();
-
 
             return response()->json([
                 'success' => true,
@@ -279,13 +251,16 @@ class DefenseController extends Controller
             // Log the error
             Log::error('Error creating defense proposal: ' . $e->getMessage(), [
                 'exception' => $e,
-                'request' => $request->except(['_token', 'panelists'])
+                'request' => $request->except(['_token', 'panelists']),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return response()->json(
+                [
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ],
+                400,
+            );
         }
     }
 
@@ -305,27 +280,30 @@ class DefenseController extends Controller
 
             // Only allow deletion if defense is still pending
             if ($defense->status !== 'pending') {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Only pending defenses can be deleted.'
-                ], 400);
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Only pending defenses can be deleted.',
+                    ],
+                    400,
+                );
             }
 
             $defense->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Defense has been deleted successfully.'
+                'message' => 'Defense has been deleted successfully.',
             ]);
         } catch (\Exception $e) {
             Log::error('Error deleting defense: ' . $e->getMessage(), [
                 'defense_id' => $defense->id,
-                'user_id' => Auth::id()
+                'user_id' => Auth::id(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while deleting the defense. Please try again.'
+                'message' => 'An error occurred while deleting the defense. Please try again.',
             ]);
         }
     }

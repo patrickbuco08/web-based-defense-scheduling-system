@@ -3,7 +3,6 @@
 namespace Bocum\Mail;
 
 use Bocum\Models\Defense;
-use Bocum\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,14 +10,15 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class DefenseProposalMail extends Mailable implements ShouldQueue
+
+class DefenseScheduleApproved extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(private $defense, private User $user)
+    public function __construct(private Defense $defense)
     {
         //
     }
@@ -29,7 +29,7 @@ class DefenseProposalMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Defense Proposal Mail',
+            subject: 'Defense Schedule Approved',
         );
     }
 
@@ -39,10 +39,9 @@ class DefenseProposalMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.defenses.proposal',
+            markdown: 'mail.defenses.approved',
             with: [
                 'defense' => $this->defense,
-                'user' => $this->user,
             ],
         );
     }
