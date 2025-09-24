@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.0-fpm
 
 # Install OPcache (if not included)
 RUN docker-php-ext-install opcache
