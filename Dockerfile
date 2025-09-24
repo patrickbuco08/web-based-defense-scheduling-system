@@ -1,10 +1,10 @@
-FROM php:8.2-fpm
+FROM php:8.0-fpm
 
 # Install OPcache (if not included)
 RUN docker-php-ext-install opcache
 
 # Copy the OPcache configuration
-COPY ./Docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+# COPY ./Docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 #specify project directory
 WORKDIR /var/www 
