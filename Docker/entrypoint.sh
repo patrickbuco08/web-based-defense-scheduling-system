@@ -1,7 +1,11 @@
 #!/bin/sh
+set -e
+
+echo "Starting entrypoint script..."
 
 if [ ! -f "vendor/autoload.php" ]; then
-composer install --no-progress --no-interaction
+    echo "Installing composer dependencies..."
+    composer install --no-progress --no-interaction
 fi
 
 if [ ! -f ".env" ]; then
@@ -11,8 +15,9 @@ else
     echo "env file exists."
 fi
 
-php artisan migrate
-php artisan key:generate
+echo "Running Laravel setup commands..."
+php artisan migrate --force
+php artisan key:generate --force
 php artisan cache:clear
 php artisan config:clear
 php artisan route:clear
@@ -33,4 +38,5 @@ fi
 
 # using nginx, execute the main process, passed as CMD
 # Execute the main process (PHP-FPM) passed as CMD
+echo "Entrypoint script completed successfully. Starting main process..."
 exec "$@"
