@@ -10,22 +10,45 @@ COPY ./Docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 WORKDIR /var/www 
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
-    libonig-dev \
-    libzip-dev \
-    nginx \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# RUN apt-get update && apt-get install -y \
+#     git \
+#     curl \
+#     libpng-dev \
+#     libjpeg62-turbo-dev \
+#     libfreetype6-dev \
+#     locales \
+#     zip \
+#     jpegoptim optipng pngquant gifsicle \
+#     vim \
+#     unzip \
+#     libonig-dev \
+#     libzip-dev \
+#     nginx \
+#     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+#     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+
+# Install system dependencies (Debian bookworm on php:8.2-fpm)
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      git \
+      curl \
+      unzip \
+      vim \
+      locales \
+      zip \
+      libpng-dev \
+      libjpeg62-turbo-dev \
+      libfreetype6-dev \
+      libzip-dev \
+      jpegoptim \
+      optipng \
+      pngquant \
+      gifsicle \
+    ; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip; \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
