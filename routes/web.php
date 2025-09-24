@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user', [AuthenticatedSessionController::class, 'getUser']);
 
-    Route::get('/accounts/departments', [AccountController::class, 'getAccountsByDepartment'])->name('accounts.index');
+    Route::get('/accounts/departments', [AccountController::class, 'getAccountsByDepartment'])->name('accounts.departments');
     Route::resource('accounts', AccountController::class)
         ->parameters(['accounts' => 'user'])
         ->except(['show']);
