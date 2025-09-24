@@ -1,4 +1,4 @@
-FROM php:8.0-fpm
+FROM php:8.2-fpm
 
 # Install OPcache (if not included)
 RUN docker-php-ext-install opcache
@@ -32,20 +32,19 @@ COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
 
 # Copy existing application directory contents
 # COPY . /var/www
-COPY . .
 
 # Copy existing application directory permissions
 COPY --chown=www-data:www-data . /var/www
+COPY ./Docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Change current user to www
 USER www-data
-
-RUN chmod a+x ./Docker/entrypoint.sh
 
 ENV PORT=9000
 
 EXPOSE 9000
 
-ENTRYPOINT [ "docker/entrypoint.sh" ]
+ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["php-fpm"]
