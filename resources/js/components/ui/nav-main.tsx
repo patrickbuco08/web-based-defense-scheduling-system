@@ -26,7 +26,7 @@ export function NavMain({
   const { user } = useAuth();
   const location = useLocation();
 
-  const isAdviser = user.roles.includes('admin');
+  const isAdviser = user.roles.includes('adviser');
 
 
   return (

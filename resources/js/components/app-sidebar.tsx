@@ -132,7 +132,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
   };
 
-  const isAdviser = user.roles.includes('admin');
+  const isAdviser = user.roles.includes('adviser');
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
