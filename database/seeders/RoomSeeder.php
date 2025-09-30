@@ -31,8 +31,8 @@ class RoomSeeder extends Seeder
                 'is_active' => true
             ],
             [
-                'room_number' => 'CS-203',
-                'building' => 'Annex Building',
+                'room_number' => 'CS-201',
+                'building' => 'Main Building',
                 'is_active' => true
             ],
         ];

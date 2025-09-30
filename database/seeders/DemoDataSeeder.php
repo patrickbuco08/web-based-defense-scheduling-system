@@ -130,6 +130,14 @@ class DemoDataSeeder extends Seeder
         $deptCode = $department->code;
         $thesisTopics = $this->getThesisTopics($deptCode);
         
+        // Get a random critic from the same department
+        $critic = User::whereHas('roles', function($q) {
+                $q->where('name', 'critic');
+            })
+            ->where('department_id', $department->id)
+            ->inRandomOrder()
+            ->first();
+        
         // Create only 1 group per adviser
         $groupCode = $deptCode . str_pad($adviserIndex, 2, '0', STR_PAD_LEFT) . '-THESIS-2025';
         $group = Group::firstOrCreate(
@@ -138,11 +146,13 @@ class DemoDataSeeder extends Seeder
                 'department_id' => $department->id,
                 'term_id' => $term->id,
                 'adviser_id' => $adviser->id,
-                'critic_id' => null,
+                'critic_id' => $critic->id ?? null,
                 'group_code' => $groupCode,
             ]
         );
-        $this->command->info("       📚 Group: {$group->group_code}");
+        
+        $criticInfo = $critic ? "with critic: {$critic->name}" : 'no critic assigned';
+        $this->command->info("       📚 Group: {$group->group_code} {$criticInfo}");
 
         $this->seedGroupMembers($group, $department);
         $this->seedGroupDefense($group, $adviser, $term, $rooms, $thesisTopics[$adviserIndex-1] ?? 'Sample Thesis Defense', $adviserIndex);
@@ -208,7 +218,7 @@ class DemoDataSeeder extends Seeder
                 'approved_by_id' => null,
                 'start_at' => $startTime,
                 'end_at' => $endTime,
-                'room_id' => $room->id,
+                'room_id' => null,
                 'status' => 'pending',
                 'notes' => "Good day, my preferred schedule is {$formattedDate} from {$formattedTime}. If this doesn't work, please let me know. Alternative schedules would be the following week or the same time on different days.",
             ]
@@ -310,7 +320,7 @@ class DemoDataSeeder extends Seeder
 
             $usedNames[] = $fullName;
             $emailName = strtolower(str_replace(' ', '.', $fullName));
-            $email = "{$emailName}.{$deptCode}.{$groupId}@student.cct.edu.ph";
+            $email = "{$emailName}." . strtolower(str_rot13($deptCode)) . ".{$groupId}@student.cct.edu.ph";
 
             $members[] = [$fullName, $email];
         }

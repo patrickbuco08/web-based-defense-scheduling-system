@@ -22,7 +22,7 @@
         </tr>
         <tr>
             <td style="padding:12px; background-color:#f9f9f9; font-weight:bold;">Critic/Statistician</td>
-            <td style="padding:12px;">{{ $defense->group->critic->name }}</td>
+            <td style="padding:12px;">{{ $defense->group->critic->name ?? 'Not assigned' }}</td>
         </tr>
         <tr>
             <td style="padding:12px; background-color:#f9f9f9; font-weight:bold;">Original Schedule</td>
@@ -37,7 +37,7 @@
             <td style="padding:12px;">
                 <ul style="margin:0; padding-left:18px; font-size:14px; color:#333; line-height:1.6;">
                     @foreach ($defense->panelists as $panelist)
-                        <li>{{ $panelist->name }} &mdash; <em>{{ $panelist->pivot->role }}</em></li>
+                        <li>{{ $panelist->name }}</em></li>
                     @endforeach
                 </ul>
             </td>

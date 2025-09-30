@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Bocum\Services\DefenseConflictService;
+use Bocum\Services\DefenseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Bocum\Mail\DefenseProposalMail;
@@ -24,7 +25,10 @@ use Bocum\Models\User;
 
 class DefenseController extends Controller
 {
-    public function __construct(protected DefenseConflictService $conflictService) {}
+    public function __construct(
+        protected DefenseConflictService $conflictService,
+        protected DefenseService $defenseService
+    ) {}
 
     public function index()
     {
@@ -172,24 +176,7 @@ class DefenseController extends Controller
 
             switch ($request->status) {
                 case 'approved':
-                    // Get base recipients (adviser, critic, panelists)
-                    $recipients = collect([$defense->adviser, $defense->critic])
-                        ->merge($defense->panelists)
-                        ->filter()
-                        ->pluck('email');
-
-                    // Add group members' emails if they exist
-                    if ($defense->group && $defense->group->members->isNotEmpty()) {
-                        $groupMemberEmails = $defense->group->members
-                            ->pluck('email')
-                            ->filter(); // Remove null/empty emails
-                        
-                        $recipients = $recipients->merge($groupMemberEmails);
-                    }
-
-                    // Ensure unique emails and convert to array
-                    $recipients = $recipients->unique()->values()->all();
-
+                    $recipients = $this->defenseService->getDefenseRecipients($defense);
                     if (!empty($recipients)) {
                         Mail::to($recipients)->queue(new DefenseScheduleApproved($defense));
                     }
@@ -203,14 +190,7 @@ class DefenseController extends Controller
                     break;
 
                 case 'cancelled':
-                    $recipients = collect([$defense->adviser, $defense->critic])
-                        ->merge($defense->panelists)
-                        ->filter()
-                        ->pluck('email')
-                        ->unique()
-                        ->values()
-                        ->all();
-
+                    $recipients = $this->defenseService->getDefenseRecipients($defense);
                     if (!empty($recipients)) {
                         Mail::to($recipients)->queue(new DefenseScheduleCancelled($defense));
                     }
@@ -231,7 +211,7 @@ class DefenseController extends Controller
             return response()->json(
                 [
                     'success' => false,
-                    'message' => 'An error occurred while updating the defense. Please try again.' . $e->getMessage(),
+                    'message' => $e->getMessage(),
                 ],
                 500,
             );
@@ -348,4 +328,5 @@ class DefenseController extends Controller
             ]);
         }
     }
+
 }
