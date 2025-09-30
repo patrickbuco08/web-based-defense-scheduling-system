@@ -17,11 +17,15 @@ class AccountController extends Controller
     public function index()
     {
         $currentUser = Auth::user();
-        $users = User::with(['roles', 'department'])
-            ->where('id', '!=', $currentUser->id)
-            ->where('department_id', $currentUser->department_id)
-            ->latest()
-            ->get()
+        $query = User::with(['roles', 'department'])
+            ->where('id', '!=', $currentUser->id);
+            
+        // Only filter by department if user is not an admin
+        if (!$currentUser->hasRole('admin')) {
+            $query->where('department_id', $currentUser->department_id);
+        }
+        
+        $users = $query->latest()->get()
             ->map(function ($user) {
                 return [
                     'id' => $user->id,
