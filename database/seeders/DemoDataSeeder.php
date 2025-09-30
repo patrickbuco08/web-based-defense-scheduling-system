@@ -2,7 +2,17 @@
 
 namespace Database\Seeders;
 
+use Bocum\Models\Department;
+use Bocum\Models\User;
+use Bocum\Models\Group;
+use Bocum\Models\GroupMember;
+use Bocum\Models\Defense;
+use Bocum\Models\Term;
+use Bocum\Models\Room;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class DemoDataSeeder extends Seeder
 {
@@ -10,21 +20,304 @@ class DemoDataSeeder extends Seeder
      * This seeder is a wrapper that runs all demo data seeders
      * in the correct order to establish relationships
      */
-    public function run(): void
+    public function run()
     {
-        $this->call([
-            // Create terms and rooms first
-            TermSeeder::class,
-            RoomSeeder::class,
+        $this->command->info('🚀 Starting DemoDataSeeder...');
+        
+        $term = Term::where('is_current', true)->first();
+        $rooms = Room::all();
+        
+        $this->command->info("📅 Current Term: {$term->school_year} - {$term->semester}");
+        $this->command->info("🏢 Available Rooms: {$rooms->count()}");
+        $this->command->newLine();
+
+        $this->seedDemoData($term, $rooms);
+        
+        $this->command->newLine();
+        $this->command->info('✅ Demo data seeding completed successfully!');
+    }
+
+    private function seedDemoData($term, $rooms)
+    {
+        $departments = [
+            ['code' => 'BSCS', 'name' => 'Computer Studies'],
+            ['code' => 'BSE', 'name' => 'Education'],
+            ['code' => 'BSHTM', 'name' => 'Hospitality and Tourism Management'],
+            ['code' => 'BSM', 'name' => 'Business and Management'],
+            ['code' => 'BSAS', 'name' => 'Arts and Sciences'],
+        ];
+
+        foreach ($departments as $deptData) {
+            $department = Department::firstOrCreate($deptData);
+            $this->command->info("\n🏫 Department: {$department->name} ({$department->code})");
+
+            $this->seedDepartmentUsers($department, $term, $rooms);
+        }
+    }
+
+    private function seedDepartmentUsers($department, $term, $rooms)
+    {
+        $users = [];
+        $deptCode = $department->code;
+        
+        // Create 3 Advisers
+        $this->command->info("  👨‍🏫 Creating Advisers...");
+        for ($i = 1; $i <= 3; $i++) {
+            $adviser = User::firstOrCreate(
+                ['email' => strtolower("adviser{$i}.{$deptCode}@cct.edu.ph")],
+                [
+                    'name' => "Adviser {$i} ({$deptCode})",
+                    'password' => Hash::make('password'),
+                    'department_id' => $department->id,
+                ]
+            );
+            $adviser->assignRole('adviser');
+            $users['advisers'][] = $adviser;
+            $this->command->info("     ✓ {$adviser->name} ({$adviser->email})");
             
-            // Then create users with their roles
-            AdminUserSeeder::class,
-            CoordinatorSeeder::class,
-            AdviserSeeder::class,
-            PanelistSeeder::class,
-            
-            // Finally, create defenses with relationships
-            DefenseSeeder::class,
-        ]);
+            $this->seedAdviserGroups($adviser, $department, $term, $rooms, $i);
+        }
+
+        // Create 3 Critics
+        $this->command->info("  🔍 Creating Critics...");
+        for ($i = 1; $i <= 3; $i++) {
+            $critic = User::firstOrCreate(
+                ['email' => strtolower("critic{$i}.{$deptCode}@cct.edu.ph")],
+                [
+                    'name' => "Critic {$i} ({$deptCode})",
+                    'password' => Hash::make('password'),
+                    'department_id' => $department->id,
+                ]
+            );
+            $critic->assignRole('critic');
+            $users['critics'][] = $critic;
+            $this->command->info("     ✓ {$critic->name} ({$critic->email})");
+        }
+
+        // Create 3 Panelists
+        $this->command->info("  👥 Creating Panelists...");
+        for ($i = 1; $i <= 3; $i++) {
+            $panelist = User::firstOrCreate(
+                ['email' => strtolower("panelist{$i}.{$deptCode}@cct.edu.ph")],
+                [
+                    'name' => "Panelist {$i} ({$deptCode})",
+                    'password' => Hash::make('password'),
+                    'department_id' => $department->id,
+                ]
+            );
+            $panelist->assignRole('panelist');
+            $users['panelists'][] = $panelist;
+            $this->command->info("     ✓ {$panelist->name} ({$panelist->email})");
+        }
+
+        // Create 1 Coordinator
+        $this->command->info("  📋 Creating Coordinator...");
+        $coordinator = User::firstOrCreate(
+            ['email' => strtolower("coordinator.{$deptCode}@cct.edu.ph")],
+            [
+                'name' => "Coordinator ({$deptCode})",
+                'password' => Hash::make('password'),
+                'department_id' => $department->id,
+            ]
+        );
+        $coordinator->assignRole('coordinator');
+        $users['coordinators'][] = $coordinator;
+        $this->command->info("     ✓ {$coordinator->name} ({$coordinator->email})");
+    }
+
+    private function seedAdviserGroups($adviser, $department, $term, $rooms, $adviserIndex)
+    {
+        $deptCode = $department->code;
+        $thesisTopics = $this->getThesisTopics($deptCode);
+        
+        // Create only 1 group per adviser
+        $groupCode = $deptCode . str_pad($adviserIndex, 2, '0', STR_PAD_LEFT) . '-THESIS-2025';
+        $group = Group::firstOrCreate(
+            ['group_code' => $groupCode],
+            [
+                'department_id' => $department->id,
+                'term_id' => $term->id,
+                'adviser_id' => $adviser->id,
+                'critic_id' => null,
+                'group_code' => $groupCode,
+            ]
+        );
+        $this->command->info("       📚 Group: {$group->group_code}");
+
+        $this->seedGroupMembers($group, $department);
+        $this->seedGroupDefense($group, $adviser, $term, $rooms, $thesisTopics[$adviserIndex-1] ?? 'Sample Thesis Defense', $adviserIndex);
+    }
+
+    private function seedGroupMembers($group, $department)
+    {
+        $memberNames = $this->getFilipinoStudentNames($department->code, $group->id);
+
+        foreach ($memberNames as $index => $memberData) {
+            $member = GroupMember::firstOrCreate(
+                [
+                    'group_id' => $group->id,
+                    'student_name' => $memberData[0]
+                ],
+                [
+                    'email' => $memberData[1],
+                ]
+            );
+            $this->command->info("          • {$memberData[0]}");
+        }
+    }
+
+    private function seedGroupDefense($group, $adviser, $term, $rooms, $title, $groupIndex = 0)
+    {
+        // Generate a base date starting from next Monday
+        $baseDate = Carbon::now()->startOfWeek()->addWeek();
+
+        // Calculate the day offset based on group index to ensure different days
+        $dayOffset = $groupIndex * 2; // Space defenses 2 days apart
+        $startDate = $baseDate->copy()->addDays($dayOffset);
+
+        // Generate random time between 9 AM and 3 PM
+        $hour = rand(9, 15); // 9 AM to 3 PM
+        $minute = (rand(0, 1) == 0) ? 0 : 30; // Either :00 or :30
+
+        // Create start and end times (1.5 hour duration)
+        $startTime = $startDate->copy()->setTime($hour, $minute);
+        $endTime = $startTime->copy()->addHours(1.5);
+
+        // Find an available room
+        $room = $this->findAvailableRoom($rooms, $startTime, $endTime);
+
+        // If no room is available at this time, try next day
+        while (!$room) {
+            $startTime->addDay();
+            $endTime->addDay();
+            $room = $this->findAvailableRoom($rooms, $startTime, $endTime);
+        }
+
+        // Format notes with the selected schedule
+        $formattedDate = $startTime->format('l, F j, Y');
+        $formattedTime = $startTime->format('g:i A') . ' to ' . $endTime->format('g:i A');
+
+        $defense = Defense::firstOrCreate(
+            [
+                'group_id' => $group->id,
+                'title' => $title
+            ],
+            [
+                'adviser_id' => $adviser->id,
+                'proposed_by_id' => $adviser->id,
+                'approved_by_id' => null,
+                'start_at' => $startTime,
+                'end_at' => $endTime,
+                'room_id' => $room->id,
+                'status' => 'pending',
+                'notes' => "Good day, my preferred schedule is {$formattedDate} from {$formattedTime}. If this doesn't work, please let me know. Alternative schedules would be the following week or the same time on different days.",
+            ]
+        );
+        $this->command->info("          🗓️  Defense: {$formattedDate} | {$formattedTime} | Room: {$room->room_number}");
+
+    }
+
+    private function findAvailableRoom($rooms, $startTime, $endTime)
+    {
+        // Check each room for availability
+        foreach ($rooms as $room) {
+            $conflict = Defense::where('room_id', $room->id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('start_at', [$startTime, $endTime->copy()->subMinute()])
+                          ->orWhereBetween('end_at', [$startTime->copy()->addMinute(), $endTime])
+                          ->orWhere(function($q) use ($startTime, $endTime) {
+                              $q->where('start_at', '<=', $startTime)
+                                ->where('end_at', '>=', $endTime);
+                          });
+                })
+                ->exists();
+
+            if (!$conflict) {
+                return $room;
+            }
+        }
+        return null;
+    }
+
+    private function getThesisTopics($deptCode)
+    {
+        $topics = [
+            'BSCS' => [
+                'AI-Powered Student Performance Analytics System',
+                'Blockchain-Based Academic Records Management',
+                'Mobile Learning Platform with Gamification'
+            ],
+            'BSE' => [
+                'Digital Classroom Management System for Elementary Education',
+                'Interactive Learning Modules for Mathematics',
+                'Student Assessment and Progress Tracking Platform'
+            ],
+            'BSHTM' => [
+                'Hotel Reservation and Management System',
+                'Tourism Destination Recommendation Platform',
+                'Restaurant Point of Sale and Inventory System'
+            ],
+            'BSM' => [
+                'Business Intelligence Dashboard for SMEs',
+                'Customer Relationship Management System',
+                'Supply Chain Management and Analytics Platform'
+            ],
+            'BSAS' => [
+                'Laboratory Information Management System',
+                'Research Data Collection and Analysis Platform',
+                'Academic Publication Management System'
+            ],
+        ];
+
+        return $topics[$deptCode] ?? ['Sample Thesis Defense', 'Another Thesis Defense', 'Third Thesis Defense'];
+    }
+
+    private function getFilipinoStudentNames($deptCode, $groupId)
+    {
+        // Pool of Filipino first names
+        $firstNames = [
+            'Maria', 'Jose', 'Juan', 'Ana', 'Carlos', 'Rosa', 'Miguel', 'Sofia',
+            'Gabriel', 'Isabella', 'Rafael', 'Gabriela', 'Luis', 'Carmen', 'Diego',
+            'Lucia', 'Fernando', 'Elena', 'Ricardo', 'Patricia', 'Antonio', 'Teresa',
+            'Manuel', 'Beatriz', 'Francisco', 'Margarita', 'Pedro', 'Cristina',
+            'Ramon', 'Angelica', 'Roberto', 'Victoria', 'Eduardo', 'Valentina',
+            'Andres', 'Camila', 'Jorge', 'Natalia', 'Alberto', 'Daniela'
+        ];
+
+        // Pool of Filipino last names
+        $lastNames = [
+            'Santos', 'Reyes', 'Cruz', 'Bautista', 'Garcia', 'Mendoza', 'Torres',
+            'Gonzales', 'Lopez', 'Flores', 'Ramos', 'Rivera', 'Gomez', 'Fernandez',
+            'Dela Cruz', 'Villanueva', 'Castillo', 'Morales', 'Aquino', 'Santiago',
+            'Pascual', 'Mercado', 'Aguilar', 'Valdez', 'Navarro', 'Diaz', 'Salazar',
+            'Domingo', 'Hernandez', 'Castro', 'Jimenez', 'Perez', 'Alvarez', 'Rojas'
+        ];
+
+        // Use group ID and department code to seed random for consistency
+        $seed = crc32($deptCode . $groupId);
+        mt_srand($seed);
+
+        $members = [];
+        $usedNames = [];
+
+        for ($i = 0; $i < 3; $i++) {
+            // Generate unique name
+            do {
+                $firstName = $firstNames[mt_rand(0, count($firstNames) - 1)];
+                $lastName = $lastNames[mt_rand(0, count($lastNames) - 1)];
+                $fullName = "{$firstName} {$lastName}";
+            } while (in_array($fullName, $usedNames));
+
+            $usedNames[] = $fullName;
+            $emailName = strtolower(str_replace(' ', '.', $fullName));
+            $email = "{$emailName}.{$deptCode}.{$groupId}@student.cct.edu.ph";
+
+            $members[] = [$fullName, $email];
+        }
+
+        // Reset random seed
+        mt_srand();
+
+        return $members;
     }
 }

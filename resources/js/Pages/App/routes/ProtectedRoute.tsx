@@ -15,17 +15,23 @@ export default function ProtectedRoute({ children, allowedRoles, userRoles }: Pr
         return <Navigate to="/login" replace />;
     }
 
+    // Redirect admin users to accounts page when accessing root
     if (userRoles.includes('admin') && userRoles.length === 1 && currentPath === '/app') {
         return <Navigate to="/app/admin/accounts" replace />;
-    } else {
-        const hasRequiredRole = userRoles.some(role => allowedRoles.includes(role));
-        if (!hasRequiredRole) {
-            // logged in but not allowed → redirect somewhere else
-            return <Navigate to="/app" replace />;
-        }
     }
 
+    // Redirect coordinator-only users to calendar when accessing root
+    const isCoordinatorOnly = userRoles.length === 1 && userRoles.includes('coordinator');
 
+    if (isCoordinatorOnly && (currentPath === '/app' || currentPath === '/app/')) {
+        return <Navigate to="/app/coordinators/calendar" replace />;
+    }
+
+    // Check if user has any of the required roles
+    const hasRequiredRole = userRoles.some(role => allowedRoles.includes(role));
+    if (!hasRequiredRole) {
+        return <Navigate to="/app" replace />;
+    }
 
     return <>{children}</>;
 }

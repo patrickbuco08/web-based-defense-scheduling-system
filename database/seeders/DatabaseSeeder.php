@@ -15,23 +15,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Core setup
             PermissionSeeder::class,
-            DepartmentSeeder::class,
-            
-            // Create users and roles
+            RoleSeeder::class,
             AdminUserSeeder::class,
-            CoordinatorSeeder::class,
-            AdviserSeeder::class,
-            PanelistSeeder::class,
             
             // Create terms and rooms
             TermSeeder::class,
             RoomSeeder::class,
 
-            // Create groups with relationships
-            GroupSeeder::class,
-            
-            // Create defenses with relationships
-            DefenseSeeder::class,
+            DemoDataSeeder::class
         ]);
     }
 }

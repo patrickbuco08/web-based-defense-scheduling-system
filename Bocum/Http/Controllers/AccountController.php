@@ -19,6 +19,7 @@ class AccountController extends Controller
         $currentUser = Auth::user();
         $users = User::with(['roles', 'department'])
             ->where('id', '!=', $currentUser->id)
+            ->where('department_id', $currentUser->department_id)
             ->latest()
             ->get()
             ->map(function ($user) {
