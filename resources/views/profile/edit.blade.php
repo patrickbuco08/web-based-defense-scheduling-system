@@ -1,8 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Profile') }}
+            </h2>
+            @if(auth()->user()?->roles->isNotEmpty())
+                <div class="flex gap-2">
+                    @foreach(auth()->user()->roles as $role)
+                        <span class="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            {{ ucfirst($role->name) }}
+                        </span>
+                    @endforeach
+                </div>
+            @endif
+        </div>
     </x-slot>
 
     <div class="py-12">

@@ -1,11 +1,12 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -46,11 +47,12 @@ interface Term {
 interface Member {
   id: number;
   name: string;
+  email: string;
 }
 
 export const AddGroupButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [members, setMembers] = useState<Member[]>([{ id: Date.now(), name: "" }]);
+  const [members, setMembers] = useState<Member[]>([{ id: Date.now(), name: "", email: "" }]);
 
   const createGroupMutation = useCreateGroup();
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
@@ -76,7 +78,7 @@ export const AddGroupButton = () => {
   }, [activeTerm]);
 
   const handleAddMember = () => {
-    setMembers([...members, { id: Date.now(), name: "" }]);
+    setMembers([...members, { id: Date.now(), name: "", email: "" }]);
   };
 
   const handleRemoveMember = (id: number) => {
@@ -85,10 +87,12 @@ export const AddGroupButton = () => {
     }
   };
 
-  const handleMemberChange = (id: number, value: string) => {
-    setMembers(members.map(member =>
-      member.id === id ? { ...member, name: value } : member
-    ));
+  const handleMemberChange = (id: number, field: 'name' | 'email', value: string) => {
+    setMembers(
+      members.map((member) =>
+        member.id === id ? { ...member, [field]: value } : member
+      )
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,10 +121,22 @@ export const AddGroupButton = () => {
       return;
     }
 
+    // Prepare data for submission
     const submitData = {
       ...formData,
-      members: validMembers.map(member => ({ name: member.name })),
+      members: validMembers.map(({ name, email }) => ({
+        name,
+        email: email || null,
+      })),
     };
+
+    // Log member emails for debugging
+    const memberEmails = validMembers.map(member => ({
+      id: member.id,
+      name: member.name,
+      email: member.email
+    }));
+    console.log('Member emails:', memberEmails);
 
     createGroupMutation.mutate(submitData, {
       onSuccess: () => {
@@ -129,15 +145,15 @@ export const AddGroupButton = () => {
         // Reset form
         setFormData({
           group_code: "",
-          department_id: "",
-          term_id: activeTerm?.id.toString() || "",
+          department_id: user?.department_id?.toString() || "",
+          term_id: activeTerm?.id?.toString() || "",
           critic_id: "",
         });
-        setMembers([{ id: Date.now(), name: "" }]);
+        setMembers([{ id: Date.now(), name: "", email: "" }]);
       },
       onError: (error: any) => {
         console.error("Error creating group:", error);
-        toast.error(error.response?.data?.message || "Failed to create group");
+        toast.error(error?.response?.data?.message || "Failed to create group");
       },
     });
   };
@@ -150,7 +166,7 @@ export const AddGroupButton = () => {
           Add Group
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Group</DialogTitle>
           <DialogDescription>
@@ -249,48 +265,55 @@ export const AddGroupButton = () => {
                 <Plus className="h-4 w-4 mr-1" /> Add Member
               </Button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {members.map((member) => (
-                <div key={member.id} className="flex gap-2">
-                  <Input
-                    value={member.name}
-                    onChange={(e) => handleMemberChange(member.id, e.target.value)}
-                    placeholder="Member name"
-                    className="flex-1"
-                    required={members.length > 1}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleRemoveMember(member.id)}
-                    disabled={members.length === 1}
-                    className="h-10 w-10"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                <div key={member.id} className="flex flex-col gap-3 p-4 border rounded-md bg-muted/10">
+                  <div className="flex gap-2">
+                    <div className="flex-1 space-y-2">
+                      <div>
+                        <Label htmlFor={`member-name-${member.id}`} className="text-sm font-medium">
+                          Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Input
+                          id={`member-name-${member.id}`}
+                          value={member.name}
+                          onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
+                          placeholder="Member name"
+                          required
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`member-email-${member.id}`} className="text-sm font-medium">
+                          Email
+                        </Label>
+                        <Input
+                          id={`member-email-${member.id}`}
+                          type="email"
+                          value={member.email}
+                          onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
+                          placeholder="member@example.com"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveMember(member.id)}
+                      disabled={members.length === 1}
+                      className="h-8 w-8 self-start"
                     >
-                      <path d="M3 6h18" />
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                      <line x1="10" y1="11" x2="10" y2="17" />
-                      <line x1="14" y1="11" x2="14" y2="17" />
-                    </svg>
-                  </Button>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
+          <DialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
@@ -299,7 +322,10 @@ export const AddGroupButton = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={createGroupMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={createGroupMutation.isPending}
+            >
               {createGroupMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -309,7 +335,7 @@ export const AddGroupButton = () => {
                 'Create Group'
               )}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

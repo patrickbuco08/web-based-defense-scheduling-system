@@ -30,6 +30,7 @@ class GroupController extends Controller
             'group_code' => 'required|string|max:50|unique:groups,group_code',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
+            'members.*.email' => 'nullable|email|max:255',
             'term_id' => 'required|exists:terms,id',
             'department_id' => 'required|exists:departments,id',
             'critic_id' => 'nullable|exists:users,id',
@@ -49,6 +50,7 @@ class GroupController extends Controller
         foreach ($validated['members'] as $memberData) {
             $group->members()->create([
                 'student_name' => $memberData['name'],
+                'email' => $memberData['email'] ?? null,
             ]);
         }
 
@@ -86,6 +88,7 @@ class GroupController extends Controller
             'group_code' => 'required|string|max:50|unique:groups,group_code,' . $group->id,
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
+            'members.*.email' => 'nullable|email|max:255',
             'term_id' => 'required|exists:terms,id',
             'critic_id' => 'nullable|exists:users,id',
         ]);
@@ -104,6 +107,7 @@ class GroupController extends Controller
         foreach ($validated['members'] as $memberData) {
             $group->members()->create([
                 'student_name' => $memberData['name'],
+                'email' => $memberData['email'] ?? null,
             ]);
         }
 
