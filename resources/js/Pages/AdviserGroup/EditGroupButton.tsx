@@ -122,9 +122,6 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
         email: member.email
       }));
 
-      // Log member emails for debugging
-      console.log('Member emails:', memberEmails);
-
       // Proceed with the API call
       updateGroupMutation.mutate(
         {

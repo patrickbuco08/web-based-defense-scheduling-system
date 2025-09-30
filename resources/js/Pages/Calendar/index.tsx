@@ -192,8 +192,6 @@ function Calendar() {
     setIsDialogOpen(true);
   };
 
-  console.log(mappedEvents);
-
   return (
     <div className="p-6">
       <div className="mb-4 flex justify-between items-center">

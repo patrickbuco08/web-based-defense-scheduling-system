@@ -172,13 +172,23 @@ class DefenseController extends Controller
 
             switch ($request->status) {
                 case 'approved':
+                    // Get base recipients (adviser, critic, panelists)
                     $recipients = collect([$defense->adviser, $defense->critic])
                         ->merge($defense->panelists)
                         ->filter()
-                        ->pluck('email')
-                        ->unique()
-                        ->values()
-                        ->all();
+                        ->pluck('email');
+
+                    // Add group members' emails if they exist
+                    if ($defense->group && $defense->group->members->isNotEmpty()) {
+                        $groupMemberEmails = $defense->group->members
+                            ->pluck('email')
+                            ->filter(); // Remove null/empty emails
+                        
+                        $recipients = $recipients->merge($groupMemberEmails);
+                    }
+
+                    // Ensure unique emails and convert to array
+                    $recipients = $recipients->unique()->values()->all();
 
                     if (!empty($recipients)) {
                         Mail::to($recipients)->queue(new DefenseScheduleApproved($defense));
