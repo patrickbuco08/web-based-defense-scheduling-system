@@ -1,18 +1,18 @@
 import { apiClient } from "@/lib/api-client";
 
-interface Department {
+export interface Department {
   id: number;
   code: string;
   name: string;
   created_at: string;
 }
 
-interface CreateDepartmentPayload {
+export interface CreateDepartmentPayload {
   code: string;
   name: string;
 }
 
-interface UpdateDepartmentPayload {
+export interface UpdateDepartmentPayload {
   code: string;
   name: string;
 }

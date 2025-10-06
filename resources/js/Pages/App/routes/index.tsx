@@ -11,6 +11,7 @@ import Term from "@/Pages/Term";
 import Room from "@/Pages/Room";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminReport from "@/Pages/AdminReport";
 
 export function AppRoutes() { 
 
@@ -44,6 +45,7 @@ export function AppRoutes() {
         <Route path="adviser/groups" element={<ProtectedRoute allowedRoles={['adviser']} userRoles={user?.roles} children={<AdviserGroup />} />} />
 
         <Route path="coordinators/calendar" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<DepartmentDefenseCalendar />} />} />
+        <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminReport />} />} />
       </Route>
     </Routes>
   );

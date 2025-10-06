@@ -17,6 +17,7 @@ use Bocum\Http\Controllers\DepartmentController;
 use Bocum\Http\Controllers\Admin\PermissionController;
 use Bocum\Http\Controllers\Admin\RoleController;
 use Bocum\Http\Controllers\CriticController;
+use Bocum\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -80,6 +81,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('departments', DepartmentController::class)->except(['show', 'create', 'edit']);
 
     Route::get('critics', [CriticController::class, 'index'])->name('critics.index');
+
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/export/csv', [ReportController::class, 'exportCsv'])->name('reports.export.csv');
+    Route::get('reports/export/xlsx', [ReportController::class, 'exportXlsx'])->name('reports.export.xlsx');
 
     Route::post('defenses/{defense}/check-conflicts', [DefenseController::class, 'checkConflicts'])->name('defenses.conflicts.check');
     Route::get('defenses/departments', [DefenseController::class, 'departmentIndex'])->name('defenses.departmentIndex');

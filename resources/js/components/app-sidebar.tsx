@@ -72,7 +72,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         name: "Manage Terms",
         url: "/app/admin/terms",
-        icon: IconBuilding,
+        icon: IconCalendarMonth,
+      },
+      {
+        name: "Reports",
+        url: "/app/admin/reports",
+        icon: IconFileDescription,
       },
     ],
     navClouds: [
