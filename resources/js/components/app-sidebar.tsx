@@ -52,6 +52,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/app/coordinators/calendar",
         icon: IconCalendarMonth,
       },
+      {
+        name: "Reports",
+        url: "/app/coordinators/reports",
+        icon: IconFileDescription,
+      },
     ],
     admin: [
       {

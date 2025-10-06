@@ -12,6 +12,7 @@ import Room from "@/Pages/Room";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminReport from "@/Pages/AdminReport";
+import CoordinatorReport from "@/Pages/CoordinatorReport";
 
 export function AppRoutes() { 
 
@@ -41,11 +42,12 @@ export function AppRoutes() {
         <Route path="admin/rooms" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Room />} />} />
         <Route path="admin/accounts" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Account />} />} />
         <Route path="admin/terms" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Term />} />} />
+        <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminReport />} />} />
 
         <Route path="adviser/groups" element={<ProtectedRoute allowedRoles={['adviser']} userRoles={user?.roles} children={<AdviserGroup />} />} />
 
         <Route path="coordinators/calendar" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<DepartmentDefenseCalendar />} />} />
-        <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminReport />} />} />
+        <Route path="coordinators/reports" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorReport />} />} />
       </Route>
     </Routes>
   );
