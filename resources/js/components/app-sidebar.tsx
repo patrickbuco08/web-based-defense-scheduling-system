@@ -57,6 +57,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/app/coordinators/reports",
         icon: IconFileDescription,
       },
+      {
+        name: "Activity Log",
+        url: "/app/coordinators/logs",
+        icon: IconFileDescription,
+      },
     ],
     admin: [
       {
@@ -82,6 +87,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         name: "Reports",
         url: "/app/admin/reports",
+        icon: IconFileDescription,
+      },
+      {
+        name: "Activity Log",
+        url: "/app/admin/logs",
         icon: IconFileDescription,
       },
     ],

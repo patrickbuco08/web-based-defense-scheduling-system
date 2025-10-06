@@ -22,6 +22,7 @@ use Bocum\Mail\DefenseScheduleApproved;
 use Bocum\Mail\DefenseScheduleCancelled;
 use Bocum\Mail\DefenseScheduleRejected;
 use Bocum\Models\User;
+use Spatie\Activitylog\activity;
 
 class DefenseController extends Controller
 {
@@ -166,12 +167,23 @@ class DefenseController extends Controller
                 $data['rejection_note'] = $request->rejection_note;
             }
 
+            $oldStatus = $defense->status;
+
             // Update the defense
             $defense->update($data);
 
             // Sync panelists if provided
             if ($request->has('panelists')) {
                 $defense->panelists()->sync($request->panelists);
+
+                activity('defense')
+                    ->causedBy(Auth::user())
+                    ->performedOn($defense)
+                    ->withProperties([
+                        'action' => 'panelists.assigned',
+                        'panelists' => $defense->panelists()->pluck('users.name')->all(),
+                    ])
+                    ->log('defense.panelists_assigned');
             }
 
             switch ($request->status) {
@@ -180,6 +192,19 @@ class DefenseController extends Controller
                     if (!empty($recipients)) {
                         Mail::to($recipients)->queue(new DefenseScheduleApproved($defense));
                     }
+
+                    activity('defense')
+                        ->causedBy(Auth::user())
+                        ->performedOn($defense)
+                        ->withProperties([
+                            'status_from' => 'pending',
+                            'status_to'   => 'approved',
+                            'room_id'     => $defense->room_id,
+                            'start_at'    => $defense->start_at,
+                            'end_at'      => $defense->end_at,
+                            'panelists'   => $defense->panelists()->pluck('users.name')->all(),
+                        ])->log('defense.approved');
+
                     break;
 
                 case 'rejected':
@@ -187,6 +212,16 @@ class DefenseController extends Controller
                     if ($adviser && $adviser->email) {
                         Mail::to($adviser->email)->queue(new DefenseScheduleRejected($defense, $adviser));
                     }
+
+                    activity('defense')
+                        ->causedBy(Auth::user())
+                        ->performedOn($defense)
+                        ->withProperties([
+                            'status_from' => $oldStatus,
+                            'status_to'   => 'rejected',
+                            'reason'      => $request->rejection_note,
+                        ])->log('defense.rejected');
+
                     break;
 
                 case 'cancelled':
@@ -194,6 +229,15 @@ class DefenseController extends Controller
                     if (!empty($recipients)) {
                         Mail::to($recipients)->queue(new DefenseScheduleCancelled($defense));
                     }
+
+                    activity('defense')
+                        ->causedBy(Auth::user())
+                        ->performedOn($defense)
+                        ->withProperties([
+                            'status_from' => $oldStatus,
+                            'status_to'   => 'cancelled',
+                        ])->log('defense.cancelled');
+
                     break;
 
                 // Add more cases for other statuses if needed
@@ -260,6 +304,20 @@ class DefenseController extends Controller
             $coordinator = User::role('coordinator')->where('department_id', $adviser->department_id)->firstOrFail();
 
             Mail::to($coordinator->email)->queue(new DefenseProposalMail($defense, $adviser));
+
+            $defense->load('group', 'group.term');
+
+            activity('defense')
+                ->causedBy(Auth::user())
+                ->performedOn($defense)
+                ->withProperties([
+                    'status_from' => null,
+                    'status_to'   => 'pending',
+                    'group_id'    => $defense->group->id,
+                    'term_id'     => $defense->group->term->id,
+                    'start_at'    => $defense->start_at,
+                    'end_at'      => $defense->end_at,
+                ])->log('defense.proposed');
 
             DB::commit();
 
@@ -328,5 +386,4 @@ class DefenseController extends Controller
             ]);
         }
     }
-
 }
