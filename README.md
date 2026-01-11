@@ -40,7 +40,7 @@ DB_PASSWORD=defense_scheduling_password
 ## 🛠️ build the application
 
 ```
-docker-compose up --build -d
+docker compose up --build -d
 ```
 
 ---
