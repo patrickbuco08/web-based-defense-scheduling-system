@@ -5,6 +5,7 @@ import AppLayout from "@/layouts/AppLayout";
 import Account from "@/Pages/Account";
 import AdviserGroup from "@/Pages/AdviserGroup";
 import Calendar from "@/Pages/Calendar";
+import Dashboard from "@/Pages/Dashboard";
 import DepartmentDefenseCalendar from "@/Pages/Coordinator/DepartmentDefenseCalendar";
 import Department from "@/Pages/Department";
 import Term from "@/Pages/Term";
@@ -35,6 +36,17 @@ export function AppRoutes() {
               allowedRoles={['coordinator', 'adviser', 'panelist', 'critic']}
               userRoles={user?.roles}
               children={<Calendar />}
+            />
+          }
+        />
+
+        <Route
+          path="dashboard"
+          element={
+            <ProtectedRoute
+              allowedRoles={['coordinator', 'adviser', 'panelist', 'critic']}
+              userRoles={user?.roles}
+              children={<Dashboard />}
             />
           }
         />

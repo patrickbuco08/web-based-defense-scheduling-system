@@ -31,6 +31,12 @@ import { useAuth } from "@/hooks/useAuth";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
 
+  const dashboard = {
+    name: "Dashboard",
+    url: "/app/dashboard",
+    icon: IconInnerShadowTop,
+  };
+
   const data = {
     navMain: [
       {
@@ -40,6 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
     ],
     adviser: [
+      dashboard,
       {
         name: "Group Registration",
         url: "/app/adviser/groups",

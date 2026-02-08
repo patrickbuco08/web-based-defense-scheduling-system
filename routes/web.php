@@ -19,6 +19,7 @@ use Bocum\Http\Controllers\Admin\RoleController;
 use Bocum\Http\Controllers\CriticController;
 use Bocum\Http\Controllers\ReportController;
 use Bocum\Http\Controllers\LogsController;
+use Bocum\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -66,6 +67,8 @@ Route::middleware('auth')->group(function () {
     })->where('any', '.*')->name('app');
 
     Route::get('/user', [AuthenticatedSessionController::class, 'getUser']);
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
     Route::get('/accounts/departments', [AccountController::class, 'getAccountsByDepartment'])->name('accounts.departments');
     Route::resource('accounts', AccountController::class)

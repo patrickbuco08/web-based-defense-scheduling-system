@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import { useDefenses } from "@/features/defenses/queries/useDefenses";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -138,14 +139,22 @@ interface Defense {
 
 function Calendar() {
   const calendarRef = useRef<FullCalendar>(null);
+  const [searchParams] = useSearchParams();
   const [selectedDefense, setSelectedDefense] = useState<Defense | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || 'all');
   const deleteDefense = useDeleteDefense();
   const { user } = useAuth();
 
   const { data: defenses = [] } = useDefenses();
+
+  useEffect(() => {
+    const statusParam = searchParams.get('status');
+    if (statusParam) {
+      setStatusFilter(statusParam);
+    }
+  }, [searchParams]);
 
   const getEventColor = useCallback((status: string) => {
     switch (status) {
