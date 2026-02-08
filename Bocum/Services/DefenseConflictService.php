@@ -83,6 +83,36 @@ class DefenseConflictService
     }
 
     /**
+     * Get occupied time slots for a specific date and room
+     * Returns time ranges that are already booked by approved defenses
+     * 
+     * @param int $defenseId Current defense being edited (to exclude from results)
+     * @param int $roomId Room to check
+     * @param string $proposedDate Date to check in Y-m-d format
+     * @return array Array of occupied time slots with start_time and end_time in H:i format
+     */
+    public function getOccupiedTimeSlots(int $defenseId, int $roomId, string $proposedDate): array
+    {
+        $occupiedDefenses = Defense::query()
+            ->whereDate('start_at', $proposedDate)
+            ->where('room_id', $roomId)
+            ->where('status', 'approved')
+            ->where('id', '!=', $defenseId)
+            ->select('id', 'title', 'start_at', 'end_at')
+            ->orderBy('start_at')
+            ->get();
+
+        return $occupiedDefenses->map(function ($defense) {
+            return [
+                'defense_id' => $defense->id,
+                'title' => $defense->title,
+                'start_time' => optional($defense->start_at)->format('H:i'),
+                'end_time' => optional($defense->end_at)->format('H:i'),
+            ];
+        })->toArray();
+    }
+
+    /**
      * Check if there's a panelist conflict for the given defense
      * 
      * @param int $defenseId

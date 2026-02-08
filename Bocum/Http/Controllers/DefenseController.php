@@ -73,17 +73,23 @@ class DefenseController extends Controller
     public function checkConflicts(Request $request, Defense $defense): JsonResponse
     {
         $validated = $request->validate([
-            'panelist_ids' => 'required|array',
+            'panelist_ids' => 'sometimes|array',
             'panelist_ids.*' => 'exists:users,id',
+            'panelists' => 'sometimes|array',
+            'panelists.*' => 'exists:users,id',
             'proposed_date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'room_id' => 'required|exists:rooms,id',
         ]);
 
+        $panelistIds = $validated['panelist_ids'] ?? $validated['panelists'] ?? [];
+
         $roomConflicts = $this->conflictService->checkRoomConflict($defense, $validated['room_id'], $validated['proposed_date'], $validated['start_time'], $validated['end_time']);
 
-        $panelistConflicts = $this->conflictService->checkPanelistConflict($defense->id, $validated['panelist_ids'], $validated['proposed_date'], $validated['start_time'], $validated['end_time']);
+        $panelistConflicts = $this->conflictService->checkPanelistConflict($defense->id, $panelistIds, $validated['proposed_date'], $validated['start_time'], $validated['end_time']);
+
+        $occupiedSlots = $this->conflictService->getOccupiedTimeSlots($defense->id, $validated['room_id'], $validated['proposed_date']);
 
         return response()->json([
             'success' => true,
@@ -91,6 +97,7 @@ class DefenseController extends Controller
                 'room_conflicts' => $roomConflicts,
                 'panelist_conflicts' => $panelistConflicts,
                 'has_any_conflicts' => $roomConflicts['has_conflict'] || $panelistConflicts['has_conflict'],
+                'occupied_slots' => $occupiedSlots,
             ],
         ]);
     }

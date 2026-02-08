@@ -22,7 +22,6 @@ import {
     AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
@@ -32,6 +31,7 @@ import { format, parseISO, formatISO } from "date-fns";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import debounce from 'lodash/debounce';
+import { TimeSlotCombobox } from "@/components/TimeSlotCombobox";
 
 interface FormData {
     title: string;
@@ -76,6 +76,7 @@ function DepartmentDefenseCalendar() {
         room_conflicts: { has_conflict: boolean; message: string; conflicts: any[] };
         panelist_conflicts: { has_conflict: boolean; message: string; conflicts: any[] };
         has_any_conflicts: boolean;
+        occupied_slots: Array<{ defense_id: number; title: string; start_time: string; end_time: string }>;
     } | null>(null);
     const [isCheckingConflicts, setIsCheckingConflicts] = useState(false);
     // Debounced check conflicts function using lodash
@@ -248,7 +249,10 @@ function DepartmentDefenseCalendar() {
                 height="auto"
             />
 
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} modal={false}>
+                {isDialogOpen && (
+                    <div className="fixed inset-0 z-40 bg-black/80" />
+                )}
                 <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <div className="flex items-center justify-between">
@@ -335,6 +339,27 @@ function DepartmentDefenseCalendar() {
                                 </div>
                             )}
 
+                            {/* Room Selection */}
+                            <div className="space-y-2">
+                                <Label>Room</Label>
+                                <Select
+                                    value={formData.room_id}
+                                    onValueChange={(value) => setFormData(prev => ({ ...prev, room_id: value }))}
+                                    disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select room" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {rooms.map((room: any) => (
+                                            <SelectItem key={room.id} value={room.id.toString()}>
+                                                {room.building} - Room {room.room_number}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
                             <div className="space-y-2">
                                 <div className="flex flex-col md:flex-row gap-4">
 
@@ -383,17 +408,15 @@ function DepartmentDefenseCalendar() {
                                         <Label htmlFor="start_time" className="text-sm font-medium mb-1 block">
                                             Start Time
                                         </Label>
-                                        <div className="relative">
-                                            <Input
-                                                id="start_time"
-                                                type="time"
-                                                value={formData.start_time}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
-                                                className={`w-full appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none ${['pending', 'approved', 'rejected', 'cancelled'].includes(initialStatus) ? 'bg-gray-50' : 'bg-background'}`}
-                                                disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
-                                                required
-                                            />
-                                        </div>
+                                        <TimeSlotCombobox
+                                            id="start_time"
+                                            value={formData.start_time}
+                                            onChange={(value) => setFormData(prev => ({ ...prev, start_time: value }))}
+                                            occupiedSlots={conflicts?.occupied_slots || []}
+                                            disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                            placeholder="Select start time"
+                                            className="w-full"
+                                        />
                                     </div>
 
                                     {/* End Time - Editable */}
@@ -401,41 +424,18 @@ function DepartmentDefenseCalendar() {
                                         <Label htmlFor="end_time" className="text-sm font-medium mb-1 block">
                                             End Time
                                         </Label>
-                                        <div className="relative">
-                                            <Input
-                                                id="end_time"
-                                                type="time"
-                                                value={formData.end_time}
-                                                onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
-                                                min={formData.start_time}
-                                                className={`w-full appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none ${['approved', 'rejected', 'cancelled'].includes(initialStatus) ? 'bg-gray-50' : 'bg-background'}`}
-                                                disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
-                                                required
-                                            />
-                                        </div>
+                                        <TimeSlotCombobox
+                                            id="end_time"
+                                            value={formData.end_time}
+                                            onChange={(value) => setFormData(prev => ({ ...prev, end_time: value }))}
+                                            occupiedSlots={conflicts?.occupied_slots || []}
+                                            minTime={formData.start_time}
+                                            disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                            placeholder="Select end time"
+                                            className="w-full"
+                                        />
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Room Selection */}
-                            <div className="space-y-2">
-                                <Label>Room</Label>
-                                <Select
-                                    value={formData.room_id}
-                                    onValueChange={(value) => setFormData(prev => ({ ...prev, room_id: value }))}
-                                    disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select room" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {rooms.map((room: any) => (
-                                            <SelectItem key={room.id} value={room.id.toString()}>
-                                                {room.building} - Room {room.room_number}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
                             </div>
 
                             {/* Status Selection */}
@@ -543,9 +543,9 @@ function DepartmentDefenseCalendar() {
                             >
                                 {updateDefense.isPending ? "Saving..." :
                                     isCheckingConflicts ? "Checking..." :
-                                    conflicts?.has_any_conflicts ? "Cannot Save - Conflicts Detected" :
-                                    initialStatus === 'approved' && formData.status === 'cancelled' ? "Cancel Defense" :
-                                        "Save Changes"}
+                                        conflicts?.has_any_conflicts ? "Cannot Save - Conflicts Detected" :
+                                            initialStatus === 'approved' && formData.status === 'cancelled' ? "Cancel Defense" :
+                                                "Save Changes"}
                             </Button>
                         </DialogFooter>
                     )}
