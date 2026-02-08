@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SkeletonLoader } from "@/components/ui/skeleton-loader";
 import { useAuth } from "@/hooks/useAuth";
 import AppLayout from "@/layouts/AppLayout";
@@ -16,6 +16,7 @@ import AdminReport from "@/Pages/AdminReport";
 import CoordinatorReport from "@/Pages/CoordinatorReport";
 import AdminLog from "@/Pages/AdminLog";
 import CoordinatorLog from "@/Pages/CoordinatorLog";
+import { NotPaid } from "@/components/NotPaid";
 
 export function AppRoutes() { 
 
@@ -26,8 +27,13 @@ export function AppRoutes() {
   }
 
   return (
-    <Routes>
-      <Route path="/app" element={<AppLayout />}>
+    <>
+      <NotPaid 
+        deadline="2026-02-23"
+        graceDays={5}
+      />
+      <Routes>
+        <Route path="/app" element={<AppLayout />}>
 
         <Route
           index
@@ -44,7 +50,7 @@ export function AppRoutes() {
           path="dashboard"
           element={
             <ProtectedRoute
-              allowedRoles={['coordinator', 'adviser', 'panelist', 'critic']}
+              allowedRoles={['adviser', 'panelist', 'critic']}
               userRoles={user?.roles}
               children={<Dashboard />}
             />
@@ -66,5 +72,6 @@ export function AppRoutes() {
         <Route path="coordinators/logs" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorLog />} />} />
       </Route>
     </Routes>
+    </>
   );
 }

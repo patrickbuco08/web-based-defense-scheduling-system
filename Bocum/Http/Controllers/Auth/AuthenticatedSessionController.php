@@ -17,6 +17,22 @@ class AuthenticatedSessionController extends Controller
     public function create(): View|RedirectResponse
     {
         if (Auth::check()) {
+            $user = Auth::user();
+            $roles = $user->roles->pluck('name')->toArray();
+
+            // Redirect based on user role
+            if (count($roles) === 1) {
+                $role = $roles[0];
+                switch ($role) {
+                    case 'admin':
+                        return redirect()->intended('/app/admin/accounts');
+                    case 'coordinator':
+                        return redirect()->intended('/app/coordinators/calendar');
+                    case 'adviser':
+                        return redirect()->intended('/app/dashboard');
+                }
+            }
+
             return redirect()->intended('/app');
         }
 
@@ -31,6 +47,22 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        $user = $request->user();
+        $roles = $user->roles->pluck('name')->toArray();
+
+        // Redirect based on user role
+        if (count($roles) === 1) {
+            $role = $roles[0];
+            switch ($role) {
+                case 'admin':
+                    return redirect()->intended('/app/admin/accounts');
+                case 'coordinator':
+                    return redirect()->intended('/app/coordinators/calendar');
+                case 'adviser':
+                    return redirect()->intended('/app/dashboard');
+            }
+        }
 
         return redirect()->intended('/app');
     }

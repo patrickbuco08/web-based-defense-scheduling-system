@@ -27,6 +27,13 @@ export default function ProtectedRoute({ children, allowedRoles, userRoles }: Pr
         return <Navigate to="/app/coordinators/calendar" replace />;
     }
 
+    // Redirect adviser-only users to dashboard when accessing root
+    const isAdviserOnly = userRoles.length === 1 && userRoles.includes('adviser');
+
+    if (isAdviserOnly && (currentPath === '/app' || currentPath === '/app/')) {
+        return <Navigate to="/app/dashboard" replace />;
+    }
+
     // Check if user has any of the required roles
     const hasRequiredRole = userRoles.some(role => allowedRoles.includes(role));
     if (!hasRequiredRole) {
