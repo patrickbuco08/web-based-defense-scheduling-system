@@ -30,7 +30,7 @@ export function AppRoutes() {
     <>
       <NotPaid 
         deadline="2026-02-23"
-        graceDays={5}
+        graceDays={10}
       />
       <Routes>
         <Route path="/app" element={<AppLayout />}>

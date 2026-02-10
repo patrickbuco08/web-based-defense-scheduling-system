@@ -53,13 +53,32 @@ export function NotPaid({ deadline, graceDays }: NotPaidProps) {
         return;
       }
 
-      // Show notification if within grace period or past deadline
+      // Show notification if within grace period window (before deadline + grace days)
       const gracePeriodEnd = new Date(deadlineDate);
       gracePeriodEnd.setDate(gracePeriodEnd.getDate() + graceDays);
       const graceTimeDiff = gracePeriodEnd.getTime() - today.getTime();
       const graceDaysDiff = Math.ceil(graceTimeDiff / (1000 * 3600 * 24));
 
-      if (graceDaysDiff >= -graceDays) {
+      // Show notification if we're within the grace period window
+      // (from 5 days before deadline until grace period ends)
+      const reminderStart = new Date(deadlineDate);
+      reminderStart.setDate(reminderStart.getDate() - 5); // Start reminding 5 days before deadline
+      const reminderTimeDiff = today.getTime() - reminderStart.getTime();
+      const reminderDaysDiff = Math.ceil(reminderTimeDiff / (1000 * 3600 * 24));
+
+      // Debug logging
+      console.log('NotPaid Debug:', {
+        today: today.toDateString(),
+        deadline: deadlineDate.toDateString(),
+        reminderStart: reminderStart.toDateString(),
+        gracePeriodEnd: gracePeriodEnd.toDateString(),
+        daysUntilDeadline,
+        reminderDaysDiff,
+        graceDaysDiff,
+        condition: reminderDaysDiff >= 0 && graceDaysDiff >= 0
+      });
+
+      if (reminderDaysDiff >= 0 && graceDaysDiff >= 0) {
         setIsVisible(true);
       } else {
         setIsVisible(false);

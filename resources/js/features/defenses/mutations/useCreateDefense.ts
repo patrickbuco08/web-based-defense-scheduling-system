@@ -9,8 +9,14 @@ export const useCreateDefense = () => {
     mutationFn: defensesApi.createDefense,
     onSuccess: () => {
       // Invalidate and refetch the defenses list
-      return queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({ 
         queryKey: ['defenses'],
+        refetchType: 'active',
+      });
+      
+      // Invalidate dashboard queries to refresh stats
+      queryClient.invalidateQueries({ 
+        queryKey: ['dashboard'],
         refetchType: 'active',
       });
     },

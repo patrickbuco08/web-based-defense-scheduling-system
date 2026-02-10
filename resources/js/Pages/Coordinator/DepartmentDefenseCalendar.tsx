@@ -413,7 +413,7 @@ function DepartmentDefenseCalendar() {
                                             value={formData.start_time}
                                             onChange={(value) => setFormData(prev => ({ ...prev, start_time: value }))}
                                             occupiedSlots={conflicts?.occupied_slots || []}
-                                            disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                            disabled={['rejected', 'cancelled'].includes(initialStatus)}
                                             placeholder="Select start time"
                                             className="w-full"
                                         />
@@ -430,7 +430,7 @@ function DepartmentDefenseCalendar() {
                                             onChange={(value) => setFormData(prev => ({ ...prev, end_time: value }))}
                                             occupiedSlots={conflicts?.occupied_slots || []}
                                             minTime={formData.start_time}
-                                            disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                            disabled={['rejected', 'cancelled'].includes(initialStatus)}
                                             placeholder="Select end time"
                                             className="w-full"
                                         />
