@@ -190,6 +190,7 @@ const Dashboard = () => {
                                 <TableHead className="w-[140px]">When</TableHead>
                                 <TableHead className="w-[160px]">Status</TableHead>
                                 <TableHead className="w-[180px]">Group Code</TableHead>
+                                <TableHead className="w-[180px]">Course Code</TableHead>
                                 <TableHead>Title</TableHead>
                                 <TableHead className="w-[200px]">Location</TableHead>
                             </TableRow>
@@ -221,6 +222,9 @@ const Dashboard = () => {
                                         </TableCell>
                                         <TableCell className="font-medium">
                                             {defense.group?.group_code || "—"}
+                                        </TableCell>
+                                        <TableCell className="text-sm">
+                                            {defense.group?.course_code || "—"}
                                         </TableCell>
                                         <TableCell className="text-sm">
                                             {defense.title || "—"}

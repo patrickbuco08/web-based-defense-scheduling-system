@@ -62,6 +62,7 @@ export const AddGroupButton = () => {
 
   const [formData, setFormData] = useState({
     group_code: "",
+    course_code: "",
     department_id: user?.department_id?.toString() || '',
     term_id: "",
     critic_id: "",
@@ -145,6 +146,7 @@ export const AddGroupButton = () => {
         // Reset form
         setFormData({
           group_code: "",
+          course_code: "",
           department_id: user?.department_id?.toString() || "",
           term_id: activeTerm?.id?.toString() || "",
           critic_id: "",
@@ -190,6 +192,19 @@ export const AddGroupButton = () => {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="course_code" className="text-right">
+              Course Code
+            </Label>
+            <Input
+              id="course_code"
+              name="course_code"
+              value={formData.course_code}
+              onChange={handleChange}
+              className="col-span-3"
+            />
+          </div>
+
+          <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="department_id" className="text-right">
               Department
             </Label>
@@ -220,7 +235,7 @@ export const AddGroupButton = () => {
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">Term</Label>
+            <Label className="text-right">Academic Year</Label>
             <div className="col-span-3 text-sm text-muted-foreground">
               {activeTerm ? (
                 `${activeTerm.semester} - ${activeTerm.school_year}`

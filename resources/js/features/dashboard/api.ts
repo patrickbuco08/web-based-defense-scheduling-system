@@ -20,6 +20,7 @@ export interface DashboardDefense {
     group: {
         id: number;
         group_code: string;
+        course_code: string;
     };
     room?: {
         id: number;

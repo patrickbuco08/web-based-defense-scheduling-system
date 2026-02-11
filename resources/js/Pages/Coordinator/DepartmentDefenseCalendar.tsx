@@ -272,22 +272,28 @@ function DepartmentDefenseCalendar() {
                                     <Label className="text-sm font-semibold text-gray-700">Group Information</Label>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Group Code and Term */}
-                                    <div className="space-y-3">
-                                        <div>
-                                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Group Code</span>
-                                            <p className="text-sm font-semibold text-gray-900">{selectedDefense.group?.group_code || 'N/A'}</p>
-                                        </div>
-                                        <div>
-                                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Academic Term</span>
-                                            <p className="text-sm text-gray-700">
-                                                {selectedDefense.group?.term ?
-                                                    `${selectedDefense.group.term.school_year} - ${selectedDefense.group.term.semester} Semester`
-                                                    : 'N/A'
-                                                }
-                                            </p>
-                                        </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {/* Group Code */}
+                                    <div>
+                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Group Code</span>
+                                        <p className="text-sm font-semibold text-gray-900">{selectedDefense.group?.group_code || 'N/A'}</p>
+                                    </div>
+
+                                    {/* Course Code */}
+                                    <div>
+                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Course Code</span>
+                                        <p className="text-sm text-gray-700">{selectedDefense.group?.course_code || 'N/A'}</p>
+                                    </div>
+
+                                    {/* Academic Term */}
+                                    <div>
+                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Academic Term</span>
+                                        <p className="text-sm text-gray-700">
+                                            {selectedDefense.group?.term ?
+                                                `${selectedDefense.group.term.school_year} - ${selectedDefense.group.term.semester} Semester`
+                                                : 'N/A'
+                                            }
+                                        </p>
                                     </div>
 
                                     {/* Adviser and Critic */}

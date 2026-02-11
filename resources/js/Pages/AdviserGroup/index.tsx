@@ -85,14 +85,6 @@ const AdviserGroup = () => {
         );
     }
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
-    };
-
     return (
         <div className="w-full max-w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
             <div className="flex justify-between items-center">
@@ -110,6 +102,7 @@ const AdviserGroup = () => {
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[150px]">Group Code</TableHead>
+                            <TableHead className="w-[150px]">Course Code</TableHead>
                             <TableHead className="w-[200px]">Adviser</TableHead>
                             <TableHead className="w-[200px]">Critic</TableHead>
                             <TableHead className="w-[150px]">Term</TableHead>
@@ -122,6 +115,7 @@ const AdviserGroup = () => {
                         {groups?.map((group) => (
                             <TableRow key={group.id}>
                                 <TableCell className="font-medium">{group.group_code}</TableCell>
+                                <TableCell>{group.course_code || '-'}</TableCell>
                                 <TableCell>{group.adviser?.name || '-'}</TableCell>
                                 <TableCell>{group.critic?.name || 'Not assigned'}</TableCell>
                                 <TableCell>

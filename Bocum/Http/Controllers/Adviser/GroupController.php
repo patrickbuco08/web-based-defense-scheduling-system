@@ -28,6 +28,7 @@ class GroupController extends Controller
     {
         $validated = $request->validate([
             'group_code' => 'required|string|max:50|unique:groups,group_code',
+            'course_code' => 'nullable|string|max:50',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
             'members.*.email' => 'nullable|email|max:255',
@@ -39,6 +40,7 @@ class GroupController extends Controller
         // Create the group
         $group = Group::create([
             'group_code' => $validated['group_code'],
+            'course_code' => $validated['course_code'] ?? null,
             'term_id' => $validated['term_id'],
             'department_id' => $validated['department_id'],
             'critic_id' => $validated['critic_id'] ?? null,
@@ -86,6 +88,7 @@ class GroupController extends Controller
 
         $validated = $request->validate([
             'group_code' => 'required|string|max:50|unique:groups,group_code,' . $group->id,
+            'course_code' => 'nullable|string|max:50',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
             'members.*.email' => 'nullable|email|max:255',
@@ -96,6 +99,7 @@ class GroupController extends Controller
         // Update the group
         $group->update([
             'group_code' => $validated['group_code'],
+            'course_code' => $validated['course_code'] ?? null,
             'term_id' => $validated['term_id'],
             'critic_id' => $validated['critic_id'] ?? null,
         ]);

@@ -8,7 +8,9 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles, userRoles }: ProtectedRouteProps) {
+    
     const location = useLocation();
+
     const currentPath = location.pathname;
     if (!userRoles) {
         // not logged in → redirect to login
@@ -25,13 +27,6 @@ export default function ProtectedRoute({ children, allowedRoles, userRoles }: Pr
 
     if (isCoordinatorOnly && (currentPath === '/app' || currentPath === '/app/')) {
         return <Navigate to="/app/coordinators/calendar" replace />;
-    }
-
-    // Redirect adviser-only users to dashboard when accessing root
-    const isAdviserOnly = userRoles.length === 1 && userRoles.includes('adviser');
-
-    if (isAdviserOnly && (currentPath === '/app' || currentPath === '/app/')) {
-        return <Navigate to="/app/dashboard" replace />;
     }
 
     // Check if user has any of the required roles

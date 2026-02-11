@@ -66,18 +66,6 @@ export function NotPaid({ deadline, graceDays }: NotPaidProps) {
       const reminderTimeDiff = today.getTime() - reminderStart.getTime();
       const reminderDaysDiff = Math.ceil(reminderTimeDiff / (1000 * 3600 * 24));
 
-      // Debug logging
-      console.log('NotPaid Debug:', {
-        today: today.toDateString(),
-        deadline: deadlineDate.toDateString(),
-        reminderStart: reminderStart.toDateString(),
-        gracePeriodEnd: gracePeriodEnd.toDateString(),
-        daysUntilDeadline,
-        reminderDaysDiff,
-        graceDaysDiff,
-        condition: reminderDaysDiff >= 0 && graceDaysDiff >= 0
-      });
-
       if (reminderDaysDiff >= 0 && graceDaysDiff >= 0) {
         setIsVisible(true);
       } else {

@@ -11,6 +11,7 @@ export interface Group {
   department_id: number;
   term_id: number;
   group_code: string;
+  course_code: string;
   adviser_id: number;
   critic_id: number | null;
   created_at: string;

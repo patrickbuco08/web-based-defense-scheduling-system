@@ -376,6 +376,23 @@ function Calendar() {
                 </div>
               </div>
 
+              {selectedDefense.group && (
+                <div className="flex items-start gap-3 p-4 border rounded-lg">
+                  <UsersIcon className="h-5 w-5 text-indigo-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Group</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Group Code: {selectedDefense.group.group_code || "N/A"}
+                    </p>
+                    {selectedDefense.group.course_code && (
+                      <p className="text-xs text-gray-600">
+                        Course Code: {selectedDefense.group.course_code}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Students Section */}
               {selectedDefense.group?.members &&
                 selectedDefense.group.members.length > 0 && (
