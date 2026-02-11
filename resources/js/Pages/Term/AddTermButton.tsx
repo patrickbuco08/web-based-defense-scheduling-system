@@ -18,12 +18,12 @@ const AddTermButton = () => {
             <DialogTrigger asChild>
                 <Button>
                     <Plus className="h-4 w-4" />
-                    Add Term
+                    Add Academic Year
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add New Term</DialogTitle>
+                    <DialogTitle>Add Academic Year</DialogTitle>
                 </DialogHeader>
                 <AddTermForm onSuccess={() => setIsOpen(false)} />
             </DialogContent>

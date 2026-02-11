@@ -87,8 +87,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconBuilding,
       },
       {
-        name: "Manage Terms",
-        url: "/app/admin/terms",
+        name: "Manage Academic Year",
+        url: "/app/admin/academic-year",
         icon: IconCalendarMonth,
       },
       {

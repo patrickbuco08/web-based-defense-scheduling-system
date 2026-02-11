@@ -16,7 +16,7 @@ import AdminReport from "@/Pages/AdminReport";
 import CoordinatorReport from "@/Pages/CoordinatorReport";
 import AdminLog from "@/Pages/AdminLog";
 import CoordinatorLog from "@/Pages/CoordinatorLog";
-import { NotPaid } from "@/components/NotPaid";
+// import { NotPaid } from "@/components/NotPaid";
 
 export function AppRoutes() { 
 
@@ -28,10 +28,10 @@ export function AppRoutes() {
 
   return (
     <>
-      <NotPaid 
-        deadline="2026-02-23"
+      {/* <NotPaid 
+        deadline="2026-03-23"
         graceDays={10}
-      />
+      /> */}
       <Routes>
         <Route path="/app" element={<AppLayout />}>
 
@@ -61,7 +61,7 @@ export function AppRoutes() {
         <Route path="admin/departments" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Department />} />} />
         <Route path="admin/rooms" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Room />} />} />
         <Route path="admin/accounts" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Account />} />} />
-        <Route path="admin/terms" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Term />} />} />
+        <Route path="admin/academic-year" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Term />} />} />
         <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminReport />} />} />
         <Route path="admin/logs" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminLog />} />} />
 

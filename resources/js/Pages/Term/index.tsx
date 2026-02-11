@@ -91,11 +91,11 @@ const Term = () => {
         <div className="w-full max-w-full px-4 sm:px-6 py-6 sm:py-8 space-y-6">
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold tracking-tight">Manage Terms</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">Manage Academic Year</h1>
                     <AddTermButton />
                 </div>
                 <p className="text-muted-foreground">
-                    View and manage all available terms for defense scheduling
+                    View and manage all available academic year for defense scheduling
                 </p>
             </div>
 
@@ -103,7 +103,7 @@ const Term = () => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>School Year</TableHead>
+                            <TableHead>Academic Year</TableHead>
                             <TableHead>Semester</TableHead>
                             <TableHead>Is Current</TableHead>
                             <TableHead>Actions</TableHead>
