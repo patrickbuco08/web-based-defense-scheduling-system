@@ -242,7 +242,7 @@ function DepartmentDefenseCalendar() {
                 headerToolbar={{
                     left: "prev,next today",
                     center: "title",
-                    right: "dayGridMonth,timeGridWeek,timeGridDay",
+                    right: "dayGridYear,dayGridMonth,timeGridWeek,timeGridDay",
                 }}
                 events={events}
                 eventClick={handleEventClick}

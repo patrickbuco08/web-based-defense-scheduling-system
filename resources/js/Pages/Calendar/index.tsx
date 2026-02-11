@@ -233,7 +233,7 @@ function Calendar() {
         headerToolbar={{
           left: "prev,next today",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
+          right: "dayGridYear,dayGridMonth,timeGridWeek,timeGridDay",
         }}
         events={mappedEvents}
         eventClick={handleEventClick}
