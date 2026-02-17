@@ -20,6 +20,7 @@ $app = BocumApplication::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest' => \Bocum\Http\Middleware\RedirectIfAuthenticated::class,
+            'register.link' => \Bocum\Http\Middleware\CheckRegisterLink::class,
         ]);
     })->withProviders([
         \Bocum\Providers\AuthServiceProvider::class,

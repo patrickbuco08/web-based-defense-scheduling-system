@@ -123,4 +123,17 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Features
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options control various features of the application.
+    | You can enable/disable features by setting the corresponding environment
+    | variables.
+    |
+    */
+
+    'with_register_link' => env('WITH_REGISTER_LINK', false),
+
 ];

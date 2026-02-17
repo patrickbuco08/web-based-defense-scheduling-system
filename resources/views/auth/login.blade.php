@@ -94,6 +94,7 @@
                 </div>
 
                 <!-- Register Link -->
+                @if(config('app.with_register_link', false))
                 <div class="text-center mt-4">
                     <p class="text-sm text-white/80">
                         Don't have an account?
@@ -103,6 +104,7 @@
                         </a>
                     </p>
                 </div>
+                @endif
             </form>
         </div>
     </div>
