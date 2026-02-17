@@ -378,11 +378,11 @@ function DepartmentDefenseCalendar() {
                                             <PopoverTrigger asChild>
                                                 <Button
                                                     variant="outline"
-                                                    disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                                    disabled={['rejected', 'cancelled'].includes(initialStatus)}
                                                     className={cn(
                                                         "w-full justify-start text-left font-normal",
                                                         !formData.date && "text-muted-foreground",
-                                                        ['approved', 'rejected', 'cancelled'].includes(initialStatus) && "bg-gray-50"
+                                                        ['rejected', 'cancelled'].includes(initialStatus) && "bg-gray-50"
                                                     )}
                                                 >
                                                     <CalendarIcon className="mr-2 h-4 w-4" />

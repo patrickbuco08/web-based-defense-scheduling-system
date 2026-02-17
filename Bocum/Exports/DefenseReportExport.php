@@ -7,9 +7,11 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class DefenseReportExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize
+class DefenseReportExport implements FromCollection, WithHeadings, WithMapping, WithStyles, ShouldAutoSize, WithColumnFormatting
 {
     protected $data;
 
@@ -59,12 +61,33 @@ class DefenseReportExport implements FromCollection, WithHeadings, WithMapping, 
             $row['critic'] ?? '',
             is_array($row['panelists'] ?? null) ? implode(', ', $row['panelists']) : '',
             $row['room'] ?? '',
-            $row['start_date_time'] ?? '',
-            $row['end_date_time'] ?? '',
+            $this->formatDateTime($row['start_date_time'] ?? null),
+            $this->formatDateTime($row['end_date_time'] ?? null),
             ucfirst($row['status'] ?? ''),
             $row['department'] ?? '',
             $row['term'] ?? '',
         ];
+    }
+
+    /**
+     * Format datetime for Excel
+     * 
+     * @param string|null $dateTime
+     * @return string
+     */
+    private function formatDateTime($dateTime)
+    {
+        if (!$dateTime) {
+            return '';
+        }
+
+        try {
+            // Parse the datetime and format it for Excel compatibility
+            $date = \Carbon\Carbon::parse($dateTime);
+            return $date->format('m/d/Y h:i A');
+        } catch (\Exception $e) {
+            return $dateTime; // Fallback to original if parsing fails
+        }
     }
 
     /**
@@ -76,6 +99,22 @@ class DefenseReportExport implements FromCollection, WithHeadings, WithMapping, 
         return [
             // Style the first row as bold
             1 => ['font' => ['bold' => true]],
+            
+            // Set minimum column widths for datetime columns
+            'H' => ['width' => 20], // Start Date & Time
+            'I' => ['width' => 20], // End Date & Time
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function columnFormats(): array
+    {
+        return [
+            // Format datetime columns (H = Start, I = End)
+            'H' => NumberFormat::FORMAT_DATE_DATETIME,
+            'I' => NumberFormat::FORMAT_DATE_DATETIME,
         ];
     }
 }

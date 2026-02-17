@@ -67,6 +67,21 @@ const AdminReport = () => {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
+    // Auto-select latest term when terms are loaded
+    useEffect(() => {
+        if (terms && terms.length > 0 && !selectedTerm) {
+            // Find the current term (is_current = true)
+            const currentTerm = terms.find(term => term.is_current);
+            
+            if (currentTerm) {
+                setSelectedTerm(formatTermDisplay(currentTerm));
+            } else {
+                // Fallback: if no current term found, select the first one
+                setSelectedTerm(formatTermDisplay(terms[0]));
+            }
+        }
+    }, [terms, selectedTerm]);
+
     // Build filters object
     const filters: ReportFilters = useMemo(() => ({
         term: selectedTerm || undefined,

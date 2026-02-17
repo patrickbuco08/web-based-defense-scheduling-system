@@ -81,9 +81,8 @@ class Defense extends Model
                 throw new \Exception('End time must be after start time');
             }
 
-            // Check for overlapping defenses in the same room
-            $overlapping = static::where('room_id', $defense->room_id)
-                ->where('id', '!=', $defense->id ?? 0)
+            // Check for overlapping defenses (global time conflict)
+            $timeOverlapping = static::where('id', '!=', $defense->id ?? 0)
                 ->where(function ($query) use ($defense) {
                     $query->whereBetween('start_at', [$defense->start_at, $defense->end_at->subSecond()])
                         ->orWhereBetween('end_at', [$defense->start_at->addSecond(), $defense->end_at])
@@ -94,8 +93,31 @@ class Defense extends Model
                 })
                 ->exists();
 
-            if ($overlapping) {
-                throw new \Exception('The selected time slot conflicts with an existing defense in this room.');
+            if ($timeOverlapping) {
+                $occupiedTimes = self::getOccupiedTimesForDate($defense->start_at, $defense->id ?? 0);
+                $occupiedText = !empty($occupiedTimes) 
+                    ? ' Occupied times: ' . implode(', ', $occupiedTimes) 
+                    : '';
+                throw new \Exception('The selected time slot conflicts with an existing defense schedule.' . $occupiedText);
+            }
+
+            // Additional check: if room is assigned, also check for room-specific conflicts
+            if ($defense->room_id) {
+                $roomOverlapping = static::where('room_id', $defense->room_id)
+                    ->where('id', '!=', $defense->id ?? 0)
+                    ->where(function ($query) use ($defense) {
+                        $query->whereBetween('start_at', [$defense->start_at, $defense->end_at->subSecond()])
+                            ->orWhereBetween('end_at', [$defense->start_at->addSecond(), $defense->end_at])
+                            ->orWhere(function ($query) use ($defense) {
+                                $query->where('start_at', '<', $defense->start_at)
+                                    ->where('end_at', '>', $defense->end_at);
+                            });
+                    })
+                    ->exists();
+
+                if ($roomOverlapping) {
+                    throw new \Exception('The selected time slot conflicts with an existing defense in this room.');
+                }
             }
         });
     }
@@ -131,5 +153,24 @@ class Defense extends Model
                         ->where('end_at', '>', $end);
                 });
         });
+    }
+
+    /**
+     * Get occupied time slots for a given date
+     * 
+     * @param Carbon $date The date to check
+     * @param int $excludeId Defense ID to exclude from results
+     * @return array Array of occupied time slots in "h:i A - h:i A" format
+     */
+    public static function getOccupiedTimesForDate($date, $excludeId = 0)
+    {
+        $existingDefenses = static::whereDate('start_at', $date)
+            ->where('id', '!=', $excludeId)
+            ->orderBy('start_at')
+            ->get(['start_at', 'end_at']);
+        
+        return $existingDefenses->map(function ($defense) {
+            return $defense->start_at->format('h:i A') . ' - ' . $defense->end_at->format('h:i A');
+        })->toArray();
     }
 }
