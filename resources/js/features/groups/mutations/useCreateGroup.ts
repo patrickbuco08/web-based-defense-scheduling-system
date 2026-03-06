@@ -3,11 +3,11 @@ import { groupsApi } from "../api";
 import { toast } from "sonner";
 
 export interface CreateGroupData {
-  group_code: string;
   department_id: string | number;
   term_id: string | number;
   critic_id?: string | number | null;
-  members: Array<{ name: string }>;
+  course_code?: string;
+  members: Array<{ name: string; email?: string | null }>;
 }
 
 export function useCreateGroup() {

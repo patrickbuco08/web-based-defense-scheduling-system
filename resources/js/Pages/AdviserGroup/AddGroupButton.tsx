@@ -61,7 +61,6 @@ export const AddGroupButton = () => {
   const { user } = useAuth();
 
   const [formData, setFormData] = useState({
-    group_code: "",
     course_code: "",
     department_id: user?.department_id?.toString() || '',
     term_id: "",
@@ -145,7 +144,6 @@ export const AddGroupButton = () => {
         setIsOpen(false);
         // Reset form
         setFormData({
-          group_code: "",
           course_code: "",
           department_id: user?.department_id?.toString() || "",
           term_id: activeTerm?.id?.toString() || "",
@@ -177,20 +175,6 @@ export const AddGroupButton = () => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="group_code" className="text-right">
-              Group Code
-            </Label>
-            <Input
-              id="group_code"
-              name="group_code"
-              value={formData.group_code}
-              onChange={handleChange}
-              className="col-span-3"
-              required
-            />
-          </div>
-
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="course_code" className="text-right">
               Course Code

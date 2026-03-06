@@ -6,12 +6,20 @@ use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Group;
 use Bocum\Models\GroupMember;
 use Bocum\Models\Term;
+use Bocum\Services\GroupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
+    protected GroupService $groupService;
+
+    public function __construct(GroupService $groupService)
+    {
+        $this->groupService = $groupService;
+    }
+
     /**
      * Show the form for creating a new group.
      */
@@ -27,7 +35,6 @@ class GroupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'group_code' => 'required|string|max:50|unique:groups,group_code',
             'course_code' => 'nullable|string|max:50',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
@@ -37,15 +44,18 @@ class GroupController extends Controller
             'critic_id' => 'nullable|exists:users,id',
         ]);
 
+        // Generate auto group code
+        $groupCode = $this->groupService->generateGroupCode($validated['department_id']);
+
         // Create the group
         $group = Group::create([
-            'group_code' => $validated['group_code'],
+            'group_code' => $groupCode,
             'course_code' => $validated['course_code'] ?? null,
             'term_id' => $validated['term_id'],
             'department_id' => $validated['department_id'],
             'critic_id' => $validated['critic_id'] ?? null,
             'adviser_id' => Auth::id(),
-            'code' => $validated['group_code'],
+            'code' => $groupCode,
         ]);
 
         // Add group members

@@ -39,11 +39,11 @@ export interface Group {
 }
 
 export interface CreateGroupData {
-  group_code: string;
   department_id: number;
   term_id: number;
   critic_id?: number | null;
-  members: Array<{ name: string }>;
+  course_code?: string;
+  members: Array<{ name: string; email?: string | null }>;
 }
 
 export interface UpdateGroupData {
