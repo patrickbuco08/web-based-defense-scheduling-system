@@ -48,6 +48,7 @@ interface Defense {
   proposed_by_id: number;
   approved_by_id: number;
   title: string;
+  presentation_type: string | null;
   start_at: string;
   end_at: string;
   status: string;
@@ -73,6 +74,7 @@ interface Defense {
     department_id: number;
     term_id: number;
     group_code: string;
+    course_code: string;
     adviser_id: number;
     critic_id: number | null;
     created_at: string;
@@ -141,6 +143,7 @@ function Calendar() {
   const calendarRef = useRef<FullCalendar>(null);
   const [searchParams] = useSearchParams();
   const [selectedDefense, setSelectedDefense] = useState<Defense | null>(null);
+  console.log(selectedDefense)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || 'all');
@@ -384,6 +387,15 @@ function Calendar() {
                     <p className="text-sm font-semibold text-gray-900">
                       Group Code: {selectedDefense.group.group_code || "N/A"}
                     </p>
+                    {selectedDefense.presentation_type ? (
+                      <p className="text-xs text-gray-600">
+                        Presentation Type: {selectedDefense.presentation_type}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-400">
+                        Presentation Type: Not set
+                      </p>
+                    )}
                     {selectedDefense.group.course_code && (
                       <p className="text-xs text-gray-600">
                         Course Code: {selectedDefense.group.course_code}
@@ -525,7 +537,7 @@ function Calendar() {
                 <div className="border-t pt-4">
                   <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>
-                      Academic Term: {selectedDefense.group.term.school_year} -{" "}
+                      Academic Year: {selectedDefense.group.term.school_year} -{" "}
                       {selectedDefense.group.term.semester}
                     </span>
                     <span>Defense ID: #{selectedDefense.id}</span>
@@ -536,7 +548,6 @@ function Calendar() {
           )}
 
           {user?.id === selectedDefense?.adviser_id && (
-
             <DialogFooter className="sm:justify-between">
               <Button
                 variant="destructive"

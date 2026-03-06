@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 
 interface SecurityContextType {
   requirePassword: () => Promise<void>;
+  isVerifyingPassword: boolean;
 }
 
 export const SecurityContext = createContext<SecurityContextType | undefined>(

@@ -18,6 +18,7 @@ class Defense extends Model
         'proposed_by_id',
         'approved_by_id',
         'title',
+        'presentation_type',
         'start_at',
         'end_at',
         'status',

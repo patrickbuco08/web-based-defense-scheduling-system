@@ -3,15 +3,18 @@ import { apiClient } from "@/lib/api-client";
 
 interface CreateDefensePayload {
     title: string;
+    presentation_type: string;
     group_id: string | number;
     date: string;
     start_time: string;
     end_time: string;
     notes?: string;
+    panelists?: number[];
 }
 
 interface UpdateDefensePayload {
     title: string;
+    presentation_type: string;
     group_id: string | number;
     room_id?: string | number;
     date: string;
@@ -37,6 +40,7 @@ export const defensesApi = {
         const response = await apiClient.post("/defenses", {
             ...data,
             group_id: Number(data.group_id), // Ensure group_id is a number
+            panelists: data.panelists || [],
             // Combine date and time for the API
             start_at: `${data.date} ${data.start_time}`,
             end_at: `${data.date} ${data.end_time}`,

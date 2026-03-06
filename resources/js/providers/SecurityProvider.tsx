@@ -8,6 +8,7 @@ interface SecurityProviderProps {
 
 export function SecurityProvider({ children }: SecurityProviderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
   const resolverRef = useRef<{
     resolve: () => void;
     reject: (error: Error) => void;
@@ -17,6 +18,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     return new Promise((resolve, reject) => {
       resolverRef.current = { resolve, reject };
       setIsModalOpen(true);
+      setIsVerifyingPassword(true);
     });
   }, []);
 
@@ -39,6 +41,7 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
       }
 
       setIsModalOpen(false);
+      setIsVerifyingPassword(false);
       resolverRef.current?.resolve();
       resolverRef.current = null;
     } catch (error) {
@@ -48,12 +51,13 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setIsVerifyingPassword(false);
     resolverRef.current?.reject(new Error('Password confirmation cancelled'));
     resolverRef.current = null;
   };
 
   return (
-    <SecurityContext.Provider value={{ requirePassword }}>
+    <SecurityContext.Provider value={{ requirePassword, isVerifyingPassword }}>
       {children}
       <PasswordConfirmationModal
         open={isModalOpen}

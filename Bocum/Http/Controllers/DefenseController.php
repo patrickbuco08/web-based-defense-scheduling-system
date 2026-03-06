@@ -157,6 +157,7 @@ class DefenseController extends Controller
             // Prepare the data for update
             $data = [
                 'title' => $request->title,
+                'presentation_type' => $request->presentation_type,
                 'group_id' => $request->group_id,
                 'room_id' => $request->room_id,
                 'start_at' => Carbon::parse($request->date . ' ' . $request->start_time),
@@ -296,6 +297,7 @@ class DefenseController extends Controller
                 'proposed_by_id' => Auth::id(),
                 'term_id' => $request->term_id,
                 'title' => $request->title,
+                'presentation_type' => $request->presentation_type,
                 'start_at' => $startAt,
                 'end_at' => $endAt,
                 'status' => 'pending',

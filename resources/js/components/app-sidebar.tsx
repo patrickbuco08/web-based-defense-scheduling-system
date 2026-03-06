@@ -40,7 +40,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data = {
     navMain: [
       {
-        title: "My Defense Schedules",
+        title: "Propose schedule availability",
         url: "/app",
         icon: IconCalendarEvent,
       },

@@ -26,30 +26,42 @@ import { cn } from "@/lib/utils";
 import { ErrorResponseInterface } from "@/features/types";
 import { AxiosError } from "axios";
 import { useSecurity } from "@/contexts/SecurityContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useAccounts } from "@/features/accounts/queries/useAccounts";
 
+const presentationTypes = ["title presentation", "oral", "final", "others"] as const;
 
 type FormData = {
   title: string;
+  presentation_type: string;
   group_id: string;
   date: string;
   start_time: string;
   end_time: string;
   notes: string;
+  panelists: number[];
 };
 
 export function DefenseProposal() {
-  const { requirePassword } = useSecurity();
+  const { requirePassword, isVerifyingPassword } = useSecurity();
   const [isOpen, setIsOpen] = useState(false);
   const { data: groups = [] } = useGroups();
+  const { data: accounts = [] } = useAccounts();
   const { mutate: createDefense, isPending } = useCreateDefense();
+
+  const availablePanelists = accounts.filter((account: any) =>
+    account.roles?.includes("panelist") || account.roles?.includes("critic")
+  );
 
   const { data, setData, errors, reset } = useForm<FormData>({
     title: '',
+    presentation_type: 'title presentation',
     group_id: '',
     date: format(new Date(), 'yyyy-MM-dd'),
     start_time: '09:00',
     end_time: '10:00',
     notes: '',
+    panelists: [],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,9 +70,11 @@ export function DefenseProposal() {
     try {
       await requirePassword();
 
+
       createDefense({
         ...data,
         group_id: data.group_id,
+        panelists: data.panelists,
       }, {
         onSuccess: () => {
           setIsOpen(false);
@@ -91,7 +105,19 @@ export function DefenseProposal() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      // Don't close if password is being verified
+      if (!open && isVerifyingPassword) {
+        return;
+      }
+      setIsOpen(open);
+    }} modal={false}>
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/80" 
+          onClick={(e) => e.preventDefault()} // Prevent backdrop from closing modal
+        />
+      )}
       <DialogTrigger asChild>
         <SidebarMenuButton
           tooltip="Schedule Defense"
@@ -102,7 +128,7 @@ export function DefenseProposal() {
           <span>Schedule New Defense</span>
         </SidebarMenuButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Schedule New Defense</DialogTitle>
@@ -123,6 +149,26 @@ export function DefenseProposal() {
                 required
               />
               {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="presentation_type">Presentation Type</Label>
+              <Select
+                value={data.presentation_type}
+                onValueChange={(value) => setData('presentation_type', value)}
+              >
+                <SelectTrigger id="presentation_type">
+                  <SelectValue placeholder="Select presentation type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {presentationTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.presentation_type && <p className="text-sm text-red-500">{errors.presentation_type}</p>}
             </div>
 
             <div className="space-y-2">
@@ -228,6 +274,35 @@ export function DefenseProposal() {
                   )}
                 </div>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Panel Members</Label>
+              <div className="border rounded p-4 max-h-48 overflow-y-auto">
+                {availablePanelists.map((panelist: any) => (
+                  <div key={panelist.id} className="flex items-center space-x-2 mb-2">
+                    <Checkbox
+                      checked={data.panelists.includes(panelist.id)}
+                      onCheckedChange={(checked: boolean) => {
+                        setData(
+                          'panelists',
+                          checked
+                            ? [...data.panelists, panelist.id]
+                            : data.panelists.filter((id) => id !== panelist.id)
+                        );
+                      }}
+                      className="shrink-0"
+                    />
+                    <Label className="text-sm font-normal cursor-pointer">
+                      {panelist.name}
+                    </Label>
+                  </div>
+                ))}
+                {availablePanelists.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No panelists available.</p>
+                )}
+              </div>
+              {errors.panelists && <p className="text-sm text-red-500">{errors.panelists}</p>}
             </div>
 
             {/* notes */}

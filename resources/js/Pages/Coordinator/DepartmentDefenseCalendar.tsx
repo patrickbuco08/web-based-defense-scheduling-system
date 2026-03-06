@@ -36,6 +36,7 @@ import { useSecurity } from "@/contexts/SecurityContext";
 
 interface FormData {
     title: string;
+    presentation_type: string;
     group_id: string;
     room_id: string;
     date: string;
@@ -57,6 +58,7 @@ function DepartmentDefenseCalendar() {
     const [initialStatus, setInitialStatus] = useState<string>('pending');
     const [formData, setFormData] = useState<FormData>({
         title: '',
+        presentation_type: 'title presentation',
         group_id: '',
         room_id: '',
         date: '',
@@ -176,6 +178,7 @@ function DepartmentDefenseCalendar() {
 
         setFormData({
             title: defense.title || '',
+            presentation_type: defense.presentation_type || 'title presentation',
             group_id: defense.group_id?.toString() || '',
             room_id: defense.room_id?.toString() || '',
             date: formatISO(startDate, { representation: 'date' }),
@@ -287,15 +290,23 @@ function DepartmentDefenseCalendar() {
                                         <p className="text-sm font-semibold text-gray-900">{selectedDefense.group?.group_code || 'N/A'}</p>
                                     </div>
 
+                                    {/* Presentation Type */}
+                                    <div>
+                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Presentation Type</span>
+                                        <p className="text-sm text-gray-700">
+                                            {selectedDefense.presentation_type ? selectedDefense.presentation_type : 'Not set'}
+                                        </p>
+                                    </div>
+
                                     {/* Course Code */}
                                     <div>
                                         <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Course Code</span>
                                         <p className="text-sm text-gray-700">{selectedDefense.group?.course_code || 'N/A'}</p>
                                     </div>
 
-                                    {/* Academic Term */}
+                                    {/* Academic Year */}
                                     <div>
-                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Academic Term</span>
+                                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Academic Year</span>
                                         <p className="text-sm text-gray-700">
                                             {selectedDefense.group?.term ?
                                                 `${selectedDefense.group.term.school_year} - ${selectedDefense.group.term.semester} Semester`
