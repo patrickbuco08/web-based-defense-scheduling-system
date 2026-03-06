@@ -135,5 +135,6 @@ return [
     */
 
     'with_register_link' => env('WITH_REGISTER_LINK', false),
+    'defense_validation_enabled' => env('DEFENSE_VALIDATION_ENABLED', true),
 
 ];

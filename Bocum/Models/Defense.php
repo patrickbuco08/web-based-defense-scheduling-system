@@ -75,6 +75,10 @@ class Defense extends Model
      */
     protected static function booted()
     {
+        if (!config('app.defense_validation_enabled', true)) {
+            return;
+        }
+
         static::saving(function ($defense) {
             // Ensure end time is after start time
             if ($defense->end_at <= $defense->start_at) {
