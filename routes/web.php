@@ -97,6 +97,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('security/verify-password', [SecurityController::class, 'verifyPassword']);
 
+    // API Profile routes for React app
+    Route::get('api/profile', [\Bocum\Http\Controllers\API\ProfileController::class, 'show']);
+    Route::put('api/profile', [\Bocum\Http\Controllers\API\ProfileController::class, 'update']);
+
     Route::post('defenses/{defense}/check-conflicts', [DefenseController::class, 'checkConflicts'])->name('defenses.conflicts.check');
     Route::get('defenses/departments', [DefenseController::class, 'departmentIndex'])->name('defenses.departmentIndex');
     Route::resource('defenses', DefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy', 'update']);

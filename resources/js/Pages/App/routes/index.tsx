@@ -10,6 +10,7 @@ import DepartmentDefenseCalendar from "@/Pages/Coordinator/DepartmentDefenseCale
 import Department from "@/Pages/Department";
 import Term from "@/Pages/Term";
 import Room from "@/Pages/Room";
+import Profile from "@/Pages/Profile";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminReport from "@/Pages/AdminReport";
@@ -66,6 +67,8 @@ export function AppRoutes() {
         <Route path="admin/logs" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminLog />} />} />
 
         <Route path="adviser/groups" element={<ProtectedRoute allowedRoles={['adviser']} userRoles={user?.roles} children={<AdviserGroup />} />} />
+
+        <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'coordinator', 'adviser', 'panelist', 'critic']} userRoles={user?.roles} children={<Profile />} />} />
 
         <Route path="coordinators/calendar" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<DepartmentDefenseCalendar />} />} />
         <Route path="coordinators/reports" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorReport />} />} />

@@ -189,10 +189,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {user.roles.includes('adviser') && <NavDocuments title="Adviser" items={data.adviser} />}
         {user.roles.includes('coordinator') && <NavDocuments title="Coordinator" items={data.coordinator} />}
         {user.roles.includes('admin') && <NavDocuments title="Admin" items={data.admin} />}
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        {/* <NavUser user={user} /> */}
       </SidebarFooter>
     </Sidebar>
   );
