@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import debounce from 'lodash/debounce';
 import { TimeSlotCombobox } from "@/components/TimeSlotCombobox";
+import { useSecurity } from "@/contexts/SecurityContext";
 
 interface FormData {
     title: string;
@@ -47,6 +48,7 @@ interface FormData {
 }
 
 function DepartmentDefenseCalendar() {
+    const { requirePassword } = useSecurity();
     const calendarRef = useRef<FullCalendar>(null);
     const [selectedDefense, setSelectedDefense] = useState<any>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -195,6 +197,8 @@ function DepartmentDefenseCalendar() {
         if (!selectedDefense) return;
 
         try {
+            await requirePassword();
+
             await updateDefense.mutateAsync({
                 id: selectedDefense.id,
                 data: formData,
@@ -205,6 +209,10 @@ function DepartmentDefenseCalendar() {
             setIsEditMode(false);
             refetch();
         } catch (error: any) {
+            if (error?.message === "Password confirmation cancelled") {
+                toast.info("Update cancelled");
+                return;
+            }
             const message = error?.response?.data?.message || error?.message || "Failed to update defense";
             toast.error(message);
         }

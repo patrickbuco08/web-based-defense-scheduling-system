@@ -25,6 +25,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { ErrorResponseInterface } from "@/features/types";
 import { AxiosError } from "axios";
+import { useSecurity } from "@/contexts/SecurityContext";
+
 
 type FormData = {
   title: string;
@@ -36,6 +38,7 @@ type FormData = {
 };
 
 export function DefenseProposal() {
+  const { requirePassword } = useSecurity();
   const [isOpen, setIsOpen] = useState(false);
   const { data: groups = [] } = useGroups();
   const { mutate: createDefense, isPending } = useCreateDefense();
@@ -49,29 +52,42 @@ export function DefenseProposal() {
     notes: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    createDefense({
-      ...data,
-      group_id: data.group_id,
-    }, {
-      onSuccess: () => {
-        setIsOpen(false);
-        reset();
-        toast.success("Defense scheduled successfully!");
-      },
-      onError: (error: AxiosError<ErrorResponseInterface>) => {
-        console.error("Error deleting account:", error);
+    try {
+      await requirePassword();
 
-        const errorMessage = error.response?.data?.message ||
-          error.response?.data?.error ||
-          error.message ||
-          "Failed to schedule defense. Please try again.";
+      createDefense({
+        ...data,
+        group_id: data.group_id,
+      }, {
+        onSuccess: () => {
+          setIsOpen(false);
+          reset();
+          toast.success("Defense scheduled successfully!");
+        },
+        onError: (error: AxiosError<ErrorResponseInterface>) => {
+          console.error("Error creating defense:", error);
 
-        toast.error(errorMessage);
-      },
-    });
+          const errorMessage = error.response?.data?.message ||
+            error.response?.data?.error ||
+            error.message ||
+            "Failed to schedule defense. Please try again.";
+
+          toast.error(errorMessage);
+        },
+      });
+    } catch (error: any) {
+      if (error?.message === "Password confirmation cancelled") {
+        toast.info("Defense creation cancelled");
+        return;
+      }
+      const errorMessage = error?.response?.data?.message ||
+        error?.message ||
+        "Failed to verify password";
+      toast.error(errorMessage);
+    }
   };
 
   return (
