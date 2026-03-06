@@ -231,7 +231,7 @@ export const AddGroupButton = () => {
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="critic_id" className="text-right">
-              Critic
+              Technical Critic
             </Label>
             <Select
               name="critic_id"

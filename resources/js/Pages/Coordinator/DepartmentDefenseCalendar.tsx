@@ -49,9 +49,10 @@ interface FormData {
 }
 
 function DepartmentDefenseCalendar() {
-    const { requirePassword } = useSecurity();
+    const { requirePassword, isVerifyingPassword } = useSecurity();
     const calendarRef = useRef<FullCalendar>(null);
     const [selectedDefense, setSelectedDefense] = useState<any>(null);
+    console.log('selectedDefense', selectedDefense);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all', 'pending', 'approved', 'rejected', 'cancelled'
@@ -238,8 +239,9 @@ function DepartmentDefenseCalendar() {
                                 <SelectItem value="all">All Statuses</SelectItem>
                                 <SelectItem value="pending">Pending</SelectItem>
                                 <SelectItem value="approved">Approved</SelectItem>
-                                <SelectItem value="rejected">Rejected</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                                <SelectItem value="reschedule">Reschedule</SelectItem>
+                                <SelectItem value="reappearance">Reappearance</SelectItem>
+                                <SelectItem value="re-defense">Re-defense</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -260,7 +262,13 @@ function DepartmentDefenseCalendar() {
                 height="auto"
             />
 
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} modal={false}>
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                // Don't close if password is being verified
+                if (!open && isVerifyingPassword) {
+                    return;
+                }
+                setIsDialogOpen(open);
+            }} modal={false}>
                 {isDialogOpen && (
                     <div className="fixed inset-0 z-40 bg-black/80" />
                 )}
@@ -469,7 +477,7 @@ function DepartmentDefenseCalendar() {
                                 <Select
                                     value={formData.status}
                                     onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                                    disabled={['rejected', 'cancelled'].includes(initialStatus)}
+                                    disabled={[].includes(initialStatus)}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
@@ -477,17 +485,21 @@ function DepartmentDefenseCalendar() {
                                     <SelectContent>
                                         <SelectItem value="pending">Pending</SelectItem>
                                         <SelectItem value="approved">Approved</SelectItem>
-                                        <SelectItem value="rejected">Rejected</SelectItem>
-                                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                                        <SelectItem value="reschedule">Reschedule</SelectItem>
+                                        <SelectItem value="reappearance">Reappearance</SelectItem>
+                                        <SelectItem value="re-defense">Re-defense</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
-                            {/* Rejection Notes - Show only if status is rejected or cancelled */}
-                            {(formData.status === 'rejected' || formData.status === 'cancelled') && (
+                            {/* Rejection Notes - Show only if status requires rejection notes */}
+                            {(['reschedule', 'reappearance', 're-defense'].includes(formData.status)) && (
                                 <div className="space-y-2">
                                     <Label htmlFor="rejection_note">
-                                        {formData.status === 'rejected' ? 'Rejection Notes' : 'Cancellation Notes'}
+                                        {formData.status === 'reschedule' && 'Reschedule Notes'}
+                                        {formData.status === 'reappearance' && 'Reappearance Notes'}
+                                        {formData.status === 're-defense' && 'Re-defense Notes'}
+                                        <span className="text-red-500">*</span>
                                     </Label>
                                     <textarea
                                         id="rejection_note"
@@ -495,9 +507,9 @@ function DepartmentDefenseCalendar() {
                                         onChange={(e) => setFormData(prev => ({ ...prev, rejection_note: e.target.value }))}
                                         className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                         placeholder={`Please provide reason for ${formData.status}...`}
-                                        rows={3}
                                         required
-                                        disabled={['rejected', 'cancelled'].includes(initialStatus)}
+                                        rows={3}
+                                        disabled={['reschedule', 'reappearance', 're-defense'].includes(initialStatus)}
                                     />
                                 </div>
                             )}

@@ -45,20 +45,28 @@ class DefensePolicy
 
         // Define allowed status transitions
         $allowedTransitions = [
-            'pending' => ['pending', 'approved', 'rejected', 'cancelled'], // Can change to any status
-            'approved' => ['approved', 'cancelled'], // Can only stay approved or be cancelled
-            'rejected' => ['rejected'], // No changes allowed
+            'pending' => ['pending', 'approved', 'rejected', 'cancelled', 'reschedule', 'reappearance', 're-defense'], // Can change to any status
+            'approved' => ['approved', 'cancelled', 'reschedule', 'reappearance', 're-defense'], // Can stay approved, be cancelled, or be rescheduled
+            'rejected' => ['rejected', 'reschedule', 'reappearance', 're-defense'], // Can be rescheduled after rejection
             'cancelled' => ['cancelled'], // No changes allowed
+            'reschedule' => ['reschedule', 'pending', 'rejected', 'cancelled'], // From reschedule can go to pending, rejected, or cancelled
+            'reappearance' => ['reappearance', 'pending', 'rejected', 'cancelled'], // From reappearance can go to pending, rejected, or cancelled
+            're-defense' => ['re-defense', 'pending', 'rejected', 'cancelled'], // From re-defense can go to pending, rejected, or cancelled
         ];
 
         // Check if the transition is allowed
         if (!in_array($newStatus, $allowedTransitions[$currentStatus] ?? [])) {
             switch ($currentStatus) {
                 case 'approved':
-                    throw new AuthorizationException('Approved defenses can only be cancelled.');
+                    throw new AuthorizationException('Approved defenses can only be cancelled, rescheduled, or marked for reappearance/re-defense.');
                 case 'rejected':
+                    throw new AuthorizationException('Rejected defenses can only be rescheduled or marked for reappearance/re-defense.');
                 case 'cancelled':
                     throw new AuthorizationException('This defense cannot be modified further.');
+                case 'reschedule':
+                case 'reappearance':
+                case 're-defense':
+                    throw new AuthorizationException('This defense can only be moved to pending, rejected, or cancelled status.');
                 default:
                     throw new AuthorizationException('Invalid status transition.');
             }
