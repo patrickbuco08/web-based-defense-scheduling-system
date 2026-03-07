@@ -20,6 +20,7 @@ import {
     EditIcon,
     GraduationCapIcon,
     AlertTriangle,
+    ClockIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -359,6 +360,68 @@ function DepartmentDefenseCalendar() {
                                 )}
                             </div>
 
+                            {/* Date and Time Information Section */}
+                            <div className="bg-gray-50 rounded-lg p-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <CalendarIcon className="h-5 w-5 text-blue-600" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">
+                                                Start Time
+                                            </p>
+                                            <p className="text-sm font-semibold text-gray-900">
+                                                {new Date(selectedDefense.start_at).toLocaleDateString(
+                                                    "en-US",
+                                                    {
+                                                        weekday: "long",
+                                                        year: "numeric",
+                                                        month: "long",
+                                                        day: "numeric",
+                                                    }
+                                                )}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                {new Date(selectedDefense.start_at).toLocaleTimeString(
+                                                    "en-US",
+                                                    {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    }
+                                                )}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <ClockIcon className="h-5 w-5 text-green-600" />
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-500">
+                                                End Time
+                                            </p>
+                                            <p className="text-sm font-semibold text-gray-900">
+                                                {new Date(selectedDefense.end_at).toLocaleDateString(
+                                                    "en-US",
+                                                    {
+                                                        weekday: "long",
+                                                        year: "numeric",
+                                                        month: "long",
+                                                        day: "numeric",
+                                                    }
+                                                )}
+                                            </p>
+                                            <p className="text-sm text-gray-600">
+                                                {new Date(selectedDefense.end_at).toLocaleTimeString(
+                                                    "en-US",
+                                                    {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    }
+                                                )}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Room Conflict Display */}
                             {conflicts?.room_conflicts?.has_conflict && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
@@ -431,6 +494,7 @@ function DepartmentDefenseCalendar() {
                                                         }))
                                                     }
                                                     initialFocus
+                                                    disabled={(date) => date < new Date()}
                                                 />
                                             </PopoverContent>
                                         </Popover>
