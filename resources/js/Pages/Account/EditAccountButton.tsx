@@ -30,6 +30,8 @@ interface EditAccountButtonProps {
   };
 }
 
+const EXCLUDED_ROLES = ['critic', 'panelist'];
+
 export function EditAccountButton({ account }: EditAccountButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -155,7 +157,7 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
                 Roles
               </Label>
               <div className="col-span-3 space-y-2">
-                {roles?.map((role) => (
+                {roles?.filter((role: any) => !EXCLUDED_ROLES.includes(role.name)).map((role: any) => (
                   <div key={role.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={`role-${role.id}`}

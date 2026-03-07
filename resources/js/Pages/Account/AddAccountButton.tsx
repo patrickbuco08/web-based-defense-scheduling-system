@@ -29,11 +29,15 @@ interface Department {
   // Add other department properties if they exist
 }
 
+const EXCLUDED_ROLES = ['critic', 'panelist'];
+
 export function AddAccountButton() {
   const [open, setOpen] = useState(false);
   const { data: departments } = useDepartments();
   const createAccount = useCreateAccount();
   const { data: roles, isLoading: isLoadingRoles } = useRoles();
+
+  console.log(roles);
 
 
   const [formData, setFormData] = useState({
@@ -133,7 +137,7 @@ export function AddAccountButton() {
             <div className="space-y-2">
               <Label>Roles (Select at least one)</Label>
               <div className="space-y-2">
-                {roles?.map((role: any) => (
+                {roles?.filter((role: any) => !EXCLUDED_ROLES.includes(role.name)).map((role: any) => (
                   <div key={role.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={role.id}
