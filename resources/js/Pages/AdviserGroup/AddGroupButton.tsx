@@ -47,12 +47,11 @@ interface Term {
 interface Member {
   id: number;
   name: string;
-  email: string;
 }
 
 export const AddGroupButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [members, setMembers] = useState<Member[]>([{ id: Date.now(), name: "", email: "" }]);
+  const [members, setMembers] = useState<Member[]>([{ id: Date.now(), name: "" }]);
 
   const createGroupMutation = useCreateGroup();
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
@@ -78,7 +77,7 @@ export const AddGroupButton = () => {
   }, [activeTerm]);
 
   const handleAddMember = () => {
-    setMembers([...members, { id: Date.now(), name: "", email: "" }]);
+    setMembers([...members, { id: Date.now(), name: "" }]);
   };
 
   const handleRemoveMember = (id: number) => {
@@ -87,7 +86,7 @@ export const AddGroupButton = () => {
     }
   };
 
-  const handleMemberChange = (id: number, field: 'name' | 'email', value: string) => {
+  const handleMemberChange = (id: number, field: 'name', value: string) => {
     setMembers(
       members.map((member) =>
         member.id === id ? { ...member, [field]: value } : member
@@ -124,19 +123,10 @@ export const AddGroupButton = () => {
     // Prepare data for submission
     const submitData = {
       ...formData,
-      members: validMembers.map(({ name, email }) => ({
+      members: validMembers.map(({ name }) => ({
         name,
-        email: email || null,
       })),
     };
-
-    // Log member emails for debugging
-    const memberEmails = validMembers.map(member => ({
-      id: member.id,
-      name: member.name,
-      email: member.email
-    }));
-    console.log('Member emails:', memberEmails);
 
     createGroupMutation.mutate(submitData, {
       onSuccess: () => {
@@ -149,7 +139,7 @@ export const AddGroupButton = () => {
           term_id: activeTerm?.id?.toString() || "",
           critic_id: "",
         });
-        setMembers([{ id: Date.now(), name: "", email: "" }]);
+        setMembers([{ id: Date.now(), name: "" }]);
       },
       onError: (error: any) => {
         console.error("Error creating group:", error);
@@ -279,19 +269,6 @@ export const AddGroupButton = () => {
                           onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
                           placeholder="Member name"
                           required
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`member-email-${member.id}`} className="text-sm font-medium">
-                          Email
-                        </Label>
-                        <Input
-                          id={`member-email-${member.id}`}
-                          type="email"
-                          value={member.email}
-                          onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
-                          placeholder="member@example.com"
                           className="mt-1"
                         />
                       </div>

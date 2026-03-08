@@ -23,7 +23,6 @@ import { Input } from "@/components/ui/input";
 interface GroupMember {
   id: number;
   student_name: string;
-  email: string;
 }
 
 interface EditGroupButtonProps {
@@ -48,14 +47,13 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
     critic_id: group.critic_id || null,
   });
 
-  const [members, setMembers] = useState<Array<{ id: number; name: string; email: string }>>(
+  const [members, setMembers] = useState<Array<{ id: number; name: string }>>(
     group.members && group.members.length > 0
       ? group.members.map((m: any) => ({
         id: m.id,
         name: m.student_name,
-        email: m.email || "",
       }))
-      : [{ id: Date.now(), name: "", email: "" }]
+      : [{ id: Date.now(), name: "" }]
   );
 
   const updateGroupMutation = useUpdateGroup();
@@ -64,7 +62,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
   const { data: critics } = useCritics();
 
   const handleAddMember = () => {
-    setMembers([...members, { id: Date.now(), name: "", email: "" }]);
+    setMembers([...members, { id: Date.now(), name: "" }]);
   };
 
   const handleRemoveMember = (id: number) => {
@@ -73,7 +71,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
     }
   };
 
-  const handleMemberChange = (id: number, field: 'name' | 'email', value: string) => {
+  const handleMemberChange = (id: number, field: 'name', value: string) => {
     setMembers(
       members.map((member) =>
         member.id === id ? { ...member, [field]: value } : member
@@ -110,18 +108,10 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
       // Prepare data for submission
       const data = {
         ...formData,
-        members: validMembers.map(({ name, email }) => ({
+        members: validMembers.map(({ name }) => ({
           name,
-          email: email || null,
         })),
       };
-
-      // Prepare member emails for backend (if needed for other purposes)
-      const memberEmails = validMembers.map(member => ({
-        id: member.id,
-        name: member.name,
-        email: member.email
-      }));
 
       // Proceed with the API call
       updateGroupMutation.mutate(
@@ -318,19 +308,6 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
                             onChange={(e) => handleMemberChange(member.id, 'name', e.target.value)}
                             placeholder="Member name"
                             required
-                            className="mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor={`member-email-${member.id}`} className="text-sm font-medium">
-                            Email
-                          </Label>
-                          <Input
-                            id={`member-email-${member.id}`}
-                            type="email"
-                            value={member.email}
-                            onChange={(e) => handleMemberChange(member.id, 'email', e.target.value)}
-                            placeholder="member@example.com"
                             className="mt-1"
                           />
                         </div>

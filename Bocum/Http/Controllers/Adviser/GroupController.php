@@ -4,7 +4,6 @@ namespace Bocum\Http\Controllers\Adviser;
 
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Group;
-use Bocum\Models\GroupMember;
 use Bocum\Models\Term;
 use Bocum\Services\GroupService;
 use Illuminate\Http\Request;
@@ -38,7 +37,6 @@ class GroupController extends Controller
             'course_code' => 'nullable|string|max:50',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
-            'members.*.email' => 'nullable|email|max:255',
             'term_id' => 'required|exists:terms,id',
             'department_id' => 'required|exists:departments,id',
             'critic_id' => 'nullable|exists:users,id',
@@ -62,7 +60,6 @@ class GroupController extends Controller
         foreach ($validated['members'] as $memberData) {
             $group->members()->create([
                 'student_name' => $memberData['name'],
-                'email' => $memberData['email'] ?? null,
             ]);
         }
 
@@ -101,7 +98,6 @@ class GroupController extends Controller
             'course_code' => 'nullable|string|max:50',
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
-            'members.*.email' => 'nullable|email|max:255',
             'term_id' => 'required|exists:terms,id',
             'critic_id' => 'nullable|exists:users,id',
         ]);
@@ -121,7 +117,6 @@ class GroupController extends Controller
         foreach ($validated['members'] as $memberData) {
             $group->members()->create([
                 'student_name' => $memberData['name'],
-                'email' => $memberData['email'] ?? null,
             ]);
         }
 

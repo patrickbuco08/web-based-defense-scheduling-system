@@ -20,15 +20,6 @@ class DefenseService
             ->filter()
             ->pluck('email');
 
-        // Add group members' emails if they exist
-        if ($defense->group && $defense->group->members->isNotEmpty()) {
-            $groupMemberEmails = $defense->group->members
-                ->pluck('email')
-                ->filter(); // Remove null/empty emails
-
-            $recipients = $recipients->merge($groupMemberEmails);
-        }
-
         // Ensure unique emails and convert to array
         return $recipients->unique()->values()->all();
     }
