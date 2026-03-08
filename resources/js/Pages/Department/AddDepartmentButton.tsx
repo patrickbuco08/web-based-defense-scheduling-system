@@ -36,10 +36,10 @@ export function AddDepartmentButton() {
       onSuccess: () => {
         setIsOpen(false);
         setFormData({ code: "", name: "" });
-        toast.success("Department created successfully!");
+        toast.success("Course created successfully!");
       },
       onError: (error: any) => {
-        const errorMessage = error?.response?.data?.message || "Failed to create department";
+        const errorMessage = error?.response?.data?.message || "Failed to create course";
         toast.error(errorMessage);
       },
     });
@@ -54,20 +54,20 @@ export function AddDepartmentButton() {
       <DialogTrigger asChild>
         <Button>
           <Plus className="h-4 w-4" />
-          Add Department
+          Add Course
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Add New Department</DialogTitle>
+            <DialogTitle>Add New Course</DialogTitle>
             <DialogDescription>
-              Create a new department. Fill in the department code and name.
+              Create a new course. Fill in the course code and name.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="code">Department Code</Label>
+              <Label htmlFor="code">Course Code</Label>
               <Input
                 id="code"
                 placeholder="e.g., CS, IT, ENG"
@@ -78,7 +78,7 @@ export function AddDepartmentButton() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="name">Department Name</Label>
+              <Label htmlFor="name">Course Name</Label>
               <Input
                 id="name"
                 placeholder="e.g., Computer Science"
@@ -99,7 +99,7 @@ export function AddDepartmentButton() {
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Creating..." : "Create Department"}
+              {isPending ? "Creating..." : "Create Course"}
             </Button>
           </DialogFooter>
         </form>

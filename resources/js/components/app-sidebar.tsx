@@ -93,7 +93,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconDoorEnter,
       },
       {
-        name: "Manage Departments",
+        name: "Manage Courses",
         url: "/app/admin/departments",
         icon: IconBuilding,
       },
