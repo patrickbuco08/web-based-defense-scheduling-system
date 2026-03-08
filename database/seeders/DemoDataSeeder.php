@@ -56,6 +56,8 @@ class DemoDataSeeder extends Seeder
             $this->seedDepartmentUsers($department, $term, $rooms);
         }
 
+        $this->seedRoomDepartments($rooms, $seededDepartments);
+
         $this->seedMultiDepartmentAdviserFixture($seededDepartments, $term, $rooms);
     }
 
@@ -277,6 +279,42 @@ class DemoDataSeeder extends Seeder
     private function syncGroupDepartments(Group $group, array $departmentIds)
     {
         $group->departments()->sync($departmentIds);
+    }
+
+    private function syncRoomDepartments(Room $room, array $departmentIds)
+    {
+        $room->departments()->sync($departmentIds);
+    }
+
+    private function seedRoomDepartments($rooms, $departments)
+    {
+        if ($rooms->isEmpty() || count($departments) === 0) {
+            return;
+        }
+
+        $this->command->info("\n🏢 Assigning Room Departments...");
+
+        foreach ($rooms->values() as $index => $room) {
+            $primaryDepartment = $departments[$index % count($departments)];
+            $departmentIds = [$primaryDepartment->id];
+
+            if ($index % 2 === 0 && count($departments) > 1) {
+                $secondaryDepartment = $departments[($index + 1) % count($departments)];
+
+                if ($secondaryDepartment->id !== $primaryDepartment->id) {
+                    $departmentIds[] = $secondaryDepartment->id;
+                }
+            }
+
+            $this->syncRoomDepartments($room, $departmentIds);
+
+            $departmentCodes = collect($departments)
+                ->whereIn('id', $departmentIds)
+                ->pluck('code')
+                ->implode(', ');
+
+            $this->command->info("     ✓ {$room->building} - {$room->room_number} ({$departmentCodes})");
+        }
     }
 
     private function seedGroupDefense($group, $adviser, $term, $rooms, $title, $groupIndex = 0)

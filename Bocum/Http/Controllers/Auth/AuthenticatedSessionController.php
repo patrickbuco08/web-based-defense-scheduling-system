@@ -77,7 +77,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function getUser(Request $request): \Illuminate\Http\JsonResponse
     {
-        $user = $request->user()->load('department');
+        $user = $request->user()->load(['department', 'departments']);
 
         return response()->json(array_merge($user->toArray(), [
             'roles' => $user->getRoleNames(),

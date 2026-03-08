@@ -25,4 +25,5 @@ interface RoomUpdateData {
   room_number: string;
   building: string;
   is_active: boolean;
+  department_ids: number[];
 }

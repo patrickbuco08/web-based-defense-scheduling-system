@@ -1,20 +1,114 @@
 import React from "react";
 import { useRooms } from "@/features/rooms/queries/useRooms";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useDepartments } from "@/features/departments/queries/useDepartments";
+import { DataTable } from "@/components/ui/data-table";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditRoomButton } from "./EditRoomButton";
 import { DeleteRoomButton } from "./DeleteRoomButton";
 import { AddRoomButton } from "./AddRoomButton";
+import { RoomData, RoomDepartment } from "@/features/rooms/api";
+import { Department } from "@/features/departments/api";
+import { ColumnDef } from "@tanstack/react-table";
 
 const ManageRoom = () => {
   const { data: rooms, isLoading, error } = useRooms();
+  const { data: departments } = useDepartments();
+
+  const columns: ColumnDef<RoomData>[] = [
+    {
+      accessorKey: "room_number",
+      header: "Room Number",
+      cell: ({ row }) => {
+        return (
+          <div className="font-medium">
+            {row.getValue("room_number")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "building",
+      header: "Building",
+      cell: ({ row }) => {
+        return (
+          <div className="max-w-[100px] truncate">
+            {row.getValue("building")}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "departments",
+      header: "Departments",
+      cell: ({ row }) => {
+        const departments = row.getValue("departments") as RoomDepartment[];
+        return (
+          <div className="flex flex-wrap gap-1">
+            {departments?.map((department) => (
+              <Badge
+                key={department.id}
+                variant="secondary"
+                className="rounded-sm"
+              >
+                {department.code}
+              </Badge>
+            ))}
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        const departments = row.getValue(id) as RoomDepartment[];
+        if (!value || value.length === 0) return true;
+        return departments?.some((dept) => value.includes(dept.id.toString()));
+      },
+    },
+    {
+      accessorKey: "is_active",
+      header: "Status",
+      cell: ({ row }) => {
+        const isActive = row.getValue("is_active") as boolean;
+        return (
+          <Badge
+            variant={isActive ? "default" : "destructive"}
+            className="rounded-sm"
+          >
+            {isActive ? "Active" : "Inactive"}
+          </Badge>
+        );
+      },
+      filterFn: (row, id, value) => {
+        if (!value || value.length === 0) return true;
+        const isActive = row.getValue(id) as boolean;
+        return value.includes(isActive ? "active" : "inactive");
+      },
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const room = row.original;
+        return (
+          <div className="flex space-x-2">
+            <EditRoomButton room={room} />
+            <DeleteRoomButton
+              id={room.id}
+              roomNumber={room.room_number}
+            />
+          </div>
+        );
+      },
+    },
+  ];
+
+  const departmentFilterOptions = departments?.map((dept: Department) => ({
+    label: dept.name,
+    value: dept.id.toString(),
+  })) || [];
+
+  const statusFilterOptions = [
+    { label: "Active", value: "active" },
+    { label: "Inactive", value: "inactive" },
+  ];
 
   if (isLoading) {
     return (
@@ -23,31 +117,30 @@ const ManageRoom = () => {
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-64" />
         </div>
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Room Number</TableHead>
-                <TableHead>Building</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className="space-y-3">
+          <Skeleton className="h-10 w-full" />
+          <div className="rounded-md border">
+            <div className="border-b p-4">
+              <div className="flex items-center space-x-2">
+                <Skeleton className="h-8 w-[250px]" />
+                <Skeleton className="h-8 w-[120px]" />
+                <Skeleton className="h-8 w-[100px]" />
+              </div>
+            </div>
+            <div className="p-4">
               {[1, 2, 3, 4, 5].map((i) => (
-                <TableRow key={i}>
-                  <TableCell>
+                <div key={i} className="border-b last:border-b-0 p-4">
+                  <div className="flex items-center space-x-4">
                     <Skeleton className="h-4 w-24" />
-                  </TableCell>
-                  <TableCell>
                     <Skeleton className="h-4 w-32" />
-                  </TableCell>
-                  <TableCell>
+                    <Skeleton className="h-4 w-40" />
                     <Skeleton className="h-4 w-16" />
-                  </TableCell>
-                </TableRow>
+                    <Skeleton className="h-8 w-32" />
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -58,7 +151,7 @@ const ManageRoom = () => {
       <div className="p-6">
         <div className="rounded-md bg-red-50 p-4">
           <div className="flex">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <svg
                 className="h-5 w-5 text-red-400"
                 viewBox="0 0 20 20"
@@ -97,47 +190,24 @@ const ManageRoom = () => {
         <AddRoomButton />
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Room Number</TableHead>
-              <TableHead>Building</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rooms?.map((room) => (
-              <TableRow key={room.id}>
-                <TableCell className="font-medium">
-                  {room.room_number}
-                </TableCell>
-                <TableCell>{room.building}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${room.is_active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                      }`}
-                  >
-                    {room.is_active ? "Active" : "Inactive"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex space-x-2">
-                    <EditRoomButton room={room} />
-                    <DeleteRoomButton
-                      id={room.id}
-                      roomNumber={room.room_number}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        data={rooms || []}
+        searchKey="room_number"
+        searchPlaceholder="Filter room number..."
+        filterOptions={[
+          {
+            column: "departments",
+            title: "Departments",
+            options: departmentFilterOptions,
+          },
+          {
+            column: "is_active",
+            title: "Status",
+            options: statusFilterOptions,
+          },
+        ]}
+      />
     </div>
   );
 };

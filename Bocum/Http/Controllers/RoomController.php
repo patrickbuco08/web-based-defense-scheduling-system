@@ -5,7 +5,6 @@ namespace Bocum\Http\Controllers;
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Room;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
@@ -14,7 +13,11 @@ class RoomController extends Controller
      */
     public function index()
     {
-        $rooms = Room::latest()->get();
+        $rooms = Room::with('departments')->latest()->get()->map(function (Room $room) {
+            return array_merge($room->toArray(), [
+                'department_ids' => $room->departments->pluck('id')->values()->all(),
+            ]);
+        });
 
         return response()->json($rooms);
         // return view('admin.rooms.index', compact('rooms'));
@@ -31,14 +34,25 @@ class RoomController extends Controller
             'room_number' => 'required|string|max:50|unique:rooms,room_number',
             'building' => 'required|string|max:100',
             'is_active' => 'boolean',
+            'department_ids' => 'required|array|min:1',
+            'department_ids.*' => 'exists:departments,id',
         ]);
         
-        $room = Room::create($validated);
+        $room = Room::create([
+            'room_number' => $validated['room_number'],
+            'building' => $validated['building'],
+            'is_active' => $validated['is_active'] ?? false,
+        ]);
+
+        $room->departments()->sync($validated['department_ids']);
+        $room->load('departments');
         
         return response()->json([
             'status' => 'success',
             'message' => 'Room created successfully',
-            'data' => $room
+            'data' => array_merge($room->toArray(), [
+                'department_ids' => $room->departments->pluck('id')->values()->all(),
+            ])
         ], 201);
     }
 
@@ -53,14 +67,25 @@ class RoomController extends Controller
             'room_number' => 'required|string|max:50|unique:rooms,room_number,' . $room->id,
             'building' => 'required|string|max:100',
             'is_active' => 'boolean',
+            'department_ids' => 'required|array|min:1',
+            'department_ids.*' => 'exists:departments,id',
         ]);
         
-        $room->update($validated);
+        $room->update([
+            'room_number' => $validated['room_number'],
+            'building' => $validated['building'],
+            'is_active' => $validated['is_active'] ?? false,
+        ]);
+
+        $room->departments()->sync($validated['department_ids']);
+        $room->load('departments');
         
         return response()->json([
             'status' => 'success',
             'message' => 'Room updated successfully',
-            'data' => $room
+            'data' => array_merge($room->toArray(), [
+                'department_ids' => $room->departments->pluck('id')->values()->all(),
+            ])
         ]);
     }
 
@@ -70,6 +95,8 @@ class RoomController extends Controller
     public function toggleStatus(Room $room)
     {
         $this->authorize('toggleStatus', $room);
+
+        $room->load('departments');
         
         $room->update([
             'is_active' => !$room->is_active
@@ -80,7 +107,9 @@ class RoomController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => "Room {$status} successfully",
-            'data' => $room
+            'data' => array_merge($room->toArray(), [
+                'department_ids' => $room->departments->pluck('id')->values()->all(),
+            ])
         ]);
     }
 

@@ -46,6 +46,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import debounce from 'lodash/debounce';
 import { TimeSlotCombobox } from "@/components/TimeSlotCombobox";
 import { useSecurity } from "@/contexts/SecurityContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface FormData {
     title: string;
@@ -63,6 +64,7 @@ interface FormData {
 
 function DepartmentDefenseCalendar() {
     const { requirePassword, isVerifyingPassword } = useSecurity();
+    const { user } = useAuth();
     const calendarRef = useRef<FullCalendar>(null);
     const [selectedDefense, setSelectedDefense] = useState<any>(null);
     console.log('selectedDefense', selectedDefense);
@@ -158,6 +160,28 @@ function DepartmentDefenseCalendar() {
     ]);
 
     // Memoize the potential panelists to prevent unnecessary recalculations
+
+    const userDepartmentIds = useMemo(() => {
+        return user?.departments?.map((department: any) => department.id) || [];
+    }, [user]);
+
+    const filteredRooms = useMemo(() => {
+        const selectedRoomId = formData.room_id ? parseInt(formData.room_id, 10) : null;
+
+        return rooms.filter((room: any) => {
+            if (selectedRoomId && room.id === selectedRoomId) {
+                return true;
+            }
+
+            if (!userDepartmentIds.length) {
+                return false;
+            }
+
+            return room.department_ids?.some((departmentId: number) =>
+                userDepartmentIds.includes(departmentId)
+            );
+        });
+    }, [rooms, userDepartmentIds, formData.room_id]);
 
     // Memoize the events mapping to prevent unnecessary recalculations
     const mappedEvents = useMemo(() => {
@@ -461,13 +485,18 @@ function DepartmentDefenseCalendar() {
                                         <SelectValue placeholder="Select room" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {rooms.map((room: any) => (
+                                        {filteredRooms.map((room: any) => (
                                             <SelectItem key={room.id} value={room.id.toString()}>
                                                 {room.building} - Room {room.room_number}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {filteredRooms.length === 0 && (
+                                    <p className="text-sm text-muted-foreground">
+                                        No rooms available for your department.
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
