@@ -64,6 +64,7 @@ export function AppRoutes() {
         <Route path="admin/rooms" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Room />} />} />
         <Route path="admin/accounts" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Account />} />} />
         <Route path="admin/academic-year" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Term />} />} />
+        <Route path="admin/archived" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<ArchivedDefenses />} />} />
         <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminReport />} />} />
         <Route path="admin/logs" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminLog />} />} />
 
@@ -73,6 +74,7 @@ export function AppRoutes() {
         <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'coordinator', 'adviser', 'panelist', 'critic']} userRoles={user?.roles} children={<Profile />} />} />
 
         <Route path="coordinators/calendar" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<DepartmentDefenseCalendar />} />} />
+        <Route path="coordinators/archived" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<ArchivedDefenses />} />} />
         <Route path="coordinators/reports" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorReport />} />} />
         <Route path="coordinators/logs" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorLog />} />} />
       </Route>

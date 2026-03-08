@@ -66,6 +66,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconCalendarMonth,
       },
       {
+        name: "Archived Defenses",
+        url: "/app/coordinators/archived",
+        icon: IconArchive,
+      },
+      {
         name: "Reports",
         url: "/app/coordinators/reports",
         icon: IconFileDescription,
@@ -96,6 +101,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         name: "Manage Academic Year",
         url: "/app/admin/academic-year",
         icon: IconCalendarMonth,
+      },
+      {
+        name: "Archived Defenses",
+        url: "/app/admin/archived",
+        icon: IconArchive,
       },
       {
         name: "Reports",

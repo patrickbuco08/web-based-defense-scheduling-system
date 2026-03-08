@@ -378,6 +378,42 @@ class DefenseController extends Controller
     }
 
     /**
+     * Get archived defenses for coordinator (department-specific).
+     */
+    public function archivedDepartmentIndex()
+    {
+        $this->authorize('departmentIndex', Defense::class);
+
+        $defenses = Defense::where('archived', true)
+            ->whereHas('group', function ($query) {
+                $query->where('department_id', Auth::user()->department_id);
+            })
+            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($defenses);
+    }
+
+    /**x
+     * Get all archived defenses for admin (all departments).
+     */
+    public function archivedAdminIndex()
+    {
+        // Check if user is admin
+        if (!Auth::user()->hasRole('admin')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $defenses = Defense::where('archived', true)
+            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($defenses);
+    }
+
+    /**
      * Archive or unarchive a defense.
      *
      * @param  \Bocum\Models\Defense  $defense
@@ -387,8 +423,14 @@ class DefenseController extends Controller
     public function archive(Defense $defense, Request $request)
     {
         try {
-            // Verify the defense belongs to the authenticated adviser
-            if ($defense->adviser_id !== Auth::id()) {
+            // Verify the user can archive this defense
+            $user = Auth::user();
+            $isAdviser = $defense->adviser_id === $user->id;
+            $isCoordinator = $user->roles->contains('name', 'coordinator') && 
+                            optional($defense->group)->department_id === $user->department_id;
+            $isAdmin = $user->roles->contains('name', 'admin');
+
+            if (!$isAdviser && !$isCoordinator && !$isAdmin) {
                 abort(403, 'Unauthorized action.');
             }
 
@@ -423,7 +465,7 @@ class DefenseController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while archiving the defense. Please try again.',
+                'message' => 'An error occurred while archiving the defense. Please try again.' . $e->getMessage(),
             ], 500);
         }
     }

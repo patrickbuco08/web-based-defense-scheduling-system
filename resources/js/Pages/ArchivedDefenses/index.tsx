@@ -1,5 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useArchivedDefenses } from "@/features/defenses/queries/useArchivedDefenses";
+import { useArchivedDepartmentDefenses } from "@/features/defenses/queries/useArchivedDepartmentDefenses";
+import { useArchivedAdminDefenses } from "@/features/defenses/queries/useArchivedAdminDefenses";
+import { useSecurity } from "@/contexts/SecurityContext";
 import {
   Dialog,
   DialogContent,
@@ -154,8 +157,18 @@ function ArchivedDefenses() {
   const [pageSize, setPageSize] = useState(10);
   const archiveDefense = useArchiveDefense();
   const { user } = useAuth();
+  const { requirePassword, isVerifyingPassword } = useSecurity();
 
-  const { data: defenses = [] } = useArchivedDefenses();
+  // Determine which query hook to use based on user role
+  const isAdmin = user?.roles?.includes('admin');
+  const isCoordinator = user?.roles?.includes('coordinator');
+  
+  const { data: adminDefenses = [] } = useArchivedAdminDefenses();
+  const { data: coordinatorDefenses = [] } = useArchivedDepartmentDefenses();
+  const { data: adviserDefenses = [] } = useArchivedDefenses();
+
+  // Use the appropriate data based on role
+  const defenses = isAdmin ? adminDefenses : isCoordinator ? coordinatorDefenses : adviserDefenses;
 
   const filteredDefenses = useMemo(() => {
     return defenses.filter((defense: Defense) => {
@@ -608,7 +621,7 @@ function ArchivedDefenses() {
             </div>
           )}
 
-          {user?.id === selectedDefense?.adviser_id && (
+          {(user?.id === selectedDefense?.adviser_id || isCoordinator) && (
             <DialogFooter className="sm:justify-between">
               <Button
                 variant="default"
@@ -641,19 +654,20 @@ function ArchivedDefenses() {
               onClick={async () => {
                 if (selectedDefense?.id) {
                   try {
+                    await requirePassword();
                     await archiveDefense.mutateAsync({ id: selectedDefense.id, archived: false });
                     toast.success("Defense restored successfully");
+                    setIsRestoreDialogOpen(false);
                   } catch (error: any) {
                     const message = error?.response?.data?.message || error?.message || "Failed to restore defense";
                     toast.error(message);
-                  } finally {
-                    setIsRestoreDialogOpen(false);
                   }
                 }
               }}
+              disabled={isVerifyingPassword || archiveDefense.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
-              {archiveDefense.isPending ? "Restoring..." : "Restore"}
+              {isVerifyingPassword ? "Verifying..." : archiveDefense.isPending ? "Restoring..." : "Restore"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

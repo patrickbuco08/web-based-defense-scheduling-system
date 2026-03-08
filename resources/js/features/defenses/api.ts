@@ -74,4 +74,14 @@ export const defensesApi = {
         const response = await apiClient.get("/defenses/archived");
         return response.data;
     },
+
+    getArchivedDepartmentDefenses: async () => {
+        const response = await apiClient.get("/defenses/archived/departments");
+        return response.data;
+    },
+
+    getArchivedAdminDefenses: async () => {
+        const response = await apiClient.get("/defenses/archived/admin");
+        return response.data;
+    },
 };

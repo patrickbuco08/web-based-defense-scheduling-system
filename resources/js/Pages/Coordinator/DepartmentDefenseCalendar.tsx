@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import { useDefenseDepartments } from "@/features/defenses/queries/useDefenseDepartments";
 import { useUpdateDefense } from "@/features/defenses/mutations/useUpdateDefense";
 import { useCheckDefenseConflicts } from "@/features/defenses/mutations/useCheckDefenseConflicts";
+import { useArchiveDefense } from "@/features/defenses/mutations/useArchiveDefense";
 import { useRooms } from "@/features/rooms/queries/useRooms";
 import { useAccounts } from "@/features/accounts/queries/useAccounts";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -16,11 +17,22 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
     CalendarIcon,
     EditIcon,
     GraduationCapIcon,
     AlertTriangle,
     ClockIcon,
+    Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -55,6 +67,7 @@ function DepartmentDefenseCalendar() {
     const [selectedDefense, setSelectedDefense] = useState<any>(null);
     console.log('selectedDefense', selectedDefense);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all', 'pending', 'approved', 'rejected', 'cancelled'
     const [initialStatus, setInitialStatus] = useState<string>('pending');
@@ -77,6 +90,7 @@ function DepartmentDefenseCalendar() {
     const { data: accounts = [] } = useAccounts();
     const updateDefense = useUpdateDefense();
     const checkConflicts = useCheckDefenseConflicts();
+    const archiveDefense = useArchiveDefense();
     const [events, setEvents] = useState<any[]>([]);
     const [conflicts, setConflicts] = useState<{
         room_conflicts: { has_conflict: boolean; message: string; conflicts: any[] };
@@ -638,21 +652,68 @@ function DepartmentDefenseCalendar() {
                                     Checking for conflicts...
                                 </div>
                             )}
-                            <Button
-                                onClick={handleSaveChanges}
-                                disabled={updateDefense.isPending || conflicts?.has_any_conflicts || isCheckingConflicts}
-                            >
-                                {updateDefense.isPending ? "Saving..." :
-                                    isCheckingConflicts ? "Checking..." :
-                                        conflicts?.has_any_conflicts ? "Cannot Save - Conflicts Detected" :
-                                            initialStatus === 'approved' && formData.status === 'cancelled' ? "Cancel Defense" :
-                                                "Save Changes"}
-                            </Button>
+                            <div className="flex justify-between items-center w-full">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setIsDialogOpen(false);
+                                        setIsArchiveDialogOpen(true);
+                                    }}
+                                    className="gap-2"
+                                >
+                                    <Archive className="h-4 w-4" />
+                                    Archive Defense
+                                </Button>
+                                <Button
+                                    onClick={handleSaveChanges}
+                                    disabled={updateDefense.isPending || conflicts?.has_any_conflicts || isCheckingConflicts}
+                                >
+                                    {updateDefense.isPending ? "Saving..." :
+                                        isCheckingConflicts ? "Checking..." :
+                                            conflicts?.has_any_conflicts ? "Cannot Save - Conflicts Detected" :
+                                                initialStatus === 'approved' && formData.status === 'cancelled' ? "Cancel Defense" :
+                                                    "Save Changes"}
+                                </Button>
+                            </div>
                         </DialogFooter>
                     )}
 
                 </DialogContent>
             </Dialog>
+
+            {/* Archive Confirmation Dialog */}
+            <AlertDialog open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Archive this defense?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will move the defense to your archived defenses. You can restore it later if needed.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={async () => {
+                                if (selectedDefense?.id) {
+                                    try {
+                                        await requirePassword();
+                                        await archiveDefense.mutateAsync({ id: selectedDefense.id, archived: true });
+                                        toast.success("Defense archived successfully");
+                                        setIsArchiveDialogOpen(false);
+                                    } catch (error: any) {
+                                        const message = error?.response?.data?.message || error?.message || "Failed to archive defense";
+                                        toast.error(message);
+                                    }
+                                }
+                            }}
+                            disabled={isVerifyingPassword || archiveDefense.isPending}
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
+                            {isVerifyingPassword ? "Verifying..." : archiveDefense.isPending ? "Archiving..." : "Archive"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
