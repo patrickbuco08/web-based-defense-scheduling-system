@@ -13,7 +13,7 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div id="root"></div>
+    <div id="root" data-login-success="{{ session('login_success') ? 'true' : 'false' }}"></div>
 </body>
 
 </html>

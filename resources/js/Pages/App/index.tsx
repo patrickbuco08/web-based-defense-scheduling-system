@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { createRoot } from "react-dom/client";
 // import { StrictMode } from "react";
-import { Toaster } from "@/components/ui/sonner";
 import { App } from "./App";
 
 // Get the root element
@@ -14,7 +13,6 @@ if (container) {
   root.render(
     <React.StrictMode>
       <App />
-      <Toaster position="top-center" />
     </React.StrictMode>
   );
 }

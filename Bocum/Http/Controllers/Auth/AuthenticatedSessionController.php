@@ -48,6 +48,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        session()->flash('login_success', true);
+
         $user = $request->user();
         $roles = $user->roles->pluck('name')->toArray();
 
