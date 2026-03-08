@@ -13,9 +13,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUpdateTerm } from "@/features/terms/mutations/useUpdateTerm";
+import { useSecurity } from "@/contexts/SecurityContext";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 interface EditTermButtonProps {
@@ -31,6 +33,8 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
     });
 
     const updateTermMutation = useUpdateTerm();
+    const { requirePassword, isVerifyingPassword } = useSecurity();
+    const queryClient = useQueryClient();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -43,14 +47,21 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            await requirePassword();
             await updateTermMutation.mutateAsync({
                 id: term.id,
                 data: formData,
             });
+            
+            // Invalidate relevant queries
+            queryClient.invalidateQueries({ queryKey: ["terms"] });
+            queryClient.invalidateQueries({ queryKey: ["defenses"] });
+            queryClient.invalidateQueries({ queryKey: ["defenses", "archived"] });
+            
             setIsOpen(false);
-            toast.success("Term updated successfully.");
+            toast.success("Academic Year updated successfully.");
         } catch (error) {
-            toast.error("Failed to update term. Please try again.");
+            toast.error("Failed to update academic year. Please try again.");
             // Error is handled by the parent component
         }
     };
@@ -65,7 +76,7 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Edit Term</DialogTitle>
+                    <DialogTitle>Edit Academic Year</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
@@ -107,8 +118,8 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={updateTermMutation.isPending}>
-                            {updateTermMutation.isPending ? "Saving..." : "Save Changes"}
+                        <Button type="submit" disabled={isVerifyingPassword || updateTermMutation.isPending}>
+                            {isVerifyingPassword ? "Verifying..." : updateTermMutation.isPending ? "Saving..." : "Save Changes"}
                         </Button>
                     </div>
                 </form>

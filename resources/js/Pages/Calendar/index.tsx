@@ -551,7 +551,7 @@ function Calendar() {
             </div>
           )}
 
-          {/* {user?.id === selectedDefense?.adviser_id && (
+          {user?.id === selectedDefense?.adviser_id && (
             <DialogFooter className="sm:justify-between">
               <Button
                 variant="outline"
@@ -565,7 +565,7 @@ function Calendar() {
                 Archive Defense
               </Button>
             </DialogFooter>
-          )} */}
+          )}
         </DialogContent>
       </Dialog>
 

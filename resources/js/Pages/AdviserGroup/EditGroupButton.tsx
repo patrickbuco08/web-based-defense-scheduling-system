@@ -209,8 +209,9 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
                   }))
                 }
                 required
+                disabled
               >
-                <SelectTrigger className="col-span-3 w-full">
+                <SelectTrigger className="col-span-3 w-full bg-gray-50">
                   <SelectValue placeholder="Select Department" />
                 </SelectTrigger>
                 <SelectContent>

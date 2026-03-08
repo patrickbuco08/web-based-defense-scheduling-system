@@ -3,6 +3,7 @@
 namespace Bocum\Http\Controllers\Admin;
 
 use Bocum\Http\Controllers\Controller;
+use Bocum\Models\Defense;
 use Bocum\Models\Term;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,10 +43,28 @@ class TermController extends Controller
         return DB::transaction(function () use ($validated) {
             // If this term is being set as current, unset any existing current term
             if ($validated['is_current'] ?? false) {
+                $currentTermIds = Term::where('is_current', true)->pluck('id');
+
+                if ($currentTermIds->isNotEmpty()) {
+                    Defense::whereHas('group', function ($query) use ($currentTermIds) {
+                        $query->whereIn('term_id', $currentTermIds);
+                    })
+                        ->where('archived', false)
+                        ->update(['archived' => true]);
+                }
+
                 Term::where('is_current', true)->update(['is_current' => false]);
             }
 
-            Term::create($validated);
+            $term = Term::create($validated);
+
+            if ($validated['is_current'] ?? false) {
+                Defense::whereHas('group', function ($query) use ($term) {
+                    $query->where('term_id', $term->id);
+                })
+                    ->where('archived', true)
+                    ->update(['archived' => false]);
+            }
 
             return response()->json([
                 'status' => 'success',
@@ -84,12 +103,32 @@ class TermController extends Controller
         return DB::transaction(function () use ($validated, $term) {
             // If this term is being set as current, unset any existing current term
             if ($validated['is_current'] ?? false) {
+                $currentTermIds = Term::where('is_current', true)
+                    ->where('id', '!=', $term->id)
+                    ->pluck('id');
+
+                if ($currentTermIds->isNotEmpty()) {
+                    Defense::whereHas('group', function ($query) use ($currentTermIds) {
+                        $query->whereIn('term_id', $currentTermIds);
+                    })
+                        ->where('archived', false)
+                        ->update(['archived' => true]);
+                }
+
                 Term::where('is_current', true)
                     ->where('id', '!=', $term->id)
                     ->update(['is_current' => false]);
             }
 
             $term->update($validated);
+
+            if ($validated['is_current'] ?? false) {
+                Defense::whereHas('group', function ($query) use ($term) {
+                    $query->where('term_id', $term->id);
+                })
+                    ->where('archived', true)
+                    ->update(['archived' => false]);
+            }
 
             return response()->json([
                 'status' => 'success',
