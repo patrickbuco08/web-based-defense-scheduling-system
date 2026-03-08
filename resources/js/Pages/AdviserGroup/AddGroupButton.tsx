@@ -262,7 +262,7 @@ export const AddGroupButton = () => {
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <Label>Members</Label>
+              <Label>Members <span className="text-destructive">*</span></Label>
               <Button
                 type="button"
                 variant="outline"

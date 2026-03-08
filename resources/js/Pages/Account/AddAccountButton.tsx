@@ -57,7 +57,7 @@ export function AddAccountButton() {
     }));
   };
 
-  const handleSelectChange = (name: string, value: string | null) => {
+  const handleSelectChange = (name: string, value: number | null) => {
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -114,7 +114,7 @@ export function AddAccountButton() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Full Name <span className="text-destructive">*</span></Label>
               <Input
                 id="name"
                 name="name"
@@ -124,7 +124,7 @@ export function AddAccountButton() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
               <Input
                 id="email"
                 name="email"
@@ -135,7 +135,7 @@ export function AddAccountButton() {
               />
             </div>
             <div className="space-y-2">
-              <Label>Roles (Select at least one)</Label>
+              <Label>Roles (Select at least one) <span className="text-destructive">*</span></Label>
               <div className="space-y-2">
                 {roles?.filter((role: any) => !EXCLUDED_ROLES.includes(role.name)).map((role: any) => (
                   <div key={role.id} className="flex items-center space-x-2">
@@ -154,16 +154,16 @@ export function AddAccountButton() {
             <div className="space-y-2">
               <Label htmlFor="department_id">Department</Label>
               <Select
-                value={formData.department_id?.toString() || ""}
+                value={formData.department_id?.toString() || "none"}
                 onValueChange={(value) =>
-                  handleSelectChange("department_id", value ? parseInt(value) : null)
+                  handleSelectChange("department_id", value === "none" ? null : parseInt(value, 10))
                 }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a department" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={null}>None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {departments?.map((dept: Department) => (
                     <SelectItem key={dept.id} value={dept.id.toString()}>
                       {dept.name}
@@ -173,7 +173,7 @@ export function AddAccountButton() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
               <Input
                 id="password"
                 name="password"
@@ -184,7 +184,7 @@ export function AddAccountButton() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password_confirmation">Confirm Password</Label>
+              <Label htmlFor="password_confirmation">Confirm Password <span className="text-destructive">*</span></Label>
               <Input
                 id="password_confirmation"
                 name="password_confirmation"

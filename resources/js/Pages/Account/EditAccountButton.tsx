@@ -128,7 +128,7 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
           <div className="space-y-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
+                Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="name"
@@ -154,7 +154,7 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
             </div>
             <div className="grid grid-cols-4 items-start gap-4">
               <Label className="text-right pt-2">
-                Roles
+                Roles <span className="text-destructive">*</span>
               </Label>
               <div className="col-span-3 space-y-2">
                 {roles?.filter((role: any) => !EXCLUDED_ROLES.includes(role.name)).map((role: any) => (

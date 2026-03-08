@@ -80,7 +80,7 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="school_year">School Year</Label>
+                        <Label htmlFor="school_year">School Year <span className="text-destructive">*</span></Label>
                         <Input
                             id="school_year"
                             name="school_year"
@@ -90,7 +90,7 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="semester">Semester</Label>
+                        <Label htmlFor="semester">Semester <span className="text-destructive">*</span></Label>
                         <Input
                             id="semester"
                             name="semester"

@@ -94,7 +94,7 @@ export function EditDepartmentButton({ department }: EditDepartmentButtonProps) 
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-code">Department Code</Label>
+              <Label htmlFor="edit-code">Department Code <span className="text-destructive">*</span></Label>
               <Input
                 id="edit-code"
                 placeholder="e.g., CS, IT, ENG"
@@ -105,7 +105,7 @@ export function EditDepartmentButton({ department }: EditDepartmentButtonProps) 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Department Name</Label>
+              <Label htmlFor="edit-name">Department Name <span className="text-destructive">*</span></Label>
               <Input
                 id="edit-name"
                 placeholder="e.g., Computer Science"

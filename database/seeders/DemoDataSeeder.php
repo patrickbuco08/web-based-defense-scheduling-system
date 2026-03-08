@@ -364,8 +364,40 @@ class DemoDataSeeder extends Seeder
                 'notes' => "Good day, my preferred schedule is {$formattedDate} from {$formattedTime}. If this doesn't work, please let me know. Alternative schedules would be the following week or the same time on different days.",
             ]
         );
+
+        $panelistIds = $this->getSeedPanelistIdsForGroup($group);
+
+        if (!empty($panelistIds)) {
+            $defense->panelists()->sync($panelistIds);
+        }
+
         $this->command->info("          🗓️  Defense: {$formattedDate} | {$formattedTime} | Room: {$room->room_number}");
 
+    }
+
+    private function getSeedPanelistIdsForGroup(Group $group, int $limit = 3): array
+    {
+        $groupDepartmentIds = $group->departments()->pluck('departments.id');
+
+        $departmentPanelistIds = User::role('panelist')
+            ->whereHas('departments', function ($query) use ($groupDepartmentIds) {
+                $query->whereIn('departments.id', $groupDepartmentIds);
+            })
+            ->orderBy('users.id')
+            ->pluck('users.id')
+            ->all();
+
+        if (count($departmentPanelistIds) >= $limit) {
+            return array_slice($departmentPanelistIds, 0, $limit);
+        }
+
+        $fallbackPanelistIds = User::role('panelist')
+            ->whereNotIn('users.id', $departmentPanelistIds)
+            ->orderBy('users.id')
+            ->pluck('users.id')
+            ->all();
+
+        return array_slice(array_merge($departmentPanelistIds, $fallbackPanelistIds), 0, $limit);
     }
 
     private function findAvailableRoom($rooms, $startTime, $endTime)

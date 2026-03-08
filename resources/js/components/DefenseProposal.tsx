@@ -140,7 +140,7 @@ export function DefenseProposal() {
           <div className="grid gap-4 py-4">
             {/* Title */}
             <div className="space-y-2">
-              <Label htmlFor="title">Defense Title</Label>
+              <Label htmlFor="title">Defense Title <span className="text-destructive">*</span></Label>
               <Input
                 id="title"
                 value={data.title}
@@ -175,7 +175,7 @@ export function DefenseProposal() {
               <div className="flex flex-col md:flex-row gap-4">
                 {/* group selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="group_id">Group</Label>
+                  <Label htmlFor="group_id">Group <span className="text-destructive">*</span></Label>
                   <Select
                     value={data.group_id}
                     onValueChange={(value) => setData('group_id', value)}
@@ -197,7 +197,7 @@ export function DefenseProposal() {
                 {/* Date Picker */}
                 <div className="flex-1">
                   <Label htmlFor="date" className="text-sm font-medium mb-1 block">
-                    Preferred Date
+                    Preferred Date <span className="text-destructive">*</span>
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -236,7 +236,7 @@ export function DefenseProposal() {
                 {/* Start Time */}
                 <div className="flex-1">
                   <Label htmlFor="start_time" className="text-sm font-medium mb-1 block">
-                    Start Time
+                    Start Time <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative">
                     <Input
@@ -256,7 +256,7 @@ export function DefenseProposal() {
                 {/* End Time */}
                 <div className="flex-1">
                   <Label htmlFor="end_time" className="text-sm font-medium mb-1 block">
-                    End Time
+                    End Time <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative">
                     <Input
@@ -277,7 +277,7 @@ export function DefenseProposal() {
             </div>
 
             <div className="space-y-2">
-              <Label>Panel Members</Label>
+              <Label>Panel Members <span className="text-destructive">*</span></Label>
               <div className="border rounded p-4 max-h-48 overflow-y-auto">
                 {availablePanelists.map((panelist: any) => (
                   <div key={panelist.id} className="flex items-center space-x-2 mb-2">

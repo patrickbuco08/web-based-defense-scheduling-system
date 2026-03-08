@@ -172,7 +172,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
           <div className="space-y-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="group_code" className="text-right">
-                Group Code
+                Group Code <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="group_code"
@@ -234,7 +234,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
             {activeTerm && (
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="term_id" className="text-right">
-                  Term
+                  Term <span className="text-destructive">*</span>
                 </Label>
                 <Select
                   name="term_id"
@@ -299,7 +299,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <Label className="text-base">Members</Label>
+                <Label className="text-base">Members <span className="text-destructive">*</span></Label>
                 <Button
                   type="button"
                   variant="outline"

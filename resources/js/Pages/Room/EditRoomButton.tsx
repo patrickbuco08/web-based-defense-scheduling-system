@@ -87,7 +87,7 @@ export function EditRoomButton({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="room_number">Room Number</Label>
+            <Label htmlFor="room_number">Room Number <span className="text-destructive">*</span></Label>
             <Input
               id="room_number"
               name="room_number"
@@ -97,7 +97,7 @@ export function EditRoomButton({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="building">Building</Label>
+            <Label htmlFor="building">Building <span className="text-destructive">*</span></Label>
             <Input
               id="building"
               name="building"
@@ -107,7 +107,7 @@ export function EditRoomButton({
             />
           </div>
           <div className="space-y-2">
-            <Label>Departments</Label>
+            <Label>Departments <span className="text-destructive">*</span></Label>
             <div className="border rounded-md p-3 max-h-48 overflow-y-auto space-y-2">
               {isLoadingDepartments ? (
                 <div className="flex justify-center p-2">

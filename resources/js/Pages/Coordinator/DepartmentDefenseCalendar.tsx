@@ -475,7 +475,7 @@ function DepartmentDefenseCalendar() {
 
                             {/* Room Selection */}
                             <div className="space-y-2">
-                                <Label>Room</Label>
+                                <Label>Room <span className="text-destructive">*</span></Label>
                                 <Select
                                     value={formData.room_id}
                                     onValueChange={(value) => setFormData(prev => ({ ...prev, room_id: value }))}
@@ -505,7 +505,7 @@ function DepartmentDefenseCalendar() {
                                     {/* Date Picker - Editable */}
                                     <div className="flex-1">
                                         <Label htmlFor="date" className="text-sm font-medium mb-1 block">
-                                            Preferred Date
+                                            Preferred Date <span className="text-destructive">*</span>
                                         </Label>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -546,7 +546,7 @@ function DepartmentDefenseCalendar() {
                                     {/* Start Time - Editable */}
                                     <div className="flex-1">
                                         <Label htmlFor="start_time" className="text-sm font-medium mb-1 block">
-                                            Start Time
+                                            Start Time <span className="text-destructive">*</span>
                                         </Label>
                                         <TimeSlotCombobox
                                             id="start_time"
@@ -562,7 +562,7 @@ function DepartmentDefenseCalendar() {
                                     {/* End Time - Editable */}
                                     <div className="flex-1">
                                         <Label htmlFor="end_time" className="text-sm font-medium mb-1 block">
-                                            End Time
+                                            End Time <span className="text-destructive">*</span>
                                         </Label>
                                         <TimeSlotCombobox
                                             id="end_time"
@@ -580,11 +580,11 @@ function DepartmentDefenseCalendar() {
 
                             {/* Status Selection */}
                             <div className="space-y-2">
-                                <Label>Status</Label>
+                                <Label>Status <span className="text-destructive">*</span></Label>
                                 <Select
                                     value={formData.status}
                                     onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                                    disabled={[].includes(initialStatus)}
+                                    disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
@@ -605,8 +605,7 @@ function DepartmentDefenseCalendar() {
                                     <Label htmlFor="rejection_note">
                                         {formData.status === 'reschedule' && 'Reschedule Notes'}
                                         {formData.status === 'reappearance' && 'Reappearance Notes'}
-                                        {formData.status === 're-defense' && 'Re-defense Notes'}
-                                        <span className="text-red-500">*</span>
+                                        {formData.status === 're-defense' && 'Re-defense Notes'} <span className="text-destructive">*</span>
                                     </Label>
                                     <textarea
                                         id="rejection_note"
@@ -637,7 +636,8 @@ function DepartmentDefenseCalendar() {
                                                             : prev.panelists.filter(id => id !== panelist.id)
                                                     }));
                                                 }}
-                                                disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                                // disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
+                                                disabled
                                                 className={['approved', 'rejected', 'cancelled'].includes(initialStatus) ? 'opacity-50' : ''}
                                             />
                                             <Label className="text-sm">{panelist.name}</Label>

@@ -67,7 +67,7 @@ export function AddDepartmentButton() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="code">Course Code</Label>
+              <Label htmlFor="code">Course Code <span className="text-destructive">*</span></Label>
               <Input
                 id="code"
                 placeholder="e.g., CS, IT, ENG"
@@ -78,7 +78,7 @@ export function AddDepartmentButton() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="name">Course Name</Label>
+              <Label htmlFor="name">Course Name <span className="text-destructive">*</span></Label>
               <Input
                 id="name"
                 placeholder="e.g., Computer Science"
