@@ -20,9 +20,11 @@ return new class extends Migration
             $table->foreignId('approved_by_id')->nullable()->constrained('users')->nullOnDelete();
     
             $table->string('title');
+            $table->string('presentation_type')->nullable();
             $table->dateTime('start_at');
             $table->dateTime('end_at');
-            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'cancelled', 'reschedule', 'reappearance', 're-defense'])->default('pending');
+            $table->boolean('archived')->default(false);
             $table->string('notes')->nullable();
             $table->string('rejection_note')->nullable();
         

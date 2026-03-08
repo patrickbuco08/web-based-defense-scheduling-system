@@ -15,11 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('group_id')->constrained()->cascadeOnDelete();
             $table->string('student_name');
-            $table->string('email')->nullable();
             $table->timestamps();
-            
-            // Add index for better query performance
-            $table->index('email');
         });
     }
 

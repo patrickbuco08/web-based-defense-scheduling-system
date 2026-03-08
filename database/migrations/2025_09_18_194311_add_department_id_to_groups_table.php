@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('groups', function (Blueprint $table) {
-            //
+            $table->dropConstrainedForeignId('department_id');
         });
     }
 };
