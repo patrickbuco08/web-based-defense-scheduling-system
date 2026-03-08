@@ -20,6 +20,10 @@ export interface Group {
     id: number;
     name: string;
   };
+  departments?: Array<{
+    id: number;
+    name: string;
+  }>;
   term?: {
     id: number;
     school_year: string;
@@ -39,15 +43,15 @@ export interface Group {
 }
 
 export interface CreateGroupData {
-  department_id: number;
+  department_ids: number[];
   term_id: number;
   critic_id?: number | null;
   course_code?: string;
-  members: Array<{ name: string; email?: string | null }>;
+  members: Array<{ name: string }>;
 }
 
 export interface UpdateGroupData {
-  department_id?: number;
+  department_ids?: number[];
   term_id?: number;
   group_code?: string;
   critic_id?: number | null;

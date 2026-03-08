@@ -40,12 +40,17 @@ const HARDCODED_TERMS = [
 export function EditGroupButton({ group }: EditGroupButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
-    department_id: group.department_id,
     term_id: group.term_id,
     group_code: group.group_code || "",
     course_code: group.course_code || "",
     critic_id: group.critic_id || null,
   });
+
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>(
+    group.departments && group.departments.length > 0
+      ? group.departments.map((d: any) => d.id)
+      : []
+  );
 
   const [members, setMembers] = useState<Array<{ id: number; name: string }>>(
     group.members && group.members.length > 0
@@ -105,9 +110,16 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
         return;
       }
 
+      // Validate departments
+      if (selectedDepartments.length === 0) {
+        toast.error("Please select at least one department");
+        return;
+      }
+
       // Prepare data for submission
       const data = {
         ...formData,
+        department_ids: selectedDepartments,
         members: validMembers.map(({ name }) => ({
           name,
         })),
@@ -185,33 +197,38 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
               />
             </div>
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="department_id" className="text-right">
-                Department
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label className="text-right pt-2">
+                Departments <span className="text-destructive">*</span>
               </Label>
-              <Select
-                name="department_id"
-                value={formData.department_id?.toString()}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    department_id: Number(value),
-                  }))
-                }
-                required
-                disabled
-              >
-                <SelectTrigger className="col-span-3 w-full bg-gray-50">
-                  <SelectValue placeholder="Select Department" />
-                </SelectTrigger>
-                <SelectContent>
-                  {departments?.map((department: any) => (
-                    <SelectItem key={department.id} value={department.id.toString()}>
-                      {department.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="col-span-3 space-y-2 border rounded-md p-3 max-h-48 overflow-y-auto">
+                {isLoadingDepartments ? (
+                  <div className="flex justify-center p-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </div>
+                ) : (
+                  departments?.map((dept: any) => (
+                    <div key={dept.id} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={`dept-${dept.id}`}
+                        checked={selectedDepartments.includes(dept.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedDepartments([...selectedDepartments, dept.id]);
+                          } else {
+                            setSelectedDepartments(selectedDepartments.filter(id => id !== dept.id));
+                          }
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <label htmlFor={`dept-${dept.id}`} className="text-sm cursor-pointer">
+                        {dept.name}
+                      </label>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
             {activeTerm && (

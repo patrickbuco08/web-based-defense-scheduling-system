@@ -19,6 +19,15 @@ class Group extends Model
         return $this->belongsTo(Department::class);
     }
 
+    /**
+     * Get all departments this group belongs to (many-to-many).
+     */
+    public function departments()
+    {
+        return $this->belongsToMany(Department::class, 'department_group')
+            ->withTimestamps();
+    }
+
     public function adviser()
     {
         return $this->belongsTo(User::class, 'adviser_id');

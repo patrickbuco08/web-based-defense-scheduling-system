@@ -56,6 +56,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all departments this user belongs to (many-to-many).
+     */
+    public function departments(): BelongsToMany
+    {
+        return $this->belongsToMany(Department::class, 'department_user')
+            ->withTimestamps();
+    }
+
+    /**
      * Get all defenses where this user is the adviser.
      */
     public function advisedDefenses(): HasMany

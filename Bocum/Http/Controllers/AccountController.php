@@ -17,12 +17,15 @@ class AccountController extends Controller
     public function index()
     {
         $currentUser = Auth::user();
-        $query = User::with(['roles', 'department'])
+        $query = User::with(['roles', 'department', 'departments'])
             ->where('id', '!=', $currentUser->id);
             
         // Only filter by department if user is not an admin
         if (!$currentUser->hasRole('admin')) {
-            $query->where('department_id', $currentUser->department_id);
+            $userDepartmentIds = $currentUser->departments->pluck('id');
+            $query->whereHas('departments', function($q) use ($userDepartmentIds) {
+                $q->whereIn('departments.id', $userDepartmentIds);
+            });
         }
         
         $users = $query->latest()->get()
@@ -47,9 +50,13 @@ class AccountController extends Controller
     public function getAccountsByDepartment()
     {
         $currentUser = Auth::user();
-        $users = User::with(['roles', 'department'])
+        $userDepartmentIds = $currentUser->departments->pluck('id');
+        
+        $users = User::with(['roles', 'department', 'departments'])
             ->where('id', '!=', $currentUser->id)
-            ->where('department_id', $currentUser->department_id)
+            ->whereHas('departments', function($query) use ($userDepartmentIds) {
+                $query->whereIn('departments.id', $userDepartmentIds);
+            })
             ->whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'admin');
             })

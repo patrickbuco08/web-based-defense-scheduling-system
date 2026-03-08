@@ -38,23 +38,27 @@ class GroupController extends Controller
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
             'term_id' => 'required|exists:terms,id',
-            'department_id' => 'required|exists:departments,id',
+            'department_ids' => 'required|array|min:1',
+            'department_ids.*' => 'required|exists:departments,id',
             'critic_id' => 'nullable|exists:users,id',
         ]);
 
-        // Generate auto group code
-        $groupCode = $this->groupService->generateGroupCode($validated['department_id']);
+        // Use first department for group code generation
+        $groupCode = $this->groupService->generateGroupCode($validated['department_ids'][0]);
 
-        // Create the group
+        // Create the group (keep department_id for backward compatibility with first department)
         $group = Group::create([
             'group_code' => $groupCode,
             'course_code' => $validated['course_code'] ?? null,
             'term_id' => $validated['term_id'],
-            'department_id' => $validated['department_id'],
+            'department_id' => $validated['department_ids'][0],
             'critic_id' => $validated['critic_id'] ?? null,
             'adviser_id' => Auth::id(),
             'code' => $groupCode,
         ]);
+
+        // Attach all departments to the group
+        $group->departments()->attach($validated['department_ids']);
 
         // Add group members
         foreach ($validated['members'] as $memberData) {
@@ -65,7 +69,7 @@ class GroupController extends Controller
 
         return response()->json([
             'message' => 'Group created successfully!',
-            'group' => $group->load('members')
+            'group' => $group->load('members', 'departments')
         ]);
     }
 
@@ -99,16 +103,22 @@ class GroupController extends Controller
             'members' => 'required|array|min:1',
             'members.*.name' => 'required|string|max:255',
             'term_id' => 'required|exists:terms,id',
+            'department_ids' => 'required|array|min:1',
+            'department_ids.*' => 'required|exists:departments,id',
             'critic_id' => 'nullable|exists:users,id',
         ]);
 
-        // Update the group
+        // Update the group (keep department_id for backward compatibility with first department)
         $group->update([
             'group_code' => $validated['group_code'],
             'course_code' => $validated['course_code'] ?? null,
             'term_id' => $validated['term_id'],
+            'department_id' => $validated['department_ids'][0],
             'critic_id' => $validated['critic_id'] ?? null,
         ]);
+
+        // Sync departments
+        $group->departments()->sync($validated['department_ids']);
 
         // Delete existing members
         $group->members()->delete();
@@ -122,7 +132,7 @@ class GroupController extends Controller
 
         return response()->json([
             'message' => 'Group updated successfully!',
-            'group' => $group->load('members')
+            'group' => $group->load('members', 'departments')
         ]);
     }
 
@@ -131,7 +141,7 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::with(['term', 'members', 'department', 'adviser', 'critic'])
+        $groups = Group::with(['term', 'members', 'department', 'departments', 'adviser', 'critic'])
             ->where('adviser_id', Auth::id())
             ->latest()
             ->get();

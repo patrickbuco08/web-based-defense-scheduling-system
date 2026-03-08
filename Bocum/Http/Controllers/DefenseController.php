@@ -55,11 +55,14 @@ class DefenseController extends Controller
     {
         $this->authorize('departmentIndex', Defense::class);
 
+        $user = Auth::user();
+        $userDepartmentIds = $user->departments->pluck('id');
+
         $defenses = Defense::where('archived', false)
-            ->whereHas('group', function ($query) {
-                $query->where('department_id', Auth::user()->department_id);
+            ->whereHas('group.departments', function ($query) use ($userDepartmentIds) {
+                $query->whereIn('departments.id', $userDepartmentIds);
             })
-            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.departments', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -312,9 +315,19 @@ class DefenseController extends Controller
             }
 
             $adviser = Auth::user();
-            $coordinator = User::role('coordinator')->where('department_id', $adviser->department_id)->firstOrFail();
+            
+            // Get all coordinators from the group's departments
+            $groupDepartmentIds = $defense->group->departments->pluck('id');
+            $coordinators = User::role('coordinator')
+                ->whereHas('departments', function ($query) use ($groupDepartmentIds) {
+                    $query->whereIn('departments.id', $groupDepartmentIds);
+                })
+                ->get();
 
-            Mail::to($coordinator->email)->queue(new DefenseProposalMail($defense, $adviser));
+            // Send email to all coordinators
+            foreach ($coordinators as $coordinator) {
+                Mail::to($coordinator->email)->queue(new DefenseProposalMail($defense, $adviser));
+            }
 
             $defense->load('group', 'group.term');
 
@@ -384,11 +397,14 @@ class DefenseController extends Controller
     {
         $this->authorize('departmentIndex', Defense::class);
 
+        $user = Auth::user();
+        $userDepartmentIds = $user->departments->pluck('id');
+
         $defenses = Defense::where('archived', true)
-            ->whereHas('group', function ($query) {
-                $query->where('department_id', Auth::user()->department_id);
+            ->whereHas('group.departments', function ($query) use ($userDepartmentIds) {
+                $query->whereIn('departments.id', $userDepartmentIds);
             })
-            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.departments', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -426,8 +442,13 @@ class DefenseController extends Controller
             // Verify the user can archive this defense
             $user = Auth::user();
             $isAdviser = $defense->adviser_id === $user->id;
+            
+            // Check if coordinator's departments intersect with group's departments
             $isCoordinator = $user->roles->contains('name', 'coordinator') && 
-                            optional($defense->group)->department_id === $user->department_id;
+                            $user->departments->pluck('id')->intersect(
+                                $defense->group->departments->pluck('id')
+                            )->isNotEmpty();
+            
             $isAdmin = $user->roles->contains('name', 'admin');
 
             if (!$isAdviser && !$isCoordinator && !$isAdmin) {

@@ -61,10 +61,18 @@ export const AddGroupButton = () => {
 
   const [formData, setFormData] = useState({
     course_code: "",
-    department_id: user?.department_id?.toString() || '',
     term_id: "",
     critic_id: "",
   });
+
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
+
+  // Set user's departments as default if available
+  useEffect(() => {
+    if (user?.departments && user.departments.length > 0) {
+      setSelectedDepartments(user.departments.map((d: any) => d.id));
+    }
+  }, [user]);
 
   // Set active term when loaded
   useEffect(() => {
@@ -120,9 +128,16 @@ export const AddGroupButton = () => {
       return;
     }
 
+    // Validate departments
+    if (selectedDepartments.length === 0) {
+      toast.error("Please select at least one department");
+      return;
+    }
+
     // Prepare data for submission
     const submitData = {
       ...formData,
+      department_ids: selectedDepartments,
       members: validMembers.map(({ name }) => ({
         name,
       })),
@@ -135,10 +150,10 @@ export const AddGroupButton = () => {
         // Reset form
         setFormData({
           course_code: "",
-          department_id: user?.department_id?.toString() || "",
           term_id: activeTerm?.id?.toString() || "",
           critic_id: "",
         });
+        setSelectedDepartments(user?.departments?.map((d: any) => d.id) || []);
         setMembers([{ id: Date.now(), name: "" }]);
       },
       onError: (error: any) => {
@@ -178,34 +193,38 @@ export const AddGroupButton = () => {
             />
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="department_id" className="text-right">
-              Department
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label className="text-right pt-2">
+              Departments <span className="text-destructive">*</span>
             </Label>
-            <Select
-              name="department_id"
-              value={formData.department_id}
-              onValueChange={(value) => handleSelectChange("department_id", value)}
-              required
-              disabled={!!user?.department_id}
-            >
-              <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Select department" />
-              </SelectTrigger>
-              <SelectContent>
-                {isLoadingDepartments ? (
-                  <div className="flex justify-center p-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  </div>
-                ) : (
-                  departments?.map((dept: Department) => (
-                    <SelectItem key={dept.id} value={dept.id.toString()}>
+            <div className="col-span-3 space-y-2 border rounded-md p-3 max-h-48 overflow-y-auto">
+              {isLoadingDepartments ? (
+                <div className="flex justify-center p-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+              ) : (
+                departments?.map((dept: Department) => (
+                  <div key={dept.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`dept-${dept.id}`}
+                      checked={selectedDepartments.includes(dept.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedDepartments([...selectedDepartments, dept.id]);
+                        } else {
+                          setSelectedDepartments(selectedDepartments.filter(id => id !== dept.id));
+                        }
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <label htmlFor={`dept-${dept.id}`} className="text-sm cursor-pointer">
                       {dept.name}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+                    </label>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">

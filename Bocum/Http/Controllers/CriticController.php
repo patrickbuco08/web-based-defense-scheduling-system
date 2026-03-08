@@ -11,10 +11,13 @@ class CriticController extends Controller
     public function index()
     {
         $authUser = Auth::user();
+        $userDepartmentIds = $authUser->departments->pluck('id');
         
-        $critics = User::with(['roles', 'department'])
+        $critics = User::with(['roles', 'department', 'departments'])
             ->where('id', '!=', $authUser->id)
-            ->where('department_id', $authUser->department_id)
+            ->whereHas('departments', function($query) use ($userDepartmentIds) {
+                $query->whereIn('departments.id', $userDepartmentIds);
+            })
             ->whereDoesntHave('roles', function($query) {
                 $query->where('name', 'admin');
             })

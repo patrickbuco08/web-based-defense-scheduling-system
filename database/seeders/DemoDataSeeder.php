@@ -12,7 +12,6 @@ use Bocum\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class DemoDataSeeder extends Seeder
 {
@@ -47,12 +46,17 @@ class DemoDataSeeder extends Seeder
             ['code' => 'BSAS', 'name' => 'Arts and Sciences'],
         ];
 
+        $seededDepartments = [];
+
         foreach ($departments as $deptData) {
             $department = Department::firstOrCreate($deptData);
+            $seededDepartments[] = $department;
             $this->command->info("\n🏫 Department: {$department->name} ({$department->code})");
 
             $this->seedDepartmentUsers($department, $term, $rooms);
         }
+
+        $this->seedMultiDepartmentAdviserFixture($seededDepartments, $term, $rooms);
     }
 
     private function seedDepartmentUsers($department, $term, $rooms)
@@ -72,6 +76,7 @@ class DemoDataSeeder extends Seeder
                 ]
             );
             $adviser->assignRole('adviser');
+            $this->syncUserDepartments($adviser, [$department->id]);
             $users['advisers'][] = $adviser;
             $this->command->info("     ✓ {$adviser->name} ({$adviser->email})");
             
@@ -90,6 +95,7 @@ class DemoDataSeeder extends Seeder
                 ]
             );
             $critic->assignRole('critic');
+            $this->syncUserDepartments($critic, [$department->id]);
             $users['critics'][] = $critic;
             $this->command->info("     ✓ {$critic->name} ({$critic->email})");
         }
@@ -106,6 +112,7 @@ class DemoDataSeeder extends Seeder
                 ]
             );
             $panelist->assignRole('panelist');
+            $this->syncUserDepartments($panelist, [$department->id]);
             $users['panelists'][] = $panelist;
             $this->command->info("     ✓ {$panelist->name} ({$panelist->email})");
         }
@@ -121,6 +128,7 @@ class DemoDataSeeder extends Seeder
             ]
         );
         $coordinator->assignRole('coordinator');
+        $this->syncUserDepartments($coordinator, [$department->id]);
         $users['coordinators'][] = $coordinator;
         $this->command->info("     ✓ {$coordinator->name} ({$coordinator->email})");
     }
@@ -134,7 +142,9 @@ class DemoDataSeeder extends Seeder
         $critic = User::whereHas('roles', function($q) {
                 $q->where('name', 'critic');
             })
-            ->where('department_id', $department->id)
+            ->whereHas('departments', function ($query) use ($department) {
+                $query->where('departments.id', $department->id);
+            })
             ->inRandomOrder()
             ->first();
         
@@ -150,6 +160,8 @@ class DemoDataSeeder extends Seeder
                 'group_code' => $groupCode,
             ]
         );
+
+        $this->syncGroupDepartments($group, [$department->id]);
         
         $criticInfo = $critic ? "with critic: {$critic->name}" : 'no critic assigned';
         $this->command->info("       📚 Group: {$group->group_code} {$criticInfo}");
@@ -162,18 +174,109 @@ class DemoDataSeeder extends Seeder
     {
         $memberNames = $this->getFilipinoStudentNames($department->code, $group->id);
 
-        foreach ($memberNames as $index => $memberData) {
+        foreach ($memberNames as $memberName) {
             $member = GroupMember::firstOrCreate(
                 [
                     'group_id' => $group->id,
-                    'student_name' => $memberData[0]
-                ],
-                [
-                    'email' => $memberData[1],
+                    'student_name' => $memberName
                 ]
             );
-            $this->command->info("          • {$memberData[0]}");
+            $this->command->info("          • {$memberName}");
         }
+    }
+
+    private function seedMultiDepartmentAdviserFixture($departments, $term, $rooms)
+    {
+        if (count($departments) < 2) {
+            return;
+        }
+
+        $primaryDepartment = $departments[0];
+        $secondaryDepartment = $departments[1];
+        $departmentIds = [$primaryDepartment->id, $secondaryDepartment->id];
+
+        $this->command->info("\n🌐 Creating Multi-Department Adviser Fixture...");
+
+        $adviser = User::firstOrCreate(
+            ['email' => 'adviser.multi@cct.edu.ph'],
+            [
+                'name' => "Adviser Multi ({$primaryDepartment->code}/{$secondaryDepartment->code})",
+                'password' => Hash::make('password'),
+                'department_id' => $primaryDepartment->id,
+            ]
+        );
+        $adviser->assignRole('adviser');
+        $this->syncUserDepartments($adviser, $departmentIds);
+        $this->command->info("     ✓ {$adviser->name} ({$adviser->email})");
+
+        $critic = User::whereHas('roles', function ($query) {
+                $query->where('name', 'critic');
+            })
+            ->whereHas('departments', function ($query) use ($departmentIds) {
+                $query->whereIn('departments.id', $departmentIds);
+            })
+            ->inRandomOrder()
+            ->first();
+
+        $groupCode = $primaryDepartment->code . 'MD01-THESIS-2025';
+        $group = Group::firstOrCreate(
+            ['group_code' => $groupCode],
+            [
+                'department_id' => $primaryDepartment->id,
+                'term_id' => $term->id,
+                'adviser_id' => $adviser->id,
+                'critic_id' => $critic?->id,
+                'group_code' => $groupCode,
+                'course_code' => 'MULTI-DEPT-DEMO',
+            ]
+        );
+
+        $group->update([
+            'department_id' => $primaryDepartment->id,
+            'term_id' => $term->id,
+            'adviser_id' => $adviser->id,
+            'critic_id' => $critic?->id,
+            'course_code' => 'MULTI-DEPT-DEMO',
+        ]);
+
+        $this->syncGroupDepartments($group, $departmentIds);
+
+        $criticInfo = $critic ? "with critic: {$critic->name}" : 'no critic assigned';
+        $this->command->info("       📚 Multi-department Group: {$group->group_code} {$criticInfo}");
+
+        $memberNames = [
+            'Alex Santos',
+            'Bianca Reyes',
+            'Carlos Dela Cruz',
+        ];
+
+        foreach ($memberNames as $memberName) {
+            GroupMember::firstOrCreate([
+                'group_id' => $group->id,
+                'student_name' => $memberName,
+            ]);
+
+            $this->command->info("          • {$memberName}");
+        }
+
+        $this->seedGroupDefense(
+            $group,
+            $adviser,
+            $term,
+            $rooms,
+            'Multi-Department Adviser Scheduling Demo',
+            11
+        );
+    }
+
+    private function syncUserDepartments(User $user, array $departmentIds)
+    {
+        $user->departments()->syncWithoutDetaching($departmentIds);
+    }
+
+    private function syncGroupDepartments(Group $group, array $departmentIds)
+    {
+        $group->departments()->sync($departmentIds);
     }
 
     private function seedGroupDefense($group, $adviser, $term, $rooms, $title, $groupIndex = 0)
@@ -319,10 +422,7 @@ class DemoDataSeeder extends Seeder
             } while (in_array($fullName, $usedNames));
 
             $usedNames[] = $fullName;
-            $emailName = strtolower(str_replace(' ', '.', $fullName));
-            $email = "{$emailName}." . strtolower(str_rot13($deptCode)) . ".{$groupId}@student.cct.edu.ph";
-
-            $members[] = [$fullName, $email];
+            $members[] = $fullName;
         }
 
         // Reset random seed
