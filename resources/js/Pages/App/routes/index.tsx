@@ -5,6 +5,7 @@ import AppLayout from "@/layouts/AppLayout";
 import Account from "@/Pages/Account";
 import AdviserGroup from "@/Pages/AdviserGroup";
 import Calendar from "@/Pages/Calendar";
+import ArchivedDefenses from "@/Pages/ArchivedDefenses";
 import Dashboard from "@/Pages/Dashboard";
 import DepartmentDefenseCalendar from "@/Pages/Coordinator/DepartmentDefenseCalendar";
 import Department from "@/Pages/Department";
@@ -67,6 +68,7 @@ export function AppRoutes() {
         <Route path="admin/logs" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminLog />} />} />
 
         <Route path="adviser/groups" element={<ProtectedRoute allowedRoles={['adviser']} userRoles={user?.roles} children={<AdviserGroup />} />} />
+        <Route path="adviser/archived" element={<ProtectedRoute allowedRoles={['adviser']} userRoles={user?.roles} children={<ArchivedDefenses />} />} />
 
         <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'coordinator', 'adviser', 'panelist', 'critic']} userRoles={user?.roles} children={<Profile />} />} />
 

@@ -39,6 +39,7 @@ class DefenseConflictService
         // Find conflicting defenses (approved, not this defense, overlap time) within the same department AND same room
         $conflictingDefenses = Defense::query()
             ->where('status', 'approved')
+            ->where('archived', false)
             ->where('id', '!=', $defense->id)
             ->where('room_id', $roomId)
             ->when($departmentId, function ($q) use ($departmentId) {
@@ -97,6 +98,7 @@ class DefenseConflictService
             ->whereDate('start_at', $proposedDate)
             ->where('room_id', $roomId)
             ->where('status', 'approved')
+            ->where('archived', false)
             ->where('id', '!=', $defenseId)
             ->select('id', 'title', 'start_at', 'end_at')
             ->orderBy('start_at')
@@ -131,6 +133,7 @@ class DefenseConflictService
         // Find defenses where any of the proposed panelists are already assigned (only approved ones)
         $conflictingDefenses = Defense::where('id', '!=', $defenseId)
             ->where('status', 'approved')
+            ->where('archived', false)
             ->whereHas('panelists', function ($query) use ($panelistIds) {
                 $query->whereIn('panelist_id', $panelistIds);
             })

@@ -34,15 +34,16 @@ class DefenseController extends Controller
     public function index()
     {
         // Get defenses where the authenticated user is the adviser, critic, or a panelist
-        $defenses = Defense::where(function ($query) {
-            $query
-                ->whereHas('group', function ($q) {
-                    $q->where('adviser_id', Auth::id())->orWhere('critic_id', Auth::id());
-                })
-                ->orWhereHas('panelists', function ($q) {
-                    $q->where('panelist_id', Auth::id());
-                });
-        })
+        $defenses = Defense::where('archived', false)
+            ->where(function ($query) {
+                $query
+                    ->whereHas('group', function ($q) {
+                        $q->where('adviser_id', Auth::id())->orWhere('critic_id', Auth::id());
+                    })
+                    ->orWhereHas('panelists', function ($q) {
+                        $q->where('panelist_id', Auth::id());
+                    });
+            })
             ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -54,9 +55,10 @@ class DefenseController extends Controller
     {
         $this->authorize('departmentIndex', Defense::class);
 
-        $defenses = Defense::whereHas('group', function ($query) {
-            $query->where('department_id', Auth::user()->department_id);
-        })
+        $defenses = Defense::where('archived', false)
+            ->whereHas('group', function ($query) {
+                $query->where('department_id', Auth::user()->department_id);
+            })
             ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -349,6 +351,80 @@ class DefenseController extends Controller
                 ],
                 400,
             );
+        }
+    }
+
+    /**
+     * Get archived defenses for the authenticated user.
+     */
+    public function archivedIndex()
+    {
+        // Get archived defenses where the authenticated user is the adviser, critic, or a panelist
+        $defenses = Defense::where('archived', true)
+            ->where(function ($query) {
+                $query
+                    ->whereHas('group', function ($q) {
+                        $q->where('adviser_id', Auth::id())->orWhere('critic_id', Auth::id());
+                    })
+                    ->orWhereHas('panelists', function ($q) {
+                        $q->where('panelist_id', Auth::id());
+                    });
+            })
+            ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($defenses);
+    }
+
+    /**
+     * Archive or unarchive a defense.
+     *
+     * @param  \Bocum\Models\Defense  $defense
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function archive(Defense $defense, Request $request)
+    {
+        try {
+            // Verify the defense belongs to the authenticated adviser
+            if ($defense->adviser_id !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
+
+            $validated = $request->validate([
+                'archived' => 'required|boolean',
+            ]);
+
+            $defense->update([
+                'archived' => $validated['archived'],
+            ]);
+
+            activity('defense')
+                ->causedBy(Auth::user())
+                ->performedOn($defense)
+                ->withProperties([
+                    'archived' => $validated['archived'],
+                ])
+                ->log($validated['archived'] ? 'defense.archived' : 'defense.unarchived');
+
+            return response()->json([
+                'success' => true,
+                'message' => $validated['archived'] 
+                    ? 'Defense has been archived successfully.' 
+                    : 'Defense has been unarchived successfully.',
+                'data' => $defense->fresh(['room', 'group', 'panelists']),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error archiving defense: ' . $e->getMessage(), [
+                'defense_id' => $defense->id,
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while archiving the defense. Please try again.',
+            ], 500);
         }
     }
 

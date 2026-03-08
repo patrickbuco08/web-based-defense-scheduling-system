@@ -1,10 +1,5 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
-import FullCalendar from "@fullcalendar/react";
-import { useDefenses } from "@/features/defenses/queries/useDefenses";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import React, { useMemo, useState } from "react";
+import { useArchivedDefenses } from "@/features/defenses/queries/useArchivedDefenses";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +7,16 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   CalendarIcon,
   ClockIcon,
@@ -21,11 +25,10 @@ import {
   UsersIcon,
   CheckCircleIcon,
   XCircleIcon,
-  Trash2,
   UserCheckIcon,
   FileTextIcon,
   GraduationCapIcon,
-  Archive,
+  ArchiveRestore,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,10 +41,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useDeleteDefense } from "@/features/defenses/mutations/useDeleteDefense";
 import { useArchiveDefense } from "@/features/defenses/mutations/useArchiveDefense";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+
 interface Defense {
   id: number;
   room_id: number;
@@ -56,11 +59,11 @@ interface Defense {
   status: string;
   description: string | null;
   rejection_note: string | null;
+  archived: boolean;
   created_at: string;
   updated_at: string;
   formatted_date: string;
   formatted_time: string;
-  // These are added for FullCalendar compatibility
   start?: string;
   end?: string;
   room: {
@@ -141,116 +144,214 @@ interface Defense {
   }>;
 }
 
-function Calendar() {
-  const calendarRef = useRef<FullCalendar>(null);
-  const [searchParams] = useSearchParams();
+function ArchivedDefenses() {
   const [selectedDefense, setSelectedDefense] = useState<Defense | null>(null);
-  console.log(selectedDefense)
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>(searchParams.get('status') || 'all');
-  const deleteDefense = useDeleteDefense();
+  const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const archiveDefense = useArchiveDefense();
   const { user } = useAuth();
 
-  const { data: defenses = [] } = useDefenses();
+  const { data: defenses = [] } = useArchivedDefenses();
 
-  useEffect(() => {
-    const statusParam = searchParams.get('status');
-    if (statusParam) {
-      setStatusFilter(statusParam);
-    }
-  }, [searchParams]);
+  const filteredDefenses = useMemo(() => {
+    return defenses.filter((defense: Defense) => {
+      const matchesStatus = statusFilter === "all" || defense.status === statusFilter;
+      const haystack = [
+        defense.title,
+        defense.group?.group_code,
+        defense.group?.course_code,
+        defense.adviser?.name,
+        defense.room?.building,
+        defense.room?.room_number,
+        defense.status,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      const matchesSearch = haystack.includes(searchTerm.toLowerCase());
 
-  const getEventColor = useCallback((status: string) => {
-    switch (status) {
-      case "approved":
-        return "#10b981"; // Emerald 500
-      case "rejected":
-        return "#ef4444"; // Red 500
-      case "cancelled":
-        return "#6b7280"; // Gray 500
-      default:
-        return "#f59e0b"; // Amber 500 (for pending)
-    }
-  }, []);
-
-  const mappedEvents = useMemo(() => {
-    if (!defenses) return [];
-
-    return defenses
-      .filter((defense: Defense) => {
-        if (statusFilter === 'all') return true;
-        return defense.status === statusFilter;
-      })
-      .map((defense: Defense) => ({
-        id: defense.id.toString(),
-        title: defense.title,
-        start: defense.start_at,
-        end: defense.end_at,
-        backgroundColor: getEventColor(defense.status),
-        borderColor: getEventColor(defense.status),
-        extendedProps: { ...defense },
-      }));
-  }, [defenses, getEventColor, statusFilter]);
-
-  const handleEventClick = (clickInfo: any) => {
-    const event = clickInfo.event;
-    const defense = event.extendedProps;
-
-    setSelectedDefense({
-      ...defense,
-      start: event.startStr,
-      end: event.endStr,
+      return matchesStatus && matchesSearch;
     });
+  }, [defenses, searchTerm, statusFilter]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredDefenses.length / pageSize));
+
+  const paginatedDefenses = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredDefenses.slice(start, start + pageSize);
+  }, [currentPage, filteredDefenses, pageSize]);
+
+  const handleViewDetails = (defense: Defense) => {
+    setSelectedDefense(defense);
     setIsDialogOpen(true);
   };
 
+  const getStatusClasses = (status: string) => {
+    switch (status) {
+      case "approved":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "cancelled":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-yellow-100 text-yellow-800";
+    }
+  };
+
   return (
-    <div className="p-6">
-      <div className="mb-4 flex justify-between items-center">
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Defense Calendar</h1>
-          <p className="text-gray-600">Overview of your defense-related schedules</p>
+          <h1 className="text-2xl font-bold text-gray-900">Archived Defenses</h1>
+          <p className="text-gray-600">View and restore your archived defense schedules</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="w-auto">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <Input
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search archived defenses..."
+            className="w-full sm:w-[280px]"
+          />
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              setStatusFilter(value);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridYear,dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-        events={mappedEvents}
-        eventClick={handleEventClick}
-        eventTimeFormat={{
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        }}
-        height="auto"
-      />
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Group</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Schedule</TableHead>
+              <TableHead>Room</TableHead>
+              <TableHead>Adviser</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedDefenses.length > 0 ? (
+              paginatedDefenses.map((defense: Defense) => (
+                <TableRow key={defense.id}>
+                  <TableCell className="font-medium">{defense.title}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div>{defense.group?.group_code || "N/A"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {defense.group?.course_code || "-"}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${getStatusClasses(defense.status)}`}>
+                      {defense.status.charAt(0).toUpperCase() + defense.status.slice(1)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div>{new Date(defense.start_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(defense.start_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                        {" - "}
+                        {new Date(defense.end_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {defense.room ? `${defense.room.building} - Room ${defense.room.room_number}` : "Pending"}
+                  </TableCell>
+                  <TableCell>{defense.adviser?.name || "N/A"}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="outline" size="sm" onClick={() => handleViewDetails(defense)}>
+                      View Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="h-24 text-center">
+                  No archived defenses found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-sm text-muted-foreground">
+          Showing {filteredDefenses.length === 0 ? 0 : (currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredDefenses.length)} of {filteredDefenses.length} archived defenses
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Rows per page</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[90px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -269,12 +370,13 @@ function Calendar() {
                   <ClockIcon className="h-4 w-4 text-yellow-600" />
                 )}
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${selectedDefense.status === "approved"
-                    ? "bg-green-100 text-green-800"
-                    : selectedDefense.status === "rejected"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    selectedDefense.status === "approved"
+                      ? "bg-green-100 text-green-800"
+                      : selectedDefense.status === "rejected"
                       ? "bg-red-100 text-red-800"
                       : "bg-yellow-100 text-yellow-800"
-                    }`}
+                  }`}
                 >
                   {selectedDefense.status.charAt(0).toUpperCase() +
                     selectedDefense.status.slice(1)}
@@ -491,51 +593,6 @@ function Calendar() {
                 </div>
               )}
 
-              {/* Approval Section */}
-              <div className="bg-green-50 rounded-lg p-4">
-                <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                  Approval Information
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <UserIcon className="h-4 w-4 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        Proposed By
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {selectedDefense.proposed_by?.name || "N/A"}
-                      </p>
-                      {selectedDefense.proposed_by?.email && (
-                        <p className="text-xs text-gray-600">
-                          {selectedDefense.proposed_by.email}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        Approved By
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {selectedDefense.approved_by?.name || "Pending"}
-                      </p>
-                      {selectedDefense.approved_by?.email && (
-                        <p className="text-xs text-gray-600">
-                          {selectedDefense.approved_by.email}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Term Information */}
               {selectedDefense.group.term && (
                 <div className="border-t pt-4">
@@ -554,28 +611,28 @@ function Calendar() {
           {user?.id === selectedDefense?.adviser_id && (
             <DialogFooter className="sm:justify-between">
               <Button
-                variant="outline"
+                variant="default"
                 onClick={() => {
                   setIsDialogOpen(false);
-                  setIsArchiveDialogOpen(true);
+                  setIsRestoreDialogOpen(true);
                 }}
-                className="gap-2"
+                className="gap-2 bg-green-600 hover:bg-green-700"
               >
-                <Archive className="h-4 w-4" />
-                Archive Defense
+                <ArchiveRestore className="h-4 w-4" />
+                Restore Defense
               </Button>
             </DialogFooter>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Archive Confirmation Dialog */}
-      <AlertDialog open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen}>
+      {/* Restore Confirmation Dialog */}
+      <AlertDialog open={isRestoreDialogOpen} onOpenChange={setIsRestoreDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Archive this defense?</AlertDialogTitle>
+            <AlertDialogTitle>Restore this defense?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will move the defense to your archived defenses. You can restore it later if needed.
+              This will restore the defense to your active defenses calendar.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -584,19 +641,19 @@ function Calendar() {
               onClick={async () => {
                 if (selectedDefense?.id) {
                   try {
-                    await archiveDefense.mutateAsync({ id: selectedDefense.id, archived: true });
-                    toast.success("Defense archived successfully");
+                    await archiveDefense.mutateAsync({ id: selectedDefense.id, archived: false });
+                    toast.success("Defense restored successfully");
                   } catch (error: any) {
-                    const message = error?.response?.data?.message || error?.message || "Failed to archive defense";
+                    const message = error?.response?.data?.message || error?.message || "Failed to restore defense";
                     toast.error(message);
                   } finally {
-                    setIsArchiveDialogOpen(false);
+                    setIsRestoreDialogOpen(false);
                   }
                 }
               }}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-green-600 hover:bg-green-700"
             >
-              {archiveDefense.isPending ? "Archiving..." : "Archive"}
+              {archiveDefense.isPending ? "Restoring..." : "Restore"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -605,4 +662,4 @@ function Calendar() {
   );
 }
 
-export default Calendar;
+export default ArchivedDefenses;

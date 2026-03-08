@@ -103,6 +103,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('defenses/{defense}/check-conflicts', [DefenseController::class, 'checkConflicts'])->name('defenses.conflicts.check');
     Route::get('defenses/departments', [DefenseController::class, 'departmentIndex'])->name('defenses.departmentIndex');
+    Route::get('defenses/archived', [DefenseController::class, 'archivedIndex'])->name('defenses.archived');
+    Route::patch('defenses/{defense}/archive', [DefenseController::class, 'archive'])->name('defenses.archive');
     Route::resource('defenses', DefenseController::class)->only(['index', 'show', 'create', 'store', 'destroy', 'update']);
 
     Route::resource('rooms', RoomController::class)->except(['show']);

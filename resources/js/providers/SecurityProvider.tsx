@@ -13,8 +13,20 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
     resolve: () => void;
     reject: (error: Error) => void;
   } | null>(null);
+  const lastVerifiedRef = useRef<number | null>(null);
 
   const requirePassword = useCallback((): Promise<void> => {
+    // Check if password was verified within the last 5 minutes (300000 ms)
+    const now = Date.now();
+    const lastVerified = lastVerifiedRef.current || parseInt(sessionStorage.getItem('lastPasswordVerified') || '0');
+    const fiveMinutesAgo = now - 300000; // 5 minutes in milliseconds
+
+    if (lastVerified && lastVerified > fiveMinutesAgo) {
+      // Password was verified within the last 5 minutes, resolve immediately
+      return Promise.resolve();
+    }
+
+    // Need to verify password again
     return new Promise((resolve, reject) => {
       resolverRef.current = { resolve, reject };
       setIsModalOpen(true);
@@ -39,6 +51,11 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || 'Invalid password');
       }
+
+      // Record successful verification time
+      const verificationTime = Date.now();
+      lastVerifiedRef.current = verificationTime;
+      sessionStorage.setItem('lastPasswordVerified', verificationTime.toString());
 
       setIsModalOpen(false);
       setIsVerifyingPassword(false);

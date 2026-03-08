@@ -23,7 +23,8 @@ class Defense extends Model
         'end_at',
         'status',
         'notes',
-        'rejection_note'
+        'rejection_note',
+        'archived'
     ];
 
     protected $casts = [
@@ -88,6 +89,7 @@ class Defense extends Model
 
             // Check for overlapping defenses (global time conflict)
             $timeOverlapping = static::where('id', '!=', $defense->id ?? 0)
+                ->where('archived', false)
                 ->where(function ($query) use ($defense) {
                     $query->whereBetween('start_at', [$defense->start_at, $defense->end_at->subSecond()])
                         ->orWhereBetween('end_at', [$defense->start_at->addSecond(), $defense->end_at])
@@ -110,6 +112,7 @@ class Defense extends Model
             if ($defense->room_id) {
                 $roomOverlapping = static::where('room_id', $defense->room_id)
                     ->where('id', '!=', $defense->id ?? 0)
+                    ->where('archived', false)
                     ->where(function ($query) use ($defense) {
                         $query->whereBetween('start_at', [$defense->start_at, $defense->end_at->subSecond()])
                             ->orWhereBetween('end_at', [$defense->start_at->addSecond(), $defense->end_at])
@@ -171,6 +174,7 @@ class Defense extends Model
     {
         $existingDefenses = static::whereDate('start_at', $date)
             ->where('id', '!=', $excludeId)
+            ->where('archived', false)
             ->orderBy('start_at')
             ->get(['start_at', 'end_at']);
         

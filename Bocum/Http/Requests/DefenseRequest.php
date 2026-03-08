@@ -23,7 +23,7 @@ class DefenseRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'presentation_type' => ['required', 'string', Rule::in(['title presentation', 'oral', 'final', 'others'])],
+            'presentation_type' => ['sometimes', 'string', Rule::in(['title presentation', 'oral', 'final', 'others'])],
             'group_id' => ['required'],
             'room_id' => ['exists:rooms,id'],
             'date' => ['required', 'date', 'after_or_equal:today'],

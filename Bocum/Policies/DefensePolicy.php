@@ -49,9 +49,9 @@ class DefensePolicy
             'approved' => ['approved', 'cancelled', 'reschedule', 'reappearance', 're-defense'], // Can stay approved, be cancelled, or be rescheduled
             'rejected' => ['rejected', 'reschedule', 'reappearance', 're-defense'], // Can be rescheduled after rejection
             'cancelled' => ['cancelled'], // No changes allowed
-            'reschedule' => ['reschedule', 'pending', 'rejected', 'cancelled'], // From reschedule can go to pending, rejected, or cancelled
-            'reappearance' => ['reappearance', 'pending', 'rejected', 'cancelled'], // From reappearance can go to pending, rejected, or cancelled
-            're-defense' => ['re-defense', 'pending', 'rejected', 'cancelled'], // From re-defense can go to pending, rejected, or cancelled
+            'reschedule' => ['reschedule', 'reappearance', 're-defense', 'pending', 'rejected', 'cancelled'], // From reschedule can go to pending, rejected, or cancelled
+            'reappearance' => ['reappearance', 'reschedule', 'pending', 'rejected', 'cancelled'], // From reappearance can go to pending, rejected, or cancelled
+            're-defense' => ['re-defense', 'reschedule', 'reappearance', 'pending', 'rejected', 'cancelled'], // From re-defense can go to pending, rejected, or cancelled
         ];
 
         // Check if the transition is allowed

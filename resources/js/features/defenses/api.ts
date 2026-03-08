@@ -62,4 +62,16 @@ export const defensesApi = {
         const response = await apiClient.delete(`/defenses/${id}`);
         return response.data;
     },
+
+    archiveDefense: async (id: number, archived: boolean) => {
+        const response = await apiClient.patch(`/defenses/${id}/archive`, {
+            archived,
+        });
+        return response.data;
+    },
+
+    getArchivedDefenses: async () => {
+        const response = await apiClient.get("/defenses/archived");
+        return response.data;
+    },
 };
