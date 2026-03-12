@@ -21,6 +21,7 @@ use Bocum\Http\Controllers\ReportController;
 use Bocum\Http\Controllers\LogsController;
 use Bocum\Http\Controllers\DashboardController;
 use Bocum\Http\Controllers\SecurityController;
+use Bocum\Http\Controllers\ResearchServiceProviderController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -84,6 +85,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('terms', TermController::class)->except(['show', 'create', 'edit']);
 
     Route::resource('departments', DepartmentController::class)->except(['show', 'create', 'edit']);
+
+    Route::resource('research-service-providers', ResearchServiceProviderController::class)->except(['show', 'create', 'edit']);
 
     Route::get('critics', [CriticController::class, 'index'])->name('critics.index');
 

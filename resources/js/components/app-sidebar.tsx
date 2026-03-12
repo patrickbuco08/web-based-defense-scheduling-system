@@ -88,6 +88,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconUsers,
       },
       {
+        name: "Research Service Providers",
+        url: "/app/admin/research-providers",
+        icon: IconFileAi,
+      },
+      {
         name: "Manage Rooms",
         url: "/app/admin/rooms",
         icon: IconDoorEnter,

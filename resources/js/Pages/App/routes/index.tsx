@@ -12,6 +12,7 @@ import Department from "@/Pages/Department";
 import Term from "@/Pages/Term";
 import Room from "@/Pages/Room";
 import Profile from "@/Pages/Profile";
+import ResearchProviders from "@/Pages/ResearchProviders";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import AdminReport from "@/Pages/AdminReport";
@@ -63,6 +64,7 @@ export function AppRoutes() {
         <Route path="admin/departments" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Department />} />} />
         <Route path="admin/rooms" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Room />} />} />
         <Route path="admin/accounts" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Account />} />} />
+        <Route path="admin/research-providers" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<ResearchProviders />} />} />
         <Route path="admin/academic-year" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<Term />} />} />
         <Route path="admin/archived" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<ArchivedDefenses />} />} />
         <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['admin']} userRoles={user?.roles} children={<AdminReport />} />} />
