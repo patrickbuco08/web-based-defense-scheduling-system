@@ -23,6 +23,7 @@ interface CheckConflictsResponse {
     room_conflicts: ConflictData;
     panelist_conflicts: ConflictData;
     has_any_conflicts: boolean;
+    occupied_slots: Array<{ defense_id: number; title: string; start_time: string; end_time: string }>;
   };
 }
 

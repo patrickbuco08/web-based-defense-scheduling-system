@@ -124,17 +124,21 @@ interface Defense {
     created_at: string;
     updated_at: string;
   };
-  panelists: Array<{
+  research_providers: Array<{
     id: number;
-    department_id: number | null;
     name: string;
-    email: string;
-    email_verified_at: string;
+    role: string;
+    department_id: number | null;
+    department: {
+      id: number;
+      name: string;
+      code: string;
+    } | null;
     created_at: string;
     updated_at: string;
     pivot: {
       defense_id: number;
-      panelist_id: number;
+      research_service_provider_id: number;
       created_at: string;
       updated_at: string;
     };
@@ -441,33 +445,33 @@ function Calendar() {
                   </div>
                 )}
 
-              {/* Panelists Section */}
-              {selectedDefense.panelists &&
-                selectedDefense.panelists.length > 0 && (
+              {/* Research Service Providers Section */}
+              {selectedDefense.research_providers &&
+                selectedDefense.research_providers.length > 0 && (
                   <div className="border rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <UserCheckIcon className="h-5 w-5 text-orange-600" />
+                      <UserCheckIcon className="h-5 w-5 text-purple-600" />
                       <h4 className="text-sm font-semibold text-gray-900">
-                        Panel Members
+                        Research Service Providers
                       </h4>
                     </div>
                     <div className="space-y-2">
-                      {selectedDefense.panelists.map((panelist) => (
+                      {selectedDefense.research_providers.map((provider: any) => (
                         <div
-                          key={panelist.id}
-                          className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg"
+                          key={provider.id}
+                          className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg"
                         >
-                          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-orange-600">
-                              {panelist.name.charAt(0).toUpperCase()}
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-purple-600">
+                              {provider.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-900">
-                              {panelist.name}
+                              {provider.name}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {panelist.email}
+                              {provider.role} • {provider.department?.name || 'N/A'}
                             </p>
                           </div>
                         </div>

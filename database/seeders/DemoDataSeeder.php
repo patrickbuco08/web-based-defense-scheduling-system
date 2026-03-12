@@ -9,6 +9,7 @@ use Bocum\Models\GroupMember;
 use Bocum\Models\Defense;
 use Bocum\Models\Term;
 use Bocum\Models\Room;
+use Bocum\Models\ResearchServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -53,6 +54,7 @@ class DemoDataSeeder extends Seeder
             $seededDepartments[] = $department;
             $this->command->info("\n🏫 Department: {$department->name} ({$department->code})");
 
+            $this->seedResearchProviders($department);
             $this->seedDepartmentUsers($department, $term, $rooms);
         }
 
@@ -365,10 +367,10 @@ class DemoDataSeeder extends Seeder
             ]
         );
 
-        $panelistIds = $this->getSeedPanelistIdsForGroup($group);
+        $providerIds = $this->getSeedResearchProviderIdsForGroup($group);
 
-        if (!empty($panelistIds)) {
-            $defense->panelists()->sync($panelistIds);
+        if (!empty($providerIds)) {
+            $defense->researchProviders()->sync($providerIds);
         }
 
         $this->command->info("          🗓️  Defense: {$formattedDate} | {$formattedTime} | Room: {$room->room_number}");
@@ -499,5 +501,53 @@ class DemoDataSeeder extends Seeder
         mt_srand();
 
         return $members;
+    }
+
+    private function seedResearchProviders($department)
+    {
+        $this->command->info("  🔬 Creating Research Service Providers...");
+        
+        $providerRoles = [
+            'Research Adviser',
+            'Panelist',
+            'Research Expert (Validator)',
+            'Subject Expert (Validator)',
+            'Language Expert (Validator)',
+            'Statistician',
+            'Technical Critic',
+            'Language Critic',
+        ];
+
+        foreach ($providerRoles as $index => $role) {
+            $provider = ResearchServiceProvider::firstOrCreate(
+                [
+                    'name' => "Dr. " . chr(65 + $index) . " " . $department->code . " Provider",
+                    'role' => $role,
+                    'department_id' => $department->id,
+                ]
+            );
+            $this->command->info("     ✓ {$provider->name} - {$provider->role}");
+        }
+    }
+
+    private function getSeedResearchProviderIdsForGroup(Group $group, int $limit = 3): array
+    {
+        $groupDepartmentIds = $group->departments()->pluck('departments.id');
+
+        $departmentProviderIds = ResearchServiceProvider::whereIn('department_id', $groupDepartmentIds)
+            ->orderBy('id')
+            ->pluck('id')
+            ->all();
+
+        if (count($departmentProviderIds) >= $limit) {
+            return array_slice($departmentProviderIds, 0, $limit);
+        }
+
+        $fallbackProviderIds = ResearchServiceProvider::whereNotIn('id', $departmentProviderIds)
+            ->orderBy('id')
+            ->pluck('id')
+            ->all();
+
+        return array_slice(array_merge($departmentProviderIds, $fallbackProviderIds), 0, $limit);
     }
 }

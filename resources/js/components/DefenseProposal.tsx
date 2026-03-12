@@ -27,7 +27,17 @@ import { ErrorResponseInterface } from "@/features/types";
 import { AxiosError } from "axios";
 import { useSecurity } from "@/contexts/SecurityContext";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAccounts } from "@/features/accounts/queries/useAccounts";
+import { Badge } from "@/components/ui/badge";
+import { X, Check, ChevronsUpDown } from "lucide-react";
+import { useResearchProviders } from "@/features/research-providers/queries/useResearchProviders";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 const presentationTypes = ["title presentation", "oral", "final", "others"] as const;
 
@@ -39,19 +49,15 @@ type FormData = {
   start_time: string;
   end_time: string;
   notes: string;
-  panelists: number[];
+  research_providers: number[];
 };
 
 export function DefenseProposal() {
   const { requirePassword, isVerifyingPassword } = useSecurity();
   const [isOpen, setIsOpen] = useState(false);
   const { data: groups = [] } = useGroups();
-  const { data: accounts = [] } = useAccounts();
+  const { data: researchProviders = [] } = useResearchProviders();
   const { mutate: createDefense, isPending } = useCreateDefense();
-
-  const availablePanelists = accounts.filter((account: any) =>
-    account.roles?.includes("panelist") || account.roles?.includes("critic")
-  );
 
   const { data, setData, errors, reset } = useForm<FormData>({
     title: '',
@@ -61,8 +67,27 @@ export function DefenseProposal() {
     start_time: '09:00',
     end_time: '10:00',
     notes: '',
-    panelists: [],
+    research_providers: [],
   });
+
+  const [open, setOpen] = useState(false);
+
+  const selectedProviders = researchProviders.filter((provider: any) =>
+    data.research_providers.includes(provider.id)
+  );
+
+  const toggleProvider = (providerId: number) => {
+    setData(
+      'research_providers',
+      data.research_providers.includes(providerId)
+        ? data.research_providers.filter(id => id !== providerId)
+        : [...data.research_providers, providerId]
+    );
+  };
+
+  const removeProvider = (providerId: number) => {
+    setData('research_providers', data.research_providers.filter(id => id !== providerId));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +99,7 @@ export function DefenseProposal() {
       createDefense({
         ...data,
         group_id: data.group_id,
-        panelists: data.panelists,
+        research_providers: data.research_providers,
       }, {
         onSuccess: () => {
           setIsOpen(false);
@@ -275,34 +300,80 @@ export function DefenseProposal() {
                 </div>
               </div>
             </div>
+            
 
             <div className="space-y-2">
-              <Label>Panel Members <span className="text-destructive">*</span></Label>
-              <div className="border rounded p-4 max-h-48 overflow-y-auto">
-                {availablePanelists.map((panelist: any) => (
-                  <div key={panelist.id} className="flex items-center space-x-2 mb-2">
-                    <Checkbox
-                      checked={data.panelists.includes(panelist.id)}
-                      onCheckedChange={(checked: boolean) => {
-                        setData(
-                          'panelists',
-                          checked
-                            ? [...data.panelists, panelist.id]
-                            : data.panelists.filter((id) => id !== panelist.id)
-                        );
-                      }}
-                      className="shrink-0"
-                    />
-                    <Label className="text-sm font-normal cursor-pointer">
-                      {panelist.name}
-                    </Label>
-                  </div>
-                ))}
-                {availablePanelists.length === 0 && (
-                  <p className="text-sm text-muted-foreground">No panelists available.</p>
-                )}
-              </div>
-              {errors.panelists && <p className="text-sm text-red-500">{errors.panelists}</p>}
+              <Label>Research Service Providers <span className="text-destructive">*</span></Label>
+              
+              {/* Selected Providers Badges */}
+              {selectedProviders.length > 0 && (
+                <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-muted/50">
+                  {selectedProviders.map((provider: any) => (
+                    <Badge key={provider.id} variant="secondary" className="gap-1">
+                      {provider.name} ({provider.role})
+                      <button
+                        type="button"
+                        onClick={() => removeProvider(provider.id)}
+                        className="ml-1 hover:bg-destructive/20 rounded-full"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              {/* Command Popover for Multi-Select */}
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                  >
+                    {selectedProviders.length > 0
+                      ? `${selectedProviders.length} provider${selectedProviders.length > 1 ? 's' : ''} selected`
+                      : "Select research providers..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search providers by name or role..." />
+                    <CommandList>
+                      <CommandEmpty>No research providers found.</CommandEmpty>
+                      <CommandGroup>
+                        {researchProviders.map((provider: any) => (
+                          <CommandItem
+                            key={provider.id}
+                            value={`${provider.name} ${provider.role} ${provider.department?.name || ''}`}
+                            onSelect={() => toggleProvider(provider.id)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                data.research_providers.includes(provider.id)
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            <div className="flex flex-col">
+                              <span className="font-medium">{provider.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {provider.role} • {provider.department?.name || 'N/A'}
+                              </span>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              
+              {errors.research_providers && <p className="text-sm text-red-500">{errors.research_providers}</p>}
             </div>
 
             {/* notes */}

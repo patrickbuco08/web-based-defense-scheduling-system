@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import { useDefenseDepartments } from "@/features/defenses/queries/useDefenseDepartments";
 import { useUpdateDefense } from "@/features/defenses/mutations/useUpdateDefense";
 import { useCheckDefenseConflicts } from "@/features/defenses/mutations/useCheckDefenseConflicts";
+import { useResearchProviders } from "@/features/research-providers/queries/useResearchProviders";
 import { useArchiveDefense } from "@/features/defenses/mutations/useArchiveDefense";
 import { useRooms } from "@/features/rooms/queries/useRooms";
 import { useAccounts } from "@/features/accounts/queries/useAccounts";
@@ -58,7 +59,6 @@ interface FormData {
     end_time: string;
     notes: string;
     status: string;
-    panelists: number[];
     rejection_note: string;
 }
 
@@ -78,18 +78,18 @@ function DepartmentDefenseCalendar() {
         presentation_type: 'title presentation',
         group_id: '',
         room_id: '',
-        date: '',
-        start_time: '',
-        end_time: '',
+        date: format(new Date(), 'yyyy-MM-dd'),
+        start_time: '09:00',
+        end_time: '10:00',
         notes: '',
         status: 'pending',
-        panelists: [],
         rejection_note: '',
     });
 
     const { data: defenses = [], refetch } = useDefenseDepartments();
     const { data: rooms = [] } = useRooms();
     const { data: accounts = [] } = useAccounts();
+    const { data: researchProviders = [] } = useResearchProviders();
     const updateDefense = useUpdateDefense();
     const checkConflicts = useCheckDefenseConflicts();
     const archiveDefense = useArchiveDefense();
@@ -113,7 +113,7 @@ function DepartmentDefenseCalendar() {
             try {
                 const result = await checkConflicts.mutateAsync({
                     defenseId,
-                    panelist_ids: formData.panelists,
+                    panelist_ids: selectedDefense?.research_providers?.map((p: any) => p.id) || [],
                     proposed_date: formData.date,
                     start_time: formData.start_time,
                     end_time: formData.end_time,
@@ -154,7 +154,6 @@ function DepartmentDefenseCalendar() {
         formData.date,
         formData.start_time,
         formData.end_time,
-        formData.panelists,
         isDialogOpen,
         selectedDefense?.id
     ]);
@@ -216,17 +215,16 @@ function DepartmentDefenseCalendar() {
         const startDate = new Date(defense.start_at);
         const endDate = new Date(defense.end_at);
 
-        setFormData({
+setFormData({
             title: defense.title || '',
             presentation_type: defense.presentation_type || 'title presentation',
             group_id: defense.group_id?.toString() || '',
             room_id: defense.room_id?.toString() || '',
-            date: formatISO(startDate, { representation: 'date' }),
-            start_time: format(startDate, 'HH:mm'),
-            end_time: format(endDate, 'HH:mm'),
+            date: defense.start_at ? format(parseISO(defense.start_at), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd'),
+            start_time: defense.start_at ? format(parseISO(defense.start_at), 'HH:mm') : '09:00',
+            end_time: defense.end_at ? format(parseISO(defense.end_at), 'HH:mm') : '10:00',
             notes: defense.notes || '',
             status: defense.status || 'pending',
-            panelists: defense.panelists?.map((p: any) => p.id) || [],
             rejection_note: defense.rejection_note || '',
         });
 
@@ -260,6 +258,8 @@ function DepartmentDefenseCalendar() {
             toast.error(message);
         }
     };
+
+    console.log(selectedDefense);
 
     return (
         <div className="p-6">
@@ -620,39 +620,41 @@ function DepartmentDefenseCalendar() {
                                 </div>
                             )}
 
-                            {/* Panel Members */}
+                            {/* Research Service Providers - Display Only */}
                             <div className="space-y-2">
-                                <Label>Panel Members</Label>
+                                <Label>Research Service Providers</Label>
                                 <div className="border rounded p-4 max-h-48 overflow-y-auto">
-                                    {accounts.map((panelist: any) => (
-                                        <div key={panelist.id} className="flex items-center space-x-2 mb-2">
-                                            <Checkbox
-                                                checked={formData.panelists.includes(panelist.id)}
-                                                onCheckedChange={(checked: boolean) => {
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        panelists: checked
-                                                            ? [...prev.panelists, panelist.id]
-                                                            : prev.panelists.filter(id => id !== panelist.id)
-                                                    }));
-                                                }}
-                                                // disabled={['approved', 'rejected', 'cancelled'].includes(initialStatus)}
-                                                disabled
-                                                className={['approved', 'rejected', 'cancelled'].includes(initialStatus) ? 'opacity-50' : ''}
-                                            />
-                                            <Label className="text-sm">{panelist.name}</Label>
-                                        </div>
-                                    ))}
+                                    {selectedDefense?.research_providers && selectedDefense.research_providers.length > 0 ? (
+                                        selectedDefense.research_providers.map((provider: any) => (
+                                            <div key={provider.id} className="flex items-center space-x-2 mb-2 p-2 bg-gray-50 rounded">
+                                                <div className="w-4 h-4 bg-purple-100 rounded-full flex items-center justify-center">
+                                                    <span className="text-xs font-medium text-purple-600">
+                                                        {provider.name.charAt(0).toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900">
+                                                        {provider.name}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600">
+                                                        {provider.role} • {provider.department?.name || 'N/A'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-sm text-gray-500 italic">No research providers assigned</p>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* Panelist Conflict Display */}
+                            {/* Research Provider Conflict Display */}
                             {conflicts?.panelist_conflicts?.has_conflict && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                                     <div className="flex items-start gap-2">
                                         <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
                                         <div>
-                                            <h4 className="text-sm font-medium text-red-800">Panelist Conflict Detected</h4>
+                                            <h4 className="text-sm font-medium text-red-800">Research Provider Conflict Detected</h4>
                                             <p className="text-sm text-red-700 mt-1">{conflicts.panelist_conflicts.message}</p>
                                         </div>
                                     </div>

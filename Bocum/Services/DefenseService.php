@@ -14,9 +14,8 @@ class DefenseService
      */
     public function getDefenseRecipients(Defense $defense): array
     {
-        // Get base recipients (adviser, critic, panelists)
-        $recipients = collect([$defense->adviser, $defense->critic])
-            ->merge($defense->panelists)
+        // Get base recipients (adviser and critic only, no panelists/research providers)
+        $recipients = collect([$defense->adviser, $defense->group->critic])
             ->filter()
             ->pluck('email');
 

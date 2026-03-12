@@ -18,7 +18,7 @@
 
 <body class="font-sans text-gray-900 antialiased">
     <div class="min-h-screen w-full flex items-center justify-center p-4 bg-cover bg-center bg-fixed"
-        style="background-image: url('{{ asset('images/cct-background.webp') }}');">
+        style="background-image: url('{{ asset('images/cct-background-2.png') }}');">
 
         <div
             class="w-full max-w-md p-8 space-y-6 bg-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/20">
@@ -26,7 +26,7 @@
             <div class="flex flex-col items-center justify-center mb-6">
                 <img src="{{ asset('images/cct-logo.png') }}" alt="CCT Logo" class="h-20 w-auto mb-4">
                 <h1 class="text-2xl font-bold text-primary tracking-wider text-center">
-                    CCT DEFENSE SCHEDULING
+                    WEB-BASED DEFENSE SCHEDULING APPLICATION FOR THESIS AND CAPSTONE PROJECTS AT CITY COLLEGE OF TAGAYTAY
                 </h1>
             </div>
 

@@ -54,6 +54,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconUsers,
       },
       {
+        name: "Research Service Providers",
+        url: "/app/adviser/research-providers",
+        icon: IconFileAi,
+      },
+      {
         name: "Archived Defenses",
         url: "/app/adviser/archived",
         icon: IconArchive,

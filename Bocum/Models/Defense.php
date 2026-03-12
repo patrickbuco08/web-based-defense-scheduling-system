@@ -63,10 +63,20 @@ class Defense extends Model
 
     /**
      * Get the panelists (users) for the defense.
+     * @deprecated Use researchProviders() instead
      */
     public function panelists()
     {
         return $this->belongsToMany(User::class, 'defense_panelist', 'defense_id', 'panelist_id')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the research service providers for the defense.
+     */
+    public function researchProviders()
+    {
+        return $this->belongsToMany(ResearchServiceProvider::class, 'defense_research_provider', 'defense_id', 'research_service_provider_id')
             ->withTimestamps();
     }
 

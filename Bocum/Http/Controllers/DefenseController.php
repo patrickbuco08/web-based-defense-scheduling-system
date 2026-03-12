@@ -33,18 +33,19 @@ class DefenseController extends Controller
 
     public function index()
     {
-        // Get defenses where the authenticated user is the adviser, critic, or a panelist
+        $this->authorize('index', Defense::class);
+
         $defenses = Defense::where('archived', false)
             ->where(function ($query) {
-                $query
+                $query->where(function ($q) {
+                    $q->where('adviser_id', Auth::id())
+                    ->orWhere('proposed_by_id', Auth::id())
                     ->whereHas('group', function ($q) {
                         $q->where('adviser_id', Auth::id())->orWhere('critic_id', Auth::id());
-                    })
-                    ->orWhereHas('panelists', function ($q) {
-                        $q->where('panelist_id', Auth::id());
                     });
+                });
             })
-            ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'researchProviders', 'researchProviders.department', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -62,7 +63,7 @@ class DefenseController extends Controller
             ->whereHas('group.departments', function ($query) use ($userDepartmentIds) {
                 $query->whereIn('departments.id', $userDepartmentIds);
             })
-            ->with(['room', 'group', 'group.departments', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.departments', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'researchProviders', 'researchProviders.department', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -114,7 +115,7 @@ class DefenseController extends Controller
             abort(403);
         }
 
-        $defense->load(['group.members', 'room', 'term', 'panelists']);
+        $defense->load(['group.members', 'room', 'term', 'researchProviders', 'researchProviders.department']);
 
         return view('adviser.defenses.show', compact('defense'));
     }
@@ -130,7 +131,7 @@ class DefenseController extends Controller
         $datas = [
             'rooms' => Room::where('is_active', true)->orderBy('building')->orderBy('room_number')->get(),
             'groups' => Group::where('adviser_id', $adviser->id)->with('members')->orderBy('id')->get(),
-            'panelists' => \Bocum\Models\User::role('panelist')->orderBy('name')->get(),
+            'researchProviders' => \Bocum\Models\ResearchServiceProvider::with('department')->orderBy('name')->get(),
             'currentTerm' => $currentTerm,
             'minDate' => now()->format('Y-m-d'),
             'maxDate' => now()->addMonths(3)->format('Y-m-d'),
@@ -185,18 +186,18 @@ class DefenseController extends Controller
             // Update the defense
             $defense->update($data);
 
-            // Sync panelists if provided
-            if ($request->has('panelists')) {
-                $defense->panelists()->sync($request->panelists);
+            // Sync research providers if provided
+            if ($request->has('research_providers')) {
+                $defense->researchProviders()->sync($request->research_providers);
 
                 activity('defense')
                     ->causedBy(Auth::user())
                     ->performedOn($defense)
                     ->withProperties([
-                        'action' => 'panelists.assigned',
-                        'panelists' => $defense->panelists()->pluck('users.name')->all(),
+                        'action' => 'research_providers.assigned',
+                        'research_providers' => $defense->researchProviders()->pluck('name')->all(),
                     ])
-                    ->log('defense.panelists_assigned');
+                    ->log('defense.research_providers_assigned');
             }
 
             switch ($request->status) {
@@ -215,7 +216,7 @@ class DefenseController extends Controller
                             'room_id'     => $defense->room_id,
                             'start_at'    => $defense->start_at,
                             'end_at'      => $defense->end_at,
-                            'panelists'   => $defense->panelists()->pluck('users.name')->all(),
+                            'research_providers' => $defense->researchProviders()->pluck('name')->all(),
                         ])->log('defense.approved');
 
                     break;
@@ -309,9 +310,9 @@ class DefenseController extends Controller
                 'notes' => $request->notes,
             ]);
 
-            // Attach panelists
-            if ($request->has('panelists')) {
-                $defense->panelists()->attach($request->panelists);
+            // Attach research providers
+            if ($request->has('research_providers')) {
+                $defense->researchProviders()->attach($request->research_providers);
             }
 
             $adviser = Auth::user();
@@ -354,7 +355,7 @@ class DefenseController extends Controller
             // Log the error
             Log::error('Error creating defense proposal: ' . $e->getMessage(), [
                 'exception' => $e,
-                'request' => $request->except(['_token', 'panelists']),
+                'request' => $request->except(['_token', 'research_providers']),
             ]);
 
             return response()->json(
@@ -372,18 +373,15 @@ class DefenseController extends Controller
      */
     public function archivedIndex()
     {
-        // Get archived defenses where the authenticated user is the adviser, critic, or a panelist
+        // Get archived defenses where the authenticated user is the adviser or critic
         $defenses = Defense::where('archived', true)
             ->where(function ($query) {
                 $query
                     ->whereHas('group', function ($q) {
                         $q->where('adviser_id', Auth::id())->orWhere('critic_id', Auth::id());
-                    })
-                    ->orWhereHas('panelists', function ($q) {
-                        $q->where('panelist_id', Auth::id());
                     });
             })
-            ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.term', 'adviser', 'proposedBy', 'approvedBy', 'researchProviders', 'researchProviders.department', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -404,7 +402,7 @@ class DefenseController extends Controller
             ->whereHas('group.departments', function ($query) use ($userDepartmentIds) {
                 $query->whereIn('departments.id', $userDepartmentIds);
             })
-            ->with(['room', 'group', 'group.departments', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.departments', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'researchProviders', 'researchProviders.department', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -422,7 +420,7 @@ class DefenseController extends Controller
         }
 
         $defenses = Defense::where('archived', true)
-            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'panelists', 'group.members'])
+            ->with(['room', 'group', 'group.term', 'group.adviser', 'group.critic', 'adviser', 'proposedBy', 'approvedBy', 'researchProviders', 'researchProviders.department', 'group.members'])
             ->orderBy('created_at', 'desc')
             ->get();
 

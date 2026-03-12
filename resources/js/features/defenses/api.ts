@@ -9,7 +9,7 @@ interface CreateDefensePayload {
     start_time: string;
     end_time: string;
     notes?: string;
-    panelists?: number[];
+    research_providers?: number[];
 }
 
 interface UpdateDefensePayload {
@@ -22,7 +22,7 @@ interface UpdateDefensePayload {
     end_time: string;
     notes?: string;
     status: string;
-    panelists?: number[];
+    research_providers?: number[];
 }
 
 export const defensesApi = {
@@ -40,7 +40,7 @@ export const defensesApi = {
         const response = await apiClient.post("/defenses", {
             ...data,
             group_id: Number(data.group_id), // Ensure group_id is a number
-            panelists: data.panelists || [],
+            research_providers: data.research_providers || [],
             // Combine date and time for the API
             start_at: `${data.date} ${data.start_time}`,
             end_at: `${data.date} ${data.end_time}`,
@@ -53,7 +53,7 @@ export const defensesApi = {
             ...data,
             group_id: Number(data.group_id),
             room_id: data.room_id ? Number(data.room_id) : null,
-            panelists: data.panelists || [],
+            research_providers: data.research_providers || [],
         });
         return response.data;
     },
