@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useDepartments } from "@/features/departments/queries/useDepartments";
 import { useActiveTerm } from "@/features/terms/queries/useActiveTerm";
 import { useCritics } from "@/features/critics/queries/useCritics";
+import { useResearchProviders } from "@/features/research-providers/queries/useResearchProviders";
 import { useCreateGroup } from "@/features/groups/mutations/useCreateGroup";
 import { toast } from "sonner";
 import {
@@ -57,12 +58,14 @@ export const AddGroupButton = () => {
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
   const { data: activeTerm } = useActiveTerm();
   const { data: critics } = useCritics();
+  const { data: researchProviders = [] } = useResearchProviders();
   const { user } = useAuth();
 
   const [formData, setFormData] = useState({
     course_code: "",
     term_id: "",
     critic_id: "",
+    research_critic_id: "",
   });
 
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
@@ -152,6 +155,7 @@ export const AddGroupButton = () => {
           course_code: "",
           term_id: activeTerm?.id?.toString() || "",
           critic_id: "",
+          research_critic_id: "",
         });
         setSelectedDepartments(user?.departments?.map((d: any) => d.id) || []);
         setMembers([{ id: Date.now(), name: "" }]);
@@ -256,6 +260,31 @@ export const AddGroupButton = () => {
                     {critic.name}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Research Critic (Research Service Provider) */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="research_critic_id" className="text-right">
+              Research Critic (RSP)
+            </Label>
+            <Select
+              name="research_critic_id"
+              value={formData.research_critic_id}
+              onValueChange={(value) => handleSelectChange("research_critic_id", value)}
+            >
+              <SelectTrigger className="col-span-3 w-full">
+                <SelectValue placeholder="Select a research critic" />
+              </SelectTrigger>
+              <SelectContent>
+                {researchProviders
+                  ?.filter((p: any) => (p.role || '').toLowerCase().includes('critic'))
+                  .map((p: any) => (
+                    <SelectItem key={p.id} value={p.id.toString()}>
+                      {p.name} ({p.role})
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

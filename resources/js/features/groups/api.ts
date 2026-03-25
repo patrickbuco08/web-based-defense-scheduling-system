@@ -14,6 +14,7 @@ export interface Group {
   course_code: string;
   adviser_id: number;
   critic_id: number | null;
+  research_critic_id?: number | null;
   created_at: string;
   updated_at: string;
   department?: {
@@ -39,6 +40,16 @@ export interface Group {
     name: string;
     email: string;
   } | null;
+  researchCritic?: {
+    id: number;
+    name: string;
+    role: string;
+    department?: {
+      id: number;
+      name: string;
+      code?: string;
+    } | null;
+  } | null;
   members?: GroupMember[];
 }
 
@@ -46,6 +57,7 @@ export interface CreateGroupData {
   department_ids: number[];
   term_id: number;
   critic_id?: number | null;
+  research_critic_id?: number | null;
   course_code?: string;
   members: Array<{ name: string }>;
 }
@@ -55,6 +67,7 @@ export interface UpdateGroupData {
   term_id?: number;
   group_code?: string;
   critic_id?: number | null;
+  research_critic_id?: number | null;
   members?: Array<{ name: string }>;
 }
 

@@ -14,11 +14,12 @@ import { toast } from "sonner";
 import { useDepartments } from "@/features/departments/queries/useDepartments";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useUpdateGroup } from "@/features/groups/mutations/useUpdateGroup";
-import { Group } from "@/types";
+import type { Group } from "@/features/groups/api";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCritics } from "@/features/critics/queries/useCritics";
 import { useActiveTerm } from "@/features/terms/queries/useActiveTerm";
 import { Input } from "@/components/ui/input";
+import { useResearchProviders } from "@/features/research-providers/queries/useResearchProviders";
 
 interface GroupMember {
   id: number;
@@ -44,6 +45,8 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
     group_code: group.group_code || "",
     course_code: group.course_code || "",
     critic_id: group.critic_id || null,
+    // fallback to any-typed access if not present in Group type
+    research_critic_id: (group as any)?.research_critic_id ?? (group as any)?.researchCritic?.id ?? null,
   });
 
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>(
@@ -65,6 +68,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
   const { data: activeTerm } = useActiveTerm();
   const { data: critics } = useCritics();
+  const { data: researchProviders = [] } = useResearchProviders();
 
   const handleAddMember = () => {
     setMembers([...members, { id: Date.now(), name: "" }]);
@@ -88,7 +92,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'department_id' || name === 'term_id' || name === 'critic_id'
+      [name]: name === 'department_id' || name === 'term_id' || name === 'critic_id' || name === 'research_critic_id'
         ? value === 'null' ? null : parseInt(value, 10)
         : value
     }));
@@ -284,6 +288,37 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
                       {critic.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Research Critic (Research Service Provider) */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="research_critic_id" className="text-right">
+                Research Critic (RSP)
+              </Label>
+              <Select
+                name="research_critic_id"
+                value={formData.research_critic_id !== null && formData.research_critic_id !== undefined ? String(formData.research_critic_id) : "none"}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    research_critic_id: value !== "none" ? Number(value) : null,
+                  }))
+                }
+              >
+                <SelectTrigger className="col-span-3 w-full">
+                  <SelectValue placeholder="No Research Critic Assigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Research Critic Assigned</SelectItem>
+                  {researchProviders
+                    ?.filter((p: any) => (p.role || '').toLowerCase().includes('critic'))
+                    .map((p: any) => (
+                      <SelectItem key={p.id} value={p.id.toString()}>
+                        {p.name} ({p.role})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

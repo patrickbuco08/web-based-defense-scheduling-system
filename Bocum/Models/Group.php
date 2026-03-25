@@ -3,11 +3,12 @@
 namespace Bocum\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Bocum\Models\ResearchServiceProvider;
 
 
 class Group extends Model
 {
-    protected $fillable = ['department_id', 'term_id', 'group_code', 'course_code', 'adviser_id', 'critic_id'];
+    protected $fillable = ['department_id', 'term_id', 'group_code', 'course_code', 'adviser_id', 'critic_id', 'research_critic_id'];
 
     public function term()
     {
@@ -36,6 +37,14 @@ class Group extends Model
     public function critic()
     {
         return $this->belongsTo(User::class, 'critic_id');
+    }
+
+    /**
+     * Research Service Provider assigned as the group's critic.
+     */
+    public function researchCritic()
+    {
+        return $this->belongsTo(ResearchServiceProvider::class, 'research_critic_id');
     }
 
     public function members()

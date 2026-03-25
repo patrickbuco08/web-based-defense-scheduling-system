@@ -41,6 +41,7 @@ class GroupController extends Controller
             'department_ids' => 'required|array|min:1',
             'department_ids.*' => 'required|exists:departments,id',
             'critic_id' => 'nullable|exists:users,id',
+            'research_critic_id' => 'nullable|exists:research_service_providers,id',
         ]);
 
         // Use first department for group code generation
@@ -53,6 +54,7 @@ class GroupController extends Controller
             'term_id' => $validated['term_id'],
             'department_id' => $validated['department_ids'][0],
             'critic_id' => $validated['critic_id'] ?? null,
+            'research_critic_id' => $validated['research_critic_id'] ?? null,
             'adviser_id' => Auth::id(),
             'code' => $groupCode,
         ]);
@@ -69,7 +71,7 @@ class GroupController extends Controller
 
         return response()->json([
             'message' => 'Group created successfully!',
-            'group' => $group->load('members', 'departments')
+            'group' => $group->load('members', 'departments', 'researchCritic')
         ]);
     }
 
@@ -106,6 +108,7 @@ class GroupController extends Controller
             'department_ids' => 'required|array|min:1',
             'department_ids.*' => 'required|exists:departments,id',
             'critic_id' => 'nullable|exists:users,id',
+            'research_critic_id' => 'nullable|exists:research_service_providers,id',
         ]);
 
         // Update the group (keep department_id for backward compatibility with first department)
@@ -115,6 +118,7 @@ class GroupController extends Controller
             'term_id' => $validated['term_id'],
             'department_id' => $validated['department_ids'][0],
             'critic_id' => $validated['critic_id'] ?? null,
+            'research_critic_id' => $validated['research_critic_id'] ?? null,
         ]);
 
         // Sync departments
@@ -132,7 +136,7 @@ class GroupController extends Controller
 
         return response()->json([
             'message' => 'Group updated successfully!',
-            'group' => $group->load('members', 'departments')
+            'group' => $group->load('members', 'departments', 'researchCritic')
         ]);
     }
 
@@ -141,7 +145,7 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::with(['term', 'members', 'department', 'departments', 'adviser', 'critic'])
+        $groups = Group::with(['term', 'members', 'department', 'departments', 'adviser', 'critic', 'researchCritic'])
             ->where('adviser_id', Auth::id())
             ->latest()
             ->get();
