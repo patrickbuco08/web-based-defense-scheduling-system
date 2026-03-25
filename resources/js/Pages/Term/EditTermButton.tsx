@@ -10,9 +10,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpdateTerm } from "@/features/terms/mutations/useUpdateTerm";
+import { useTerms } from "@/features/terms/queries/useTerms";
 import { useSecurity } from "@/contexts/SecurityContext";
 import { Pencil } from "lucide-react";
 import { useState } from "react";
@@ -35,12 +36,43 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
     const updateTermMutation = useUpdateTerm();
     const { requirePassword, isVerifyingPassword } = useSecurity();
     const queryClient = useQueryClient();
+    const { data: existingTerms = [] } = useTerms();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
+    // Generate academic year options
+    const generateAcademicYears = () => {
+        const years = [];
+        
+        // Get the latest year from existing terms
+        if (existingTerms.length > 0) {
+            const latestTerm = existingTerms.sort((a, b) => {
+                const aYear = parseInt(a.school_year.split('-')[0]);
+                const bYear = parseInt(b.school_year.split('-')[0]);
+                return bYear - aYear;
+            })[0];
+            const latestYear = parseInt(latestTerm.school_year.split('-')[0]);
+            const nextYear = latestYear + 1;
+            
+            // Include current term's year and next year
+            const currentTermYear = parseInt(term.school_year.split('-')[0]);
+            years.push(term.school_year); // Current term's year
+            if (`${nextYear}-${nextYear + 1}` !== term.school_year) {
+                years.push(`${nextYear}-${nextYear + 1}`); // Next year
+            }
+        } else {
+            years.push(term.school_year);
+        }
+        
+        return [...new Set(years)]; // Remove duplicates
+    };
+
+    const academicYears = generateAcademicYears();
+    const semesters = ["1st Semester", "2nd Semester", "3rd Semester"];
+
+    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: type === "checkbox" ? checked : value,
+            [name]: checked,
         }));
     };
 
@@ -80,24 +112,42 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="school_year">School Year <span className="text-destructive">*</span></Label>
-                        <Input
-                            id="school_year"
-                            name="school_year"
+                        <Label htmlFor="school_year">Academic Year <span className="text-destructive">*</span></Label>
+                        <Select
                             value={formData.school_year}
-                            onChange={handleChange}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, school_year: value }))}
                             required
-                        />
+                        >
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {academicYears.map((year) => (
+                                    <SelectItem key={year} value={year}>
+                                        {year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="semester">Semester <span className="text-destructive">*</span></Label>
-                        <Input
-                            id="semester"
-                            name="semester"
+                        <Select
                             value={formData.semester}
-                            onChange={handleChange}
+                            onValueChange={(value) => setFormData(prev => ({ ...prev, semester: value }))}
                             required
-                        />
+                        >
+                            <SelectTrigger>
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {semesters.map((sem) => (
+                                    <SelectItem key={sem} value={sem}>
+                                        {sem}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="flex items-center space-x-2">
                         <input
@@ -105,7 +155,7 @@ const EditTermButton = ({ term }: EditTermButtonProps) => {
                             id="is_current"
                             name="is_current"
                             checked={formData.is_current}
-                            onChange={handleChange}
+                            onChange={handleCheckboxChange}
                             className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                         />
                         <Label htmlFor="is_current">Set as current term</Label>
