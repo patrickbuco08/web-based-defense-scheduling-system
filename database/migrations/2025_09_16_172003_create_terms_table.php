@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('terms', function (Blueprint $table) {
             $table->id();
-            $table->string('school_year'); // e.g. 2025-2026
+            $table->string('school_year')->unique(); // e.g. 2025-2026
             $table->string('semester');    // e.g. 1st, 2nd
             $table->boolean('is_current')->default(false);
             $table->timestamps();

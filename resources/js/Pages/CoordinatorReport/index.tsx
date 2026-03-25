@@ -377,7 +377,7 @@ const AdminReport = () => {
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Defenses
+                                Total Defense Schedule
                             </CardTitle>
                             <TrendingUp className="h-4 w-4 text-muted-foreground" />
                         </div>
@@ -506,7 +506,7 @@ const AdminReport = () => {
                         ) : filteredDefenses.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
-                                    No defenses found. {!selectedTerm && "Please select a term to view defenses."}
+                                    No Defense Schedule found. {!selectedTerm && "Please select a term to view defense schedule."}
                                 </TableCell>
                             </TableRow>
                         ) : (

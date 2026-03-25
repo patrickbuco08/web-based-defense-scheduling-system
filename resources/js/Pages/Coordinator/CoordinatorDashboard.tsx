@@ -19,17 +19,17 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { useDashboard } from "@/features/dashboard/queries/useDashboard";
+import { useCoordinatorDashboard } from "@/features/dashboard/queries/useCoordinatorDashboard";
 
-const Dashboard = () => {
+const CoordinatorDashboard = () => {
     const navigate = useNavigate();
-    const { data: dashboardData, isLoading } = useDashboard();
+    const { data: dashboardData, isLoading } = useCoordinatorDashboard();
 
     const stats = dashboardData?.stats;
     const recentDefenses = dashboardData?.recent_defenses || [];
 
     const handleCardClick = (status: string) => {
-        navigate(`/app?status=${status}`);
+        navigate(`/app/coordinators/calendar?status=${status}`);
     };
 
     const formatDateTime = (dateTime: string) => {
@@ -76,7 +76,7 @@ const Dashboard = () => {
             <div className="space-y-2">
                 <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
                 <p className="text-muted-foreground">
-                    Overview of your defense schedules and activities
+                    Overview of your department's defense schedules and activities
                 </p>
             </div>
 
@@ -198,7 +198,7 @@ const Dashboard = () => {
                         <TableBody>
                             {isLoading ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8">
+                                    <TableCell colSpan={6} className="text-center py-8">
                                         <div className="flex items-center justify-center gap-2">
                                             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                                             <span className="text-muted-foreground">Loading defense schedule...</span>
@@ -207,7 +207,7 @@ const Dashboard = () => {
                                 </TableRow>
                             ) : recentDefenses.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                                         No recent defense schedule found.
                                     </TableCell>
                                 </TableRow>
@@ -245,4 +245,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default CoordinatorDashboard;

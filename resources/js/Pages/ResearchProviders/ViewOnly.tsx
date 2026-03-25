@@ -137,7 +137,7 @@ const ResearchProvidersViewOnly = () => {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Research Service Providers</h1>
         <p className="text-muted-foreground">
-          View available research service providers for your defenses.
+          View available research service providers for your defense schedule.
         </p>
       </div>
 

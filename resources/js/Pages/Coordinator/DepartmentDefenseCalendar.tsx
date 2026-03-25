@@ -67,7 +67,6 @@ function DepartmentDefenseCalendar() {
     const { user } = useAuth();
     const calendarRef = useRef<FullCalendar>(null);
     const [selectedDefense, setSelectedDefense] = useState<any>(null);
-    console.log('selectedDefense', selectedDefense);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -718,7 +717,7 @@ setFormData({
                     <AlertDialogHeader>
                         <AlertDialogTitle>Archive this defense?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will move the defense to your archived defenses. You can restore it later if needed.
+                            This will move the defense to your archived defense schedule. You can restore it later if needed.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

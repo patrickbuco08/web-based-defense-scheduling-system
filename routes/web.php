@@ -20,6 +20,7 @@ use Bocum\Http\Controllers\CriticController;
 use Bocum\Http\Controllers\ReportController;
 use Bocum\Http\Controllers\LogsController;
 use Bocum\Http\Controllers\DashboardController;
+use Bocum\Http\Controllers\Coordinator\DashboardController as CoordinatorDashboardController;
 use Bocum\Http\Controllers\SecurityController;
 use Bocum\Http\Controllers\ResearchServiceProviderController;
 
@@ -71,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/user', [AuthenticatedSessionController::class, 'getUser']);
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+    Route::get('/coordinator/dashboard', [CoordinatorDashboardController::class, 'index'])->name('coordinator.dashboard.index');
 
     Route::get('/accounts/departments', [AccountController::class, 'getAccountsByDepartment'])->name('accounts.departments');
     Route::resource('accounts', AccountController::class)

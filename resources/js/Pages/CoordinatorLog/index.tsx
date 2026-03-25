@@ -77,14 +77,6 @@ const CoordinatorLog = () => {
     // Extract logs from API response
     const filteredLogs = logsData?.data || [];
 
-    // Calculate KPIs
-    const totalLogs = filteredLogs.length;
-    const proposedCount = filteredLogs.filter(log => log.description === "defense.proposed").length;
-    const approvedCount = filteredLogs.filter(log => log.description === "defense.approved").length;
-    const rejectedCount = filteredLogs.filter(log => log.description === "defense.rejected").length;
-    const cancelledCount = filteredLogs.filter(log => log.description === "defense.cancelled").length;
-    const panelistsAssignedCount = filteredLogs.filter(log => log.description === "defense.panelists_assigned").length;
-
     const handleExportCSV = async () => {
         setIsExporting(true);
         try {
@@ -273,93 +265,6 @@ const CoordinatorLog = () => {
                     </div>
                 </CardContent>
             </Card>
-
-            {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Activities
-                            </CardTitle>
-                            <Activity className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{totalLogs}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Proposed
-                            </CardTitle>
-                            <FileText className="h-4 w-4 text-blue-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-blue-600">{proposedCount}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Approved
-                            </CardTitle>
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Rejected
-                            </CardTitle>
-                            <XCircle className="h-4 w-4 text-red-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Cancelled
-                            </CardTitle>
-                            <Ban className="h-4 w-4 text-gray-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-gray-600">{cancelledCount}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Panelists Assigned
-                            </CardTitle>
-                            <Users className="h-4 w-4 text-purple-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-purple-600">{panelistsAssignedCount}</div>
-                    </CardContent>
-                </Card>
-            </div>
 
             {/* Export Actions */}
             <div className="flex justify-between items-center">

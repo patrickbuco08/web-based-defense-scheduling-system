@@ -38,6 +38,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     icon: IconInnerShadowTop,
   };
 
+
+  const coordinatorDashboard = {
+    name: "Dashboard",
+    url: "/app/coordinator/dashboard",
+    icon: IconInnerShadowTop,
+  };
+
   const data = {
     navMain: [
       {
@@ -59,19 +66,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconFileAi,
       },
       {
-        name: "Archived Defenses",
+        name: "Archived Defense Schedule",
         url: "/app/adviser/archived",
         icon: IconArchive,
       },
     ],
     coordinator: [
+      coordinatorDashboard,
       {
         name: "Department Defense Calendar",
         url: "/app/coordinators/calendar",
         icon: IconCalendarMonth,
       },
       {
-        name: "Archived Defenses",
+        name: "Archived Defense Schedule",
         url: "/app/coordinators/archived",
         icon: IconArchive,
       },
@@ -113,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconCalendarMonth,
       },
       {
-        name: "Archived Defenses",
+        name: "Archived Defense Schedule",
         url: "/app/admin/archived",
         icon: IconArchive,
       },

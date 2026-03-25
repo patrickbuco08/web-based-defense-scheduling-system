@@ -39,4 +39,8 @@ export const dashboardApi = {
         const response = await apiClient.get("/dashboard");
         return response.data;
     },
+    getCoordinatorDashboardData: async (): Promise<DashboardData> => {
+        const response = await apiClient.get("/coordinator/dashboard");
+        return response.data;
+    },
 };

@@ -50,7 +50,7 @@ export function TimeSlotCombobox({
 }: TimeSlotComboboxProps) {
   // Generate all time slots
   const allSlots = React.useMemo(() => {
-    return generateTimeSlots(6, 22, 5);
+    return generateTimeSlots(7, 19, 5);
   }, []);
 
   // Mark occupied slots and filter by minTime

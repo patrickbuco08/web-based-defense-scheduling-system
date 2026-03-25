@@ -13,7 +13,7 @@ export default function Home() {
           <div className="space-y-2">
             <Button className="w-full">Schedule New Defense</Button>
             <Button variant="outline" className="w-full">
-              View Upcoming Defenses
+              View Upcoming Defense Schedule
             </Button>
             <DialogCloseButton />
           </div>

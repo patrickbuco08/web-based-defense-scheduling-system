@@ -176,7 +176,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
           <div className="space-y-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="group_code" className="text-right">
-                Group Code <span className="text-destructive">*</span>
+                Group Code
               </Label>
               <Input
                 id="group_code"
@@ -184,7 +184,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
                 value={formData.group_code}
                 onChange={handleChange}
                 className="col-span-3"
-                required
+                disabled
               />
             </div>
 

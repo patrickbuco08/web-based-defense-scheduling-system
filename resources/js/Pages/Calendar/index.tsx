@@ -519,24 +519,26 @@ function Calendar() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircleIcon className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                        Approved By
-                      </p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        {selectedDefense.approved_by?.name || "Pending"}
-                      </p>
-                      {selectedDefense.approved_by?.email && (
-                        <p className="text-xs text-gray-600">
-                          {selectedDefense.approved_by.email}
+                  {selectedDefense.approved_by && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Approved By
                         </p>
-                      )}
+                        <p className="text-sm font-semibold text-gray-900">
+                          {selectedDefense.approved_by?.name}
+                        </p>
+                        {selectedDefense.approved_by?.email && (
+                          <p className="text-xs text-gray-600">
+                            {selectedDefense.approved_by.email}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -579,7 +581,7 @@ function Calendar() {
           <AlertDialogHeader>
             <AlertDialogTitle>Archive this defense?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will move the defense to your archived defenses. You can restore it later if needed.
+              This will move the defense to your archived defense schedule. You can restore it later if needed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

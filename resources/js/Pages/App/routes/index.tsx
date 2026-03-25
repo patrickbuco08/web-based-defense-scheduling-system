@@ -7,6 +7,7 @@ import AdviserGroup from "@/Pages/AdviserGroup";
 import Calendar from "@/Pages/Calendar";
 import ArchivedDefenses from "@/Pages/ArchivedDefenses";
 import Dashboard from "@/Pages/Dashboard";
+import CoordinatorDashboard from "@/Pages/Coordinator/CoordinatorDashboard";
 import DepartmentDefenseCalendar from "@/Pages/Coordinator/DepartmentDefenseCalendar";
 import Department from "@/Pages/Department";
 import Term from "@/Pages/Term";
@@ -77,6 +78,7 @@ export function AppRoutes() {
 
         <Route path="profile" element={<ProtectedRoute allowedRoles={['admin', 'coordinator', 'adviser', 'panelist', 'critic']} userRoles={user?.roles} children={<Profile />} />} />
 
+        <Route path="coordinator/dashboard" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorDashboard />} />} />
         <Route path="coordinators/calendar" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<DepartmentDefenseCalendar />} />} />
         <Route path="coordinators/archived" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<ArchivedDefenses />} />} />
         <Route path="coordinators/reports" element={<ProtectedRoute allowedRoles={['coordinator']} userRoles={user?.roles} children={<CoordinatorReport />} />} />
