@@ -6,7 +6,6 @@ use Bocum\Http\Controllers\Controller;
 use Bocum\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -29,8 +28,12 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): JsonResponse
     {
         $user = $request->user();
-        
-        $user->fill($request->validated());
+        $validated = $request->validated();
+        $selectedRole = $validated['role'] ?? null;
+
+        unset($validated['role']);
+
+        $user->fill($validated);
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -38,11 +41,24 @@ class ProfileController extends Controller
 
         $user->save();
 
+        if ($selectedRole && $user->hasAnyRole(['adviser', 'coordinator'])) {
+            $currentRoles = $user->getRoleNames()->toArray();
+            $preservedRoles = array_values(array_filter(
+                $currentRoles,
+                fn (string $role) => !in_array($role, ['adviser', 'coordinator'], true)
+            ));
+
+            $user->syncRoles([...$preservedRoles, $selectedRole]);
+            $user->refresh();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Profile updated successfully',
             'data' => [
-                'user' => $user->load('department')
+                'user' => array_merge($user->load('department')->toArray(), [
+                    'roles' => $user->getRoleNames()->toArray(),
+                ])
             ]
         ]);
     }

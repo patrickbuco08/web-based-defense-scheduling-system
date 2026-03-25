@@ -4,21 +4,48 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { useUpdateProfile } from "@/features/profile";
 
 export default function Profile() {
   const { user } = useAuth();
   const updateProfile = useUpdateProfile();
+  const canSwitchPrimaryRole = user?.roles?.some((role: string) => role === 'adviser' || role === 'coordinator');
+  const currentRole = user?.roles?.includes('coordinator') ? 'coordinator' : 'adviser';
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
+    role: canSwitchPrimaryRole ? (currentRole as 'adviser' | 'coordinator') : undefined,
   });
+
+  const handleRoleToggle = (checked: boolean) => {
+    if (!canSwitchPrimaryRole) {
+      return;
+    }
+
+    const nextRole = checked ? 'coordinator' : 'adviser';
+
+    setFormData(prev => ({
+      ...prev,
+      role: nextRole,
+    }));
+
+    updateProfile.mutate({
+      name: formData.name,
+      email: formData.email,
+      role: nextRole,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    updateProfile.mutate(formData);
+
+    updateProfile.mutate({
+      name: formData.name,
+      email: formData.email,
+      ...(canSwitchPrimaryRole && formData.role ? { role: formData.role } : {}),
+    });
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -93,6 +120,41 @@ export default function Profile() {
               </div>
             </div>
 
+            {canSwitchPrimaryRole && (
+              <div className="rounded-lg border p-4 space-y-3">
+                <div className="space-y-1">
+                  <h4 className="font-medium">Role Access</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Switch your assigned role between adviser and coordinator.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="role-toggle">Current selected role</Label>
+                    <div className="text-sm text-muted-foreground">
+                      {formData.role === 'coordinator' ? 'Research Coordinator' : 'Adviser'}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className={formData.role === 'adviser' ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
+                      Adviser
+                    </span>
+                    <Switch
+                      id="role-toggle"
+                      checked={formData.role === 'coordinator'}
+                      disabled={updateProfile.isPending}
+                      onCheckedChange={handleRoleToggle}
+                    />
+                    <span className={formData.role === 'coordinator' ? 'text-sm font-medium' : 'text-sm text-muted-foreground'}>
+                      Research Coordinator
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <Separator />
 
             <div className="flex justify-end space-x-4">

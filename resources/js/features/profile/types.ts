@@ -13,6 +13,7 @@ export interface User {
 export interface ProfileUpdateData {
   name: string;
   email: string;
+  role?: 'adviser' | 'coordinator';
 }
 
 export interface ProfileUpdateResponse {

@@ -11,7 +11,7 @@ export function useUpdateProfile() {
     onSuccess: (data) => {
       toast.success('Profile updated successfully!');
       // Invalidate user data queries to refetch updated user info
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth', 'user'] });
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to update profile');
