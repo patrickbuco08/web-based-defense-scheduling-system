@@ -15,6 +15,7 @@ import { useDepartments } from "@/features/departments/queries/useDepartments";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useUpdateGroup } from "@/features/groups/mutations/useUpdateGroup";
 import type { Group } from "@/features/groups/api";
+import { useSecurity } from "@/contexts/SecurityContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCritics } from "@/features/critics/queries/useCritics";
 import { useActiveTerm } from "@/features/terms/queries/useActiveTerm";
@@ -65,6 +66,7 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
   );
 
   const updateGroupMutation = useUpdateGroup();
+  const { requirePassword } = useSecurity();
   const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
   const { data: activeTerm } = useActiveTerm();
   const { data: critics } = useCritics();
@@ -100,7 +102,10 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
+      await requirePassword();
+
       // First validate members
       if (members.length === 0) {
         toast.error("Please add at least one group member");

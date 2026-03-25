@@ -16,6 +16,7 @@ import { useRoles } from "@/features/roles/queries/useRoles";
 import { Loader2, Pencil } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useSecurity } from "@/contexts/SecurityContext";
 
 interface EditAccountButtonProps {
   account: {
@@ -33,6 +34,7 @@ interface EditAccountButtonProps {
 const EXCLUDED_ROLES = ['critic', 'panelist'];
 
 export function EditAccountButton({ account }: EditAccountButtonProps) {
+  const { requirePassword } = useSecurity();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: account.name,
@@ -75,7 +77,7 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (formData.roles.length === 0) {
@@ -83,25 +85,33 @@ export function EditAccountButton({ account }: EditAccountButtonProps) {
       return;
     }
 
-    // Prepare the data to send
-    const updateData = {
-      id: account.id,
-      name: formData.name,
-      email: formData.email,
-      roles: formData.roles,
-      department_id: formData.department_id || null,
-    };
+    try {
+      await requirePassword();
 
-    updateAccountMutation.mutate(updateData, {
-      onSuccess: () => {
-        toast.success("Account updated successfully");
-        setIsOpen(false);
-      },
-      onError: (error: any) => {
-        console.error('Update error:', error);
-        toast.error(error.response?.data?.message || "Failed to update account");
-      },
-    });
+      // Prepare the data to send
+      const updateData = {
+        id: account.id,
+        name: formData.name,
+        email: formData.email,
+        roles: formData.roles,
+        department_id: formData.department_id || null,
+      };
+
+      updateAccountMutation.mutate(updateData, {
+        onSuccess: () => {
+          toast.success("Account updated successfully");
+          setIsOpen(false);
+        },
+        onError: (error: any) => {
+          console.error('Update error:', error);
+          toast.error(error.response?.data?.message || "Failed to update account");
+        },
+      });
+    } catch (error: any) {
+      if (error?.message !== "Password confirmation cancelled") {
+        toast.error("Failed to verify password");
+      }
+    }
   };
 
   if (isLoadingRoles || isLoadingDepartments) {

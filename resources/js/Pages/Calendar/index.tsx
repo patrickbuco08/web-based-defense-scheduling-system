@@ -43,6 +43,7 @@ import { useDeleteDefense } from "@/features/defenses/mutations/useDeleteDefense
 import { useArchiveDefense } from "@/features/defenses/mutations/useArchiveDefense";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecurity } from "@/contexts/SecurityContext";
 interface Defense {
   id: number;
   room_id: number;
@@ -158,6 +159,7 @@ function Calendar() {
   const deleteDefense = useDeleteDefense();
   const archiveDefense = useArchiveDefense();
   const { user } = useAuth();
+  const { requirePassword } = useSecurity();
 
   const { data: defenses = [] } = useDefenses();
 
@@ -609,6 +611,7 @@ function Calendar() {
               onClick={async () => {
                 if (selectedDefense?.id) {
                   try {
+                    await requirePassword();
                     await archiveDefense.mutateAsync({ id: selectedDefense.id, archived: true });
                     toast.success("Defense archived successfully");
                   } catch (error: any) {

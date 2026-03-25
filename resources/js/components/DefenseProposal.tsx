@@ -53,7 +53,6 @@ type FormData = {
 };
 
 export function DefenseProposal() {
-  const { requirePassword, isVerifyingPassword } = useSecurity();
   const [isOpen, setIsOpen] = useState(false);
   const { data: groups = [] } = useGroups();
   const { data: researchProviders = [] } = useResearchProviders();
@@ -127,9 +126,6 @@ export function DefenseProposal() {
     e.preventDefault();
 
     try {
-      await requirePassword();
-
-
       createDefense({
         ...data,
         group_id: data.group_id,
@@ -152,10 +148,6 @@ export function DefenseProposal() {
         },
       });
     } catch (error: any) {
-      if (error?.message === "Password confirmation cancelled") {
-        toast.info("Defense creation cancelled");
-        return;
-      }
       const errorMessage = error?.response?.data?.message ||
         error?.message ||
         "Failed to verify password";
@@ -164,13 +156,7 @@ export function DefenseProposal() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      // Don't close if password is being verified
-      if (!open && isVerifyingPassword) {
-        return;
-      }
-      setIsOpen(open);
-    }} modal={false}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen} modal={false}>
       {isOpen && (
         <div 
           className="fixed inset-0 z-40 bg-black/80" 

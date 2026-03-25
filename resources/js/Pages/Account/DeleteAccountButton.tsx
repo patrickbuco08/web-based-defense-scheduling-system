@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 import { useDeleteAccount } from "@/features/accounts/mutations/useDeleteAccount";
+import { useSecurity } from "@/contexts/SecurityContext";
+import { toast } from "sonner";
 
 interface DeleteAccountButtonProps {
   id: number;
@@ -20,12 +22,14 @@ interface DeleteAccountButtonProps {
 }
 
 export function DeleteAccountButton({ id, name }: DeleteAccountButtonProps) {
+  const { requirePassword } = useSecurity();
   const [isOpen, setIsOpen] = useState(false);
   const deleteAccountMutation = useDeleteAccount();
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
+      await requirePassword();
       await deleteAccountMutation.mutateAsync(id);
       setIsOpen(false);
     } catch (error) {
