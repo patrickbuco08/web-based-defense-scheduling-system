@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import { getDisplayStatus } from "@/utils/defenseStatus";
 import FullCalendar from "@fullcalendar/react";
 import { useDefenses } from "@/features/defenses/queries/useDefenses";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -231,6 +232,9 @@ function Calendar() {
                 <SelectItem value="approved">Approved</SelectItem>
                 <SelectItem value="rejected">Rejected</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="reschedule">Reschedule</SelectItem>
+                <SelectItem value="reappearance">Reappearance</SelectItem>
+                <SelectItem value="re-defense">Re-defense</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -263,28 +267,43 @@ function Calendar() {
               <GraduationCapIcon className="h-6 w-6 text-blue-600" />
               {selectedDefense?.title || "Defense Details"}
             </DialogTitle>
-            {selectedDefense?.status && (
-              <div className="flex items-center gap-2 mt-2">
-                {selectedDefense.status === "approved" ? (
-                  <CheckCircleIcon className="h-4 w-4 text-green-600" />
-                ) : selectedDefense.status === "rejected" ? (
-                  <XCircleIcon className="h-4 w-4 text-red-600" />
-                ) : (
-                  <ClockIcon className="h-4 w-4 text-yellow-600" />
-                )}
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${selectedDefense.status === "approved"
-                    ? "bg-green-100 text-green-800"
-                    : selectedDefense.status === "rejected"
-                      ? "bg-red-100 text-red-800"
-                      : "bg-yellow-100 text-yellow-800"
+            {selectedDefense?.status && (() => {
+              const displayStatus = getDisplayStatus(selectedDefense.status, selectedDefense.end_at);
+              return (
+                <div className="flex items-center gap-2 mt-2">
+                  {displayStatus === "approved" || displayStatus === "completed" ? (
+                    <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                  ) : displayStatus === "rejected" ? (
+                    <XCircleIcon className="h-4 w-4 text-red-600" />
+                  ) : displayStatus === "cancelled" ? (
+                    <XCircleIcon className="h-4 w-4 text-gray-600" />
+                  ) : (
+                    <ClockIcon className="h-4 w-4 text-yellow-600" />
+                  )}
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      displayStatus === "approved"
+                        ? "bg-green-100 text-green-800"
+                        : displayStatus === "completed"
+                        ? "bg-teal-100 text-teal-800"
+                        : displayStatus === "rejected"
+                        ? "bg-red-100 text-red-800"
+                        : displayStatus === "cancelled"
+                        ? "bg-gray-100 text-gray-800"
+                        : displayStatus === "reschedule"
+                        ? "bg-orange-100 text-orange-800"
+                        : displayStatus === "reappearance"
+                        ? "bg-purple-100 text-purple-800"
+                        : displayStatus === "re-defense"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-yellow-100 text-yellow-800"
                     }`}
-                >
-                  {selectedDefense.status.charAt(0).toUpperCase() +
-                    selectedDefense.status.slice(1)}
-                </span>
-              </div>
-            )}
+                  >
+                    {displayStatus === "re-defense" ? "Re-defense" : displayStatus.charAt(0).toUpperCase() + displayStatus.slice(1)}
+                  </span>
+                </div>
+              );
+            })()}
           </DialogHeader>
 
           {selectedDefense && (

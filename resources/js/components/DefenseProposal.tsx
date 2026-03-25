@@ -59,16 +59,50 @@ export function DefenseProposal() {
   const { data: researchProviders = [] } = useResearchProviders();
   const { mutate: createDefense, isPending } = useCreateDefense();
 
+  const getCurrentTime = () => {
+  const now = new Date();
+  const currentHour = now.getHours();
+  
+  // If current time is outside 7am-7pm range, default to 8am
+  if (currentHour < 7 || currentHour >= 19) {
+    return '08:00';
+  }
+  
+  return format(now, 'HH:mm');
+};
+  const today = format(new Date(), 'yyyy-MM-dd');
+
   const { data, setData, errors, reset } = useForm<FormData>({
     title: '',
     presentation_type: 'title presentation',
     group_id: '',
-    date: format(new Date(), 'yyyy-MM-dd'),
-    start_time: '09:00',
+    date: today,
+    start_time: getCurrentTime(),
     end_time: '10:00',
     notes: '',
     research_providers: [],
   });
+
+  // Update start_time to current time when date changes to today
+  useEffect(() => {
+    if (data.date === today) {
+      const currentTime = getCurrentTime();
+      let endTime = new Date();
+      
+      // If current time is outside 7am-7pm, use 8-9am slot
+      const currentHour = new Date().getHours();
+      if (currentHour < 7 || currentHour >= 19) {
+        endTime = new Date();
+        endTime.setHours(9, 0, 0, 0); // 9:00 AM
+        setData('end_time', '09:00');
+      } else {
+        endTime.setHours(endTime.getHours() + 1); // Add 1 hour
+        setData('end_time', format(endTime, 'HH:mm'));
+      }
+      
+      setData('start_time', currentTime);
+    }
+  }, [data.date, today]);
 
   const [open, setOpen] = useState(false);
 
@@ -249,7 +283,7 @@ export function DefenseProposal() {
                           setData("date", date ? formatISO(date, { representation: 'date' }) : '')
                         }
                         initialFocus
-                        disabled={(date) => date < new Date()}
+                        disabled={(date: Date) => date < new Date()}
                       />
                     </PopoverContent>
                   </Popover>

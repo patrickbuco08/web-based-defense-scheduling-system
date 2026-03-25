@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { getDisplayStatus, getStatusConfig } from "@/utils/defenseStatus";
 import {
     Table,
     TableBody,
@@ -41,15 +42,9 @@ const Dashboard = () => {
         });
     };
 
-    const getStatusBadge = (status: string) => {
-        const statusConfig = {
-            "pending": { color: "bg-yellow-100 text-yellow-800", label: "Pending" },
-            "approved": { color: "bg-green-100 text-green-800", label: "Approved" },
-            "rejected": { color: "bg-red-100 text-red-800", label: "Rejected" },
-            "cancelled": { color: "bg-gray-100 text-gray-800", label: "Cancelled" },
-        };
-
-        const config = statusConfig[status as keyof typeof statusConfig] || { color: "bg-gray-100 text-gray-800", label: status };
+    const getStatusBadge = (status: string, endAt: string) => {
+        const displayStatus = getDisplayStatus(status, endAt);
+        const config = getStatusConfig(displayStatus);
 
         return (
             <Badge variant="outline" className={config.color}>
@@ -218,7 +213,7 @@ const Dashboard = () => {
                                             {formatDateTime(defense.start_at)}
                                         </TableCell>
                                         <TableCell>
-                                            {getStatusBadge(defense.status)}
+                                            {getStatusBadge(defense.status, defense.end_at)}
                                         </TableCell>
                                         <TableCell className="font-medium">
                                             {defense.group?.group_code || "—"}

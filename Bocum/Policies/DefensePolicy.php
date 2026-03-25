@@ -55,8 +55,8 @@ class DefensePolicy
 
         // Define allowed status transitions
         $allowedTransitions = [
-            'pending' => ['pending', 'approved', 'rejected', 'cancelled', 'reschedule', 'reappearance', 're-defense'], // Can change to any status
-            'approved' => ['approved', 'cancelled', 'reschedule', 'reappearance', 're-defense'], // Can stay approved, be cancelled, or be rescheduled
+            'pending' => ['pending', 'approved', 'rejected', 'cancelled', 'reschedule'], // Can change to any status
+            'approved' => ['approved', 'cancelled', 'reschedule', 'reappearance', 're-defense'], // Can stay approved, be cancelled, or rescheduled
             'rejected' => ['rejected', 'reschedule', 'reappearance', 're-defense'], // Can be rescheduled after rejection
             'cancelled' => ['cancelled'], // No changes allowed
             'reschedule' => ['reschedule', 'reappearance', 're-defense', 'pending', 'rejected', 'cancelled'], // From reschedule can go to pending, rejected, or cancelled

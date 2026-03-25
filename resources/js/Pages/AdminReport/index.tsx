@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { getDisplayStatus, getStatusConfig } from "@/utils/defenseStatus";
 import {
     Table,
     TableBody,
@@ -200,15 +201,9 @@ const AdminReport = () => {
         });
     };
 
-    const getStatusBadge = (status: string) => {
-        const statusConfig = {
-            approved: { color: "bg-green-100 text-green-800", label: "Approved" },
-            pending: { color: "bg-yellow-100 text-yellow-800", label: "Pending" },
-            rejected: { color: "bg-red-100 text-red-800", label: "Rejected" },
-            cancelled: { color: "bg-gray-100 text-gray-800", label: "Cancelled" },
-        };
-
-        const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    const getStatusBadge = (status: string, endDateTime: string) => {
+        const displayStatus = getDisplayStatus(status, endDateTime);
+        const config = getStatusConfig(displayStatus);
 
         return (
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
@@ -375,7 +370,7 @@ const AdminReport = () => {
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Defenses
+                                Total Defense Schedule
                             </CardTitle>
                             <TrendingUp className="h-4 w-4 text-muted-foreground" />
                         </div>
@@ -554,7 +549,7 @@ const AdminReport = () => {
                                     <TableCell className="text-sm whitespace-nowrap">
                                         {formatDateTime(defense.endDateTime)}
                                     </TableCell>
-                                    <TableCell>{getStatusBadge(defense.status)}</TableCell>
+                                    <TableCell>{getStatusBadge(defense.status, defense.endDateTime)}</TableCell>
                                     <TableCell>{defense.department}</TableCell>
                                     <TableCell>{defense.term}</TableCell>
                                 </TableRow>
