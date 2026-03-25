@@ -145,7 +145,7 @@ export function AddRoomButton() {
               onChange={handleChange}
               className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
             />
-            <Label htmlFor="is_active">Active</Label>
+            <Label htmlFor="is_active">Available</Label>
           </div>
           <div className="flex justify-end space-x-2 pt-4">
             <Button

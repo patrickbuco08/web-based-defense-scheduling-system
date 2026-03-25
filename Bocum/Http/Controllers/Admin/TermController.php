@@ -46,10 +46,15 @@ class TermController extends Controller
                 $currentTermIds = Term::where('is_current', true)->pluck('id');
 
                 if ($currentTermIds->isNotEmpty()) {
+                    // Only archive completed defenses (approved/reschedule that have passed their end time)
                     Defense::whereHas('group', function ($query) use ($currentTermIds) {
                         $query->whereIn('term_id', $currentTermIds);
                     })
                         ->where('archived', false)
+                        ->where(function ($query) {
+                            $query->whereIn('status', ['approved', 'reschedule'])
+                                  ->where('end_at', '<', now());
+                        })
                         ->update(['archived' => true]);
                 }
 
@@ -108,10 +113,15 @@ class TermController extends Controller
                     ->pluck('id');
 
                 if ($currentTermIds->isNotEmpty()) {
+                    // Only archive completed defenses (approved/reschedule that have passed their end time)
                     Defense::whereHas('group', function ($query) use ($currentTermIds) {
                         $query->whereIn('term_id', $currentTermIds);
                     })
                         ->where('archived', false)
+                        ->where(function ($query) {
+                            $query->whereIn('status', ['approved', 'reschedule'])
+                                  ->where('end_at', '<', now());
+                        })
                         ->update(['archived' => true]);
                 }
 

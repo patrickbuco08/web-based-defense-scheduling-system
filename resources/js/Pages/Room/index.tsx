@@ -73,14 +73,14 @@ const ManageRoom = () => {
             variant={isActive ? "default" : "destructive"}
             className="rounded-sm"
           >
-            {isActive ? "Active" : "Inactive"}
+            {isActive ? "Available" : "Not Available"}
           </Badge>
         );
       },
       filterFn: (row, id, value) => {
         if (!value || value.length === 0) return true;
         const isActive = row.getValue(id) as boolean;
-        return value.includes(isActive ? "active" : "inactive");
+        return value.includes(isActive ? "available" : "not-available");
       },
     },
     {
@@ -106,8 +106,8 @@ const ManageRoom = () => {
   })) || [];
 
   const statusFilterOptions = [
-    { label: "Active", value: "active" },
-    { label: "Inactive", value: "inactive" },
+    { label: "Available", value: "available" },
+    { label: "Not Available", value: "not-available" },
   ];
 
   if (isLoading) {
