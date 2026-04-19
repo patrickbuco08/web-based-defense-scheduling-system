@@ -27,11 +27,13 @@ class DashboardController extends Controller
             'total' => $allDefenses->count(),
             'pending' => $allDefenses->where('status', 'pending')->count(),
             'approved' => $allDefenses->where('status', 'approved')->count(),
-            'rejected' => $allDefenses->where('status', 'rejected')->count(),
-            'cancelled' => $allDefenses->where('status', 'cancelled')->count(),
-            'panelists_assigned' => $allDefenses->filter(function ($defense) {
-                return $defense->panelists->count() > 0;
+            'completed' => $allDefenses->filter(function ($defense) {
+                if (($defense->status === 'approved' || $defense->status === 'reschedule') && $defense->end_at) {
+                    return strtotime($defense->end_at) < time();
+                }
+                return false;
             })->count(),
+            'rescheduled' => $allDefenses->where('status', 'reschedule')->count(),
         ];
 
         $recentDefenses = Defense::whereHas('group.departments', function ($query) use ($userDepartmentIds) {

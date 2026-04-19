@@ -4,17 +4,20 @@ export interface Department {
   id: number;
   code: string;
   name: string;
+  school: string | null;
   created_at: string;
 }
 
 export interface CreateDepartmentPayload {
   code: string;
   name: string;
+  school?: string;
 }
 
 export interface UpdateDepartmentPayload {
   code: string;
   name: string;
+  school?: string;
 }
 
 export const departmentsApi = {

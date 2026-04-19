@@ -4,9 +4,8 @@ export interface DashboardStats {
     total: number;
     pending: number;
     approved: number;
-    rejected: number;
-    cancelled: number;
-    panelists_assigned: number;
+    completed: number;
+    rescheduled: number;
 }
 
 export interface DashboardDefense {

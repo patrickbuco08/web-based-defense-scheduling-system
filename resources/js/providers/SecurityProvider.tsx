@@ -15,15 +15,18 @@ export function SecurityProvider({ children }: SecurityProviderProps) {
   } | null>(null);
   const lastVerifiedRef = useRef<number | null>(null);
 
-  const requirePassword = useCallback((): Promise<void> => {
-    // Check if password was verified within the last 5 minutes (300000 ms)
-    const now = Date.now();
-    const lastVerified = lastVerifiedRef.current || parseInt(sessionStorage.getItem('lastPasswordVerified') || '0');
-    const fiveMinutesAgo = now - 300000; // 5 minutes in milliseconds
+  const requirePassword = useCallback((force: boolean = false): Promise<void> => {
+    // If force is true, always require password (e.g., for first approval)
+    if (!force) {
+      // Check if password was verified within the last 5 minutes (300000 ms)
+      const now = Date.now();
+      const lastVerified = lastVerifiedRef.current || parseInt(sessionStorage.getItem('lastPasswordVerified') || '0');
+      const fiveMinutesAgo = now - 300000; // 5 minutes in milliseconds
 
-    if (lastVerified && lastVerified > fiveMinutesAgo) {
-      // Password was verified within the last 5 minutes, resolve immediately
-      return Promise.resolve();
+      if (lastVerified && lastVerified > fiveMinutesAgo) {
+        // Password was verified within the last 5 minutes, resolve immediately
+        return Promise.resolve();
+      }
     }
 
     // Need to verify password again

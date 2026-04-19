@@ -13,9 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Activity,
     CheckCircle2,
-    XCircle,
-    Ban,
-    Users,
+    Clock,
     FileText,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -57,8 +55,8 @@ const Dashboard = () => {
         return (
             <div className="p-6 space-y-6">
                 <Skeleton className="h-8 w-64" />
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
                         <Skeleton key={i} className="h-32" />
                     ))}
                 </div>
@@ -75,7 +73,7 @@ const Dashboard = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <Card 
                     className="cursor-pointer hover:shadow-md transition-shadow"
                     onClick={() => handleCardClick('all')}
@@ -129,49 +127,35 @@ const Dashboard = () => {
 
                 <Card 
                     className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => handleCardClick('rejected')}
+                    onClick={() => handleCardClick('completed')}
                 >
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Rejected
+                                Completed
                             </CardTitle>
-                            <XCircle className="h-4 w-4 text-red-600" />
+                            <CheckCircle2 className="h-4 w-4 text-teal-600" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-red-600">{stats?.rejected || 0}</div>
+                        <div className="text-2xl font-bold text-teal-600">{stats?.completed || 0}</div>
                     </CardContent>
                 </Card>
 
                 <Card 
                     className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => handleCardClick('cancelled')}
+                    onClick={() => handleCardClick('reschedule')}
                 >
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Cancelled
+                                Rescheduled
                             </CardTitle>
-                            <Ban className="h-4 w-4 text-gray-600" />
+                            <Clock className="h-4 w-4 text-orange-600" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-gray-600">{stats?.cancelled || 0}</div>
-                    </CardContent>
-                </Card>
-
-                <Card className="cursor-default">
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Panelists Assigned
-                            </CardTitle>
-                            <Users className="h-4 w-4 text-purple-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-purple-600">{stats?.panelists_assigned || 0}</div>
+                        <div className="text-2xl font-bold text-orange-600">{stats?.rescheduled || 0}</div>
                     </CardContent>
                 </Card>
             </div>

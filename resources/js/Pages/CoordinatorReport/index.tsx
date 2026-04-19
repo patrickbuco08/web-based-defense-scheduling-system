@@ -26,10 +26,7 @@ import {
     Filter,
     TrendingUp,
     CheckCircle2,
-    Clock,
-    XCircle,
-    Ban,
-    Users
+    Clock
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -129,10 +126,13 @@ const AdminReport = () => {
 
     // Calculate KPIs
     const totalDefenses = filteredDefenses.length;
-    const approvedCount = filteredDefenses.filter(d => d.status === "approved").length;
     const pendingCount = filteredDefenses.filter(d => d.status === "pending").length;
-    const rejectedCount = filteredDefenses.filter(d => d.status === "rejected").length;
-    const cancelledCount = filteredDefenses.filter(d => d.status === "cancelled").length;
+    const approvedCount = filteredDefenses.filter(d => d.status === "approved").length;
+    const completedCount = filteredDefenses.filter(d => {
+        const displayStatus = getDisplayStatus(d.status, d.endDateTime);
+        return displayStatus === "completed";
+    }).length;
+    const rescheduledCount = filteredDefenses.filter(d => d.status === "reschedule").length;
 
     // Calculate unique panelists
     const uniquePanelists = new Set();
@@ -296,10 +296,10 @@ const AdminReport = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Statuses</SelectItem>
-                                    <SelectItem value="approved">Approved</SelectItem>
                                     <SelectItem value="pending">Pending</SelectItem>
-                                    <SelectItem value="rejected">Rejected</SelectItem>
-                                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                                    <SelectItem value="approved">Approved</SelectItem>
+                                    <SelectItem value="completed">Completed</SelectItem>
+                                    <SelectItem value="reschedule">Rescheduled</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -367,7 +367,7 @@ const AdminReport = () => {
             </Card>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <Card>
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
@@ -379,20 +379,6 @@ const AdminReport = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalDefenses}</div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Approved
-                            </CardTitle>
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
                     </CardContent>
                 </Card>
 
@@ -414,13 +400,13 @@ const AdminReport = () => {
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Rejected
+                                Approved
                             </CardTitle>
-                            <XCircle className="h-4 w-4 text-red-600" />
+                            <CheckCircle2 className="h-4 w-4 text-green-600" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-red-600">{rejectedCount}</div>
+                        <div className="text-2xl font-bold text-green-600">{approvedCount}</div>
                     </CardContent>
                 </Card>
 
@@ -428,13 +414,13 @@ const AdminReport = () => {
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Cancelled
+                                Completed
                             </CardTitle>
-                            <Ban className="h-4 w-4 text-gray-600" />
+                            <CheckCircle2 className="h-4 w-4 text-teal-600" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-gray-600">{cancelledCount}</div>
+                        <div className="text-2xl font-bold text-teal-600">{completedCount}</div>
                     </CardContent>
                 </Card>
 
@@ -442,13 +428,13 @@ const AdminReport = () => {
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Unique Panelists
+                                Rescheduled
                             </CardTitle>
-                            <Users className="h-4 w-4 text-blue-600" />
+                            <Clock className="h-4 w-4 text-orange-600" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-blue-600">{uniquePanelists.size}</div>
+                        <div className="text-2xl font-bold text-orange-600">{rescheduledCount}</div>
                     </CardContent>
                 </Card>
             </div>

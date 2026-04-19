@@ -70,7 +70,7 @@ function DepartmentDefenseCalendar() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all', 'pending', 'approved', 'rejected', 'cancelled'
+    const [statusFilter, setStatusFilter] = useState<string>('all'); // 'all', 'pending', 'approved', 'completed', 'reschedule'
     const [initialStatus, setInitialStatus] = useState<string>('pending');
     const [formData, setFormData] = useState<FormData>({
         title: '',
@@ -132,6 +132,8 @@ function DepartmentDefenseCalendar() {
     const getEventColor = useCallback((status: string) => {
         switch (status) {
             case 'approved': return '#10b981';
+            case 'completed': return '#14b8a6';
+            case 'reschedule': return '#f97316';
             case 'rejected': return '#ef4444';
             case 'cancelled': return '#6b7280';
             default: return '#f59e0b';
@@ -237,7 +239,9 @@ setFormData({
         if (!selectedDefense) return;
 
         try {
-            await requirePassword();
+            // Force password confirmation for first approval (pending → approved)
+            const isFirstApproval = initialStatus === 'pending' && formData.status === 'approved';
+            await requirePassword(isFirstApproval);
 
             await updateDefense.mutateAsync({
                 id: selectedDefense.id,
@@ -276,10 +280,9 @@ setFormData({
                             <SelectContent>
                                 <SelectItem value="all">All Statuses</SelectItem>
                                 <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="approved">Approved</SelectItem>
-                                <SelectItem value="reschedule">Reschedule</SelectItem>
-                                <SelectItem value="reappearance">Reappearance</SelectItem>
-                                <SelectItem value="re-defense">Re-defense</SelectItem>
+                                <SelectItem value="approved">Approved (Scheduled)</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="reschedule">Rescheduled</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -463,7 +466,7 @@ setFormData({
                             {conflicts?.room_conflicts?.has_conflict && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                                     <div className="flex items-start gap-2">
-                                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
                                         <div>
                                             <h4 className="text-sm font-medium text-red-800">Room Conflict Detected</h4>
                                             <p className="text-sm text-red-700 mt-1">{conflicts.room_conflicts.message}</p>
@@ -590,10 +593,9 @@ setFormData({
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="pending">Pending</SelectItem>
-                                        <SelectItem value="approved">Approved</SelectItem>
-                                        <SelectItem value="reschedule">Reschedule</SelectItem>
-                                        <SelectItem value="reappearance">Reappearance</SelectItem>
-                                        <SelectItem value="re-defense">Re-defense</SelectItem>
+                                        <SelectItem value="approved">Approved (Scheduled)</SelectItem>
+                                        <SelectItem value="completed">Completed</SelectItem>
+                                        <SelectItem value="reschedule" disabled={initialStatus === 'pending'}>Rescheduled</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -651,7 +653,7 @@ setFormData({
                             {conflicts?.panelist_conflicts?.has_conflict && (
                                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                                     <div className="flex items-start gap-2">
-                                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 flex-shrink-0" />
+                                        <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
                                         <div>
                                             <h4 className="text-sm font-medium text-red-800">Research Provider Conflict Detected</h4>
                                             <p className="text-sm text-red-700 mt-1">{conflicts.panelist_conflicts.message}</p>

@@ -242,32 +242,10 @@ export const AddGroupButton = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="critic_id" className="text-right">
-              Technical Critic
-            </Label>
-            <Select
-              name="critic_id"
-              value={formData.critic_id}
-              onValueChange={(value) => handleSelectChange("critic_id", value)}
-            >
-              <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Select a critic" />
-              </SelectTrigger>
-              <SelectContent>
-                {critics?.map((critic: Critic) => (
-                  <SelectItem key={critic.id} value={critic.id.toString()}>
-                    {critic.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Research Critic (Research Service Provider) */}
+          {/* Technical Critic (Research Service Provider) */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="research_critic_id" className="text-right">
-              Research Critic (RSP)
+              Technical Critic
             </Label>
             <Select
               name="research_critic_id"
@@ -275,7 +253,7 @@ export const AddGroupButton = () => {
               onValueChange={(value) => handleSelectChange("research_critic_id", value)}
             >
               <SelectTrigger className="col-span-3 w-full">
-                <SelectValue placeholder="Select a research critic" />
+                <SelectValue placeholder="Select a technical critic" />
               </SelectTrigger>
               <SelectContent>
                 {researchProviders

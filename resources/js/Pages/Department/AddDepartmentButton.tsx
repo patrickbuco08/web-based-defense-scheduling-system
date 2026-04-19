@@ -20,6 +20,7 @@ export function AddDepartmentButton() {
   const [formData, setFormData] = useState({
     code: "",
     name: "",
+    school: "",
   });
 
   const { mutate: createDepartment, isPending } = useCreateDepartment();
@@ -35,7 +36,7 @@ export function AddDepartmentButton() {
     createDepartment(formData, {
       onSuccess: () => {
         setIsOpen(false);
-        setFormData({ code: "", name: "" });
+        setFormData({ code: "", name: "", school: "" });
         toast.success("Course created successfully!");
       },
       onError: (error: any) => {
@@ -86,6 +87,16 @@ export function AddDepartmentButton() {
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 maxLength={255}
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="school">School</Label>
+              <Input
+                id="school"
+                placeholder="e.g., School of Computer Studies"
+                value={formData.school}
+                onChange={(e) => handleInputChange("school", e.target.value)}
+                maxLength={255}
               />
             </div>
           </div>

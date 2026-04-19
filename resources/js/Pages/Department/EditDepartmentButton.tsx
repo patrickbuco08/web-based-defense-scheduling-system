@@ -19,6 +19,7 @@ interface Department {
   id: number;
   code: string;
   name: string;
+  school: string | null;
   created_at: string;
 }
 
@@ -31,6 +32,7 @@ export function EditDepartmentButton({ department }: EditDepartmentButtonProps) 
   const [formData, setFormData] = useState({
     code: department.code,
     name: department.name,
+    school: department.school || "",
   });
 
   const { mutate: updateDepartment, isPending } = useUpdateDepartment();
@@ -72,6 +74,7 @@ export function EditDepartmentButton({ department }: EditDepartmentButtonProps) 
       setFormData({
         code: department.code,
         name: department.name,
+        school: department.school || "",
       });
     }
   };
@@ -113,6 +116,16 @@ export function EditDepartmentButton({ department }: EditDepartmentButtonProps) 
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 maxLength={255}
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-school">School</Label>
+              <Input
+                id="edit-school"
+                placeholder="e.g., School of Computer Studies"
+                value={formData.school}
+                onChange={(e) => handleInputChange("school", e.target.value)}
+                maxLength={255}
               />
             </div>
           </div>

@@ -29,6 +29,7 @@ const ManageDepartment = () => {
                             <TableRow>
                                 <TableHead>Code</TableHead>
                                 <TableHead>Name</TableHead>
+                                <TableHead>School</TableHead>
                                 <TableHead>Created At</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
@@ -41,6 +42,9 @@ const ManageDepartment = () => {
                                     </TableCell>
                                     <TableCell>
                                         <Skeleton className="h-4 w-32" />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Skeleton className="h-4 w-48" />
                                     </TableCell>
                                     <TableCell>
                                         <Skeleton className="h-4 w-24" />
@@ -62,7 +66,7 @@ const ManageDepartment = () => {
             <div className="p-6">
                 <div className="rounded-md bg-red-50 p-4">
                     <div className="flex">
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                             <svg
                                 className="h-5 w-5 text-red-400"
                                 viewBox="0 0 20 20"
@@ -107,6 +111,8 @@ const ManageDepartment = () => {
                         <TableRow>
                             <TableHead>Code</TableHead>
                             <TableHead>Name</TableHead>
+                            <TableHead>School</TableHead>
+                            <TableHead>Created At</TableHead>
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -117,6 +123,12 @@ const ManageDepartment = () => {
                                     {department.code}
                                 </TableCell>
                                 <TableCell>{department.name}</TableCell>
+                                <TableCell className="text-muted-foreground">
+                                    {department.school || '-'}
+                                </TableCell>
+                                <TableCell className="text-muted-foreground">
+                                    {new Date(department.created_at).toLocaleDateString()}
+                                </TableCell>
                                 <TableCell>
                                     <div className="flex space-x-2">
                                         <EditDepartmentButton department={department} />

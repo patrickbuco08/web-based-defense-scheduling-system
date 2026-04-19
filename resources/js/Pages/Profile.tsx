@@ -11,7 +11,7 @@ import { useUpdateProfile } from "@/features/profile";
 export default function Profile() {
   const { user } = useAuth();
   const updateProfile = useUpdateProfile();
-  const canSwitchPrimaryRole = user?.roles?.some((role: string) => role === 'adviser' || role === 'coordinator');
+  const canSwitchPrimaryRole = user?.roles?.includes('adviser') && user?.roles?.includes('coordinator');
   const currentRole = user?.roles?.includes('coordinator') ? 'coordinator' : 'adviser';
   const [formData, setFormData] = useState({
     name: user?.name || '',

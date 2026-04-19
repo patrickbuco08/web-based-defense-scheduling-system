@@ -269,38 +269,10 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
               </div>
             )}
 
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="critic_id" className="text-right">
-                Critic
-              </Label>
-              <Select
-                name="critic_id"
-                value={formData.critic_id?.toString() || "none"}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    critic_id: value !== "none" ? Number(value) : null,
-                  }))
-                }
-              >
-                <SelectTrigger className="col-span-3 w-full">
-                  <SelectValue placeholder="No Critic Assigned" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No Critic Assigned</SelectItem>
-                  {critics?.map((critic: any) => (
-                    <SelectItem key={critic.id} value={critic.id.toString()}>
-                      {critic.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Research Critic (Research Service Provider) */}
+            {/* Technical Critic (Research Service Provider) */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="research_critic_id" className="text-right">
-                Research Critic (RSP)
+                Technical Critic
               </Label>
               <Select
                 name="research_critic_id"
@@ -313,10 +285,10 @@ export function EditGroupButton({ group }: EditGroupButtonProps) {
                 }
               >
                 <SelectTrigger className="col-span-3 w-full">
-                  <SelectValue placeholder="No Research Critic Assigned" />
+                  <SelectValue placeholder="No Technical Critic Assigned" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">No Research Critic Assigned</SelectItem>
+                  <SelectItem value="none">No Technical Critic Assigned</SelectItem>
                   {researchProviders
                     ?.filter((p: any) => (p.role || '').toLowerCase().includes('critic'))
                     .map((p: any) => (

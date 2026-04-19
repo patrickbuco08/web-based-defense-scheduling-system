@@ -160,6 +160,50 @@ class DefenseController extends Controller
             // Authorize the update action using the policy, passing the new status
             $this->authorize('update', [$defense, $newStatus]);
 
+            // Check for room conflicts before saving
+            $roomConflicts = $this->conflictService->checkRoomConflict(
+                $defense,
+                $request->room_id,
+                $request->date,
+                $request->start_time,
+                $request->end_time
+            );
+
+            if ($roomConflicts['has_conflict']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot save defense due to room conflicts.',
+                    'errors' => [
+                        'room_conflicts' => $roomConflicts['message']
+                    ]
+                ], 422);
+            }
+
+            // Check for panelist conflicts before saving
+            $panelistIds = $request->has('research_providers') 
+                ? $request->research_providers 
+                : $defense->researchProviders()->pluck('research_service_providers.id')->toArray();
+            
+            if (!empty($panelistIds)) {
+                $panelistConflicts = $this->conflictService->checkPanelistConflict(
+                    $defense->id,
+                    $panelistIds,
+                    $request->date,
+                    $request->start_time,
+                    $request->end_time
+                );
+
+                if ($panelistConflicts['has_conflict']) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot save defense due to panelist conflicts.',
+                        'errors' => [
+                            'panelist_conflicts' => $panelistConflicts['message']
+                        ]
+                    ], 422);
+                }
+            }
+
             // Prepare the data for update
             $data = [
                 'title' => $request->title,
