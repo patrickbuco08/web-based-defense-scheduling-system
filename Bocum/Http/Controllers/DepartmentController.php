@@ -16,7 +16,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = Department::all(['id', 'code', 'name', 'created_at']);
+        $departments = Department::all(['id', 'code', 'name', 'school', 'created_at']);
 
         return response()->json($departments);
     }
@@ -32,6 +32,7 @@ class DepartmentController extends Controller
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|max:10|unique:departments,code',
             'name' => 'required|string|max:255|unique:departments,name',
+            'school' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -45,6 +46,7 @@ class DepartmentController extends Controller
         $department = Department::create([
             'code' => $request->code,
             'name' => $request->name,
+            'school' => $request->school,
         ]);
 
         return response()->json([
@@ -91,6 +93,7 @@ class DepartmentController extends Controller
                 'max:255',
                 Rule::unique('departments', 'name')->ignore($department->id)
             ],
+            'school' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -104,6 +107,7 @@ class DepartmentController extends Controller
         $department->update([
             'code' => $request->code,
             'name' => $request->name,
+            'school' => $request->school,
         ]);
 
         return response()->json([
