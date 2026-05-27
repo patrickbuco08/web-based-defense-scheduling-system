@@ -5,6 +5,7 @@ namespace Bocum\Http\Controllers;
 use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Room;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
@@ -46,6 +47,12 @@ class RoomController extends Controller
 
         $room->departments()->sync($validated['department_ids']);
         $room->load('departments');
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($room)
+            ->withProperties(['room_number' => $room->room_number, 'building' => $room->building])
+            ->log('room.created');
         
         return response()->json([
             'status' => 'success',
@@ -79,6 +86,12 @@ class RoomController extends Controller
 
         $room->departments()->sync($validated['department_ids']);
         $room->load('departments');
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($room)
+            ->withProperties(['room_number' => $room->room_number, 'building' => $room->building])
+            ->log('room.updated');
         
         return response()->json([
             'status' => 'success',
@@ -103,6 +116,12 @@ class RoomController extends Controller
         ]);
         
         $status = $room->is_active ? 'activated' : 'deactivated';
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($room)
+            ->withProperties(['room_number' => $room->room_number, 'is_active' => $room->is_active])
+            ->log('room.toggled');
         
         return response()->json([
             'status' => 'success',
@@ -128,6 +147,11 @@ class RoomController extends Controller
             ], 422);
         }
         
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->withProperties(['room_number' => $room->room_number, 'building' => $room->building])
+            ->log('room.deleted');
+
         $room->delete();
         
         return response()->json([

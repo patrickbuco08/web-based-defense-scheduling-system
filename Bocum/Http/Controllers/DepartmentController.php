@@ -4,6 +4,7 @@ namespace Bocum\Http\Controllers;
 
 use Bocum\Models\Department;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -48,6 +49,12 @@ class DepartmentController extends Controller
             'name' => $request->name,
             'school' => $request->school,
         ]);
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($department)
+            ->withProperties(['code' => $department->code, 'name' => $department->name, 'school' => $department->school])
+            ->log('course.created');
 
         return response()->json([
             'success' => true,
@@ -110,6 +117,12 @@ class DepartmentController extends Controller
             'school' => $request->school,
         ]);
 
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($department)
+            ->withProperties(['code' => $department->code, 'name' => $department->name, 'school' => $department->school])
+            ->log('course.updated');
+
         return response()->json([
             'success' => true,
             'data' => $department,
@@ -132,6 +145,11 @@ class DepartmentController extends Controller
                 'message' => 'Cannot delete department. It is currently in use.'
             ], 422);
         }
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->withProperties(['code' => $department->code, 'name' => $department->name])
+            ->log('course.deleted');
 
         $department->delete();
 

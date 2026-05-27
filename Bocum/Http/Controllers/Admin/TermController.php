@@ -6,6 +6,7 @@ use Bocum\Http\Controllers\Controller;
 use Bocum\Models\Defense;
 use Bocum\Models\Term;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -70,6 +71,12 @@ class TermController extends Controller
                     ->where('archived', true)
                     ->update(['archived' => false]);
             }
+
+            activity('admin')
+                ->causedBy(Auth::user())
+                ->performedOn($term)
+                ->withProperties(['school_year' => $term->school_year, 'semester' => $term->semester, 'is_current' => $term->is_current])
+                ->log('term.created');
 
             return response()->json([
                 'status' => 'success',
@@ -140,6 +147,12 @@ class TermController extends Controller
                     ->update(['archived' => false]);
             }
 
+            activity('admin')
+                ->causedBy(Auth::user())
+                ->performedOn($term)
+                ->withProperties(['school_year' => $term->school_year, 'semester' => $term->semester, 'is_current' => $term->is_current])
+                ->log('term.updated');
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Term updated successfully.',
@@ -167,6 +180,11 @@ class TermController extends Controller
                 'message' => 'Cannot delete term with associated groups.',
             ], 400);
         }
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->withProperties(['school_year' => $term->school_year, 'semester' => $term->semester])
+            ->log('term.deleted');
 
         $term->delete();
 

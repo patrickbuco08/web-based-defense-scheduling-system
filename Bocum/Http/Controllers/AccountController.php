@@ -118,6 +118,12 @@ class AccountController extends Controller
             // Load the role and department relationships for the response
             $user->load('roles', 'department');
 
+            activity('admin')
+                ->causedBy(Auth::user())
+                ->performedOn($user)
+                ->withProperties(['name' => $user->name, 'email' => $user->email, 'roles' => $validated['roles']])
+                ->log('account.created');
+
             return response()->json([
                 'data' => $user,
                 'message' => 'User created successfully.'
@@ -183,6 +189,12 @@ class AccountController extends Controller
             // Load the updated relationships
             $user->load('roles', 'department');
 
+            activity('admin')
+                ->causedBy(Auth::user())
+                ->performedOn($user)
+                ->withProperties(['name' => $user->name, 'email' => $user->email, 'roles' => $user->roles->pluck('name')->toArray()])
+                ->log('account.updated');
+
             return response()->json([
                 'data' => [
                     'id' => $user->id,
@@ -215,6 +227,12 @@ class AccountController extends Controller
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
+
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->withProperties(['name' => $user->name, 'email' => $user->email])
+            ->log('account.deleted');
+
         $user->delete();
 
         return response()->json([

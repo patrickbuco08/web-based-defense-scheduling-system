@@ -143,6 +143,25 @@ const AdminLog = () => {
             "defense.rejected": { color: "bg-red-100 text-red-800", label: "Rejected" },
             "defense.cancelled": { color: "bg-gray-100 text-gray-800", label: "Cancelled" },
             "defense.panelists_assigned": { color: "bg-purple-100 text-purple-800", label: "Panelists Assigned" },
+            "defense.archived": { color: "bg-slate-100 text-slate-700", label: "Archived" },
+            "defense.unarchived": { color: "bg-sky-100 text-sky-700", label: "Unarchived" },
+            "defense.research_providers_assigned": { color: "bg-indigo-100 text-indigo-800", label: "Providers Assigned" },
+            "course.created": { color: "bg-emerald-100 text-emerald-800", label: "Course Created" },
+            "course.updated": { color: "bg-yellow-100 text-yellow-800", label: "Course Updated" },
+            "course.deleted": { color: "bg-red-100 text-red-800", label: "Course Deleted" },
+            "account.created": { color: "bg-emerald-100 text-emerald-800", label: "Account Created" },
+            "account.updated": { color: "bg-yellow-100 text-yellow-800", label: "Account Updated" },
+            "account.deleted": { color: "bg-red-100 text-red-800", label: "Account Deleted" },
+            "room.created": { color: "bg-emerald-100 text-emerald-800", label: "Room Created" },
+            "room.updated": { color: "bg-yellow-100 text-yellow-800", label: "Room Updated" },
+            "room.deleted": { color: "bg-red-100 text-red-800", label: "Room Deleted" },
+            "room.toggled": { color: "bg-orange-100 text-orange-800", label: "Room Toggled" },
+            "provider.created": { color: "bg-emerald-100 text-emerald-800", label: "Provider Created" },
+            "provider.updated": { color: "bg-yellow-100 text-yellow-800", label: "Provider Updated" },
+            "provider.deleted": { color: "bg-red-100 text-red-800", label: "Provider Deleted" },
+            "term.created": { color: "bg-emerald-100 text-emerald-800", label: "Term Created" },
+            "term.updated": { color: "bg-yellow-100 text-yellow-800", label: "Term Updated" },
+            "term.deleted": { color: "bg-red-100 text-red-800", label: "Term Deleted" },
         };
 
         const config = actionConfig[action as keyof typeof actionConfig] || { color: "bg-gray-100 text-gray-800", label: action };
@@ -224,11 +243,30 @@ const AdminLog = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Actions</SelectItem>
-                                    <SelectItem value="defense.proposed">Proposed</SelectItem>
-                                    <SelectItem value="defense.approved">Approved</SelectItem>
-                                    <SelectItem value="defense.rejected">Rejected</SelectItem>
-                                    <SelectItem value="defense.cancelled">Cancelled</SelectItem>
-                                    <SelectItem value="defense.panelists_assigned">Panelists Assigned</SelectItem>
+                                    <SelectItem value="defense.proposed">Defense: Proposed</SelectItem>
+                                    <SelectItem value="defense.approved">Defense: Approved</SelectItem>
+                                    <SelectItem value="defense.rejected">Defense: Rejected</SelectItem>
+                                    <SelectItem value="defense.cancelled">Defense: Cancelled</SelectItem>
+                                    <SelectItem value="defense.panelists_assigned">Defense: Panelists Assigned</SelectItem>
+                                    <SelectItem value="defense.archived">Defense: Archived</SelectItem>
+                                    <SelectItem value="defense.unarchived">Defense: Unarchived</SelectItem>
+                                    <SelectItem value="defense.research_providers_assigned">Defense: Research Providers Assigned</SelectItem>
+                                    <SelectItem value="course.created">Course: Created</SelectItem>
+                                    <SelectItem value="course.updated">Course: Updated</SelectItem>
+                                    <SelectItem value="course.deleted">Course: Deleted</SelectItem>
+                                    <SelectItem value="account.created">Account: Created</SelectItem>
+                                    <SelectItem value="account.updated">Account: Updated</SelectItem>
+                                    <SelectItem value="account.deleted">Account: Deleted</SelectItem>
+                                    <SelectItem value="room.created">Room: Created</SelectItem>
+                                    <SelectItem value="room.updated">Room: Updated</SelectItem>
+                                    <SelectItem value="room.deleted">Room: Deleted</SelectItem>
+                                    <SelectItem value="room.toggled">Room: Toggled</SelectItem>
+                                    <SelectItem value="provider.created">Provider: Created</SelectItem>
+                                    <SelectItem value="provider.updated">Provider: Updated</SelectItem>
+                                    <SelectItem value="provider.deleted">Provider: Deleted</SelectItem>
+                                    <SelectItem value="term.created">Term: Created</SelectItem>
+                                    <SelectItem value="term.updated">Term: Updated</SelectItem>
+                                    <SelectItem value="term.deleted">Term: Deleted</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

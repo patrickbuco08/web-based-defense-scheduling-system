@@ -58,8 +58,8 @@ class LogsController extends Controller
      */
     private function getFilteredLogs(Request $request)
     {
-        // Build the query for defense-related activities
-        $query = Activity::where('log_name', 'defense')
+        // Build the query for defense and admin activities
+        $query = Activity::whereIn('log_name', ['defense', 'admin'])
             ->with([
                 'causer' => function ($query) {
                     $query->with('department');
@@ -138,7 +138,7 @@ class LogsController extends Controller
                 'subject' => $activity->subject ? [
                     'id' => $activity->subject->id,
                     'title' => $activity->subject->title ?? null,
-                    'group' => $activity->subject->group ? [
+                    'group' => (method_exists($activity->subject, 'group') && $activity->subject->group) ? [
                         'id' => $activity->subject->group->id,
                         'group_code' => $activity->subject->group->group_code,
                     ] : null,
@@ -204,6 +204,102 @@ class LogsController extends Controller
                     $assignedPanelists = implode(', ', $props['panelists']);
                 }
                 return "{$causerName} assigned panelists to \"{$title}\": {$assignedPanelists}.";
+
+            case 'defense.archived':
+                return "{$causerName} archived the defense \"{$title}\".";
+
+            case 'defense.unarchived':
+                return "{$causerName} unarchived the defense \"{$title}\".";
+
+            case 'defense.research_providers_assigned':
+                $providers = '';
+                if (isset($props['research_providers']) && is_array($props['research_providers'])) {
+                    $providers = ' ' . implode(', ', $props['research_providers']);
+                }
+                return "{$causerName} assigned research providers to \"{$title}\":{$providers}.";
+
+            case 'course.created':
+                $code = isset($props['code']) ? $props['code'] : '';
+                $name = isset($props['name']) ? $props['name'] : '';
+                return "{$causerName} created course \"{$code} – {$name}\".";
+
+            case 'course.updated':
+                $code = isset($props['code']) ? $props['code'] : '';
+                $name = isset($props['name']) ? $props['name'] : '';
+                return "{$causerName} updated course \"{$code} – {$name}\".";
+
+            case 'course.deleted':
+                $code = isset($props['code']) ? $props['code'] : '';
+                $name = isset($props['name']) ? $props['name'] : '';
+                return "{$causerName} deleted course \"{$code} – {$name}\".";
+
+            case 'account.created':
+                $email = isset($props['email']) ? $props['email'] : '';
+                $name = isset($props['name']) ? $props['name'] : '';
+                $roles = isset($props['roles']) && is_array($props['roles']) ? implode(', ', $props['roles']) : '';
+                return "{$causerName} created account for \"{$name}\" ({$email}) with role(s): {$roles}.";
+
+            case 'account.updated':
+                $email = isset($props['email']) ? $props['email'] : '';
+                $name = isset($props['name']) ? $props['name'] : '';
+                return "{$causerName} updated account for \"{$name}\" ({$email}).";
+
+            case 'account.deleted':
+                $email = isset($props['email']) ? $props['email'] : '';
+                $name = isset($props['name']) ? $props['name'] : '';
+                return "{$causerName} deleted account for \"{$name}\" ({$email}).";
+
+            case 'room.created':
+                $roomNumber = isset($props['room_number']) ? $props['room_number'] : '';
+                $building = isset($props['building']) ? $props['building'] : '';
+                return "{$causerName} created room \"{$roomNumber}\" in {$building}.";
+
+            case 'room.updated':
+                $roomNumber = isset($props['room_number']) ? $props['room_number'] : '';
+                $building = isset($props['building']) ? $props['building'] : '';
+                return "{$causerName} updated room \"{$roomNumber}\" in {$building}.";
+
+            case 'room.deleted':
+                $roomNumber = isset($props['room_number']) ? $props['room_number'] : '';
+                $building = isset($props['building']) ? $props['building'] : '';
+                return "{$causerName} deleted room \"{$roomNumber}\" in {$building}.";
+
+            case 'room.toggled':
+                $roomNumber = isset($props['room_number']) ? $props['room_number'] : '';
+                $isActive = isset($props['is_active']) ? ($props['is_active'] ? 'activated' : 'deactivated') : 'toggled';
+                return "{$causerName} {$isActive} room \"{$roomNumber}\".";
+
+            case 'provider.created':
+                $name = isset($props['name']) ? $props['name'] : '';
+                $role = isset($props['role']) ? $props['role'] : '';
+                return "{$causerName} added research service provider \"{$name}\" ({$role}).";
+
+            case 'provider.updated':
+                $name = isset($props['name']) ? $props['name'] : '';
+                $role = isset($props['role']) ? $props['role'] : '';
+                return "{$causerName} updated research service provider \"{$name}\" ({$role}).";
+
+            case 'provider.deleted':
+                $name = isset($props['name']) ? $props['name'] : '';
+                $role = isset($props['role']) ? $props['role'] : '';
+                return "{$causerName} deleted research service provider \"{$name}\" ({$role}).";
+
+            case 'term.created':
+                $sy = isset($props['school_year']) ? $props['school_year'] : '';
+                $sem = isset($props['semester']) ? $props['semester'] : '';
+                $isCurrent = !empty($props['is_current']) ? ' (set as current)' : '';
+                return "{$causerName} created term \"{$sy} {$sem}\"{$isCurrent}.";
+
+            case 'term.updated':
+                $sy = isset($props['school_year']) ? $props['school_year'] : '';
+                $sem = isset($props['semester']) ? $props['semester'] : '';
+                $isCurrent = !empty($props['is_current']) ? ' (set as current)' : '';
+                return "{$causerName} updated term \"{$sy} {$sem}\"{$isCurrent}.";
+
+            case 'term.deleted':
+                $sy = isset($props['school_year']) ? $props['school_year'] : '';
+                $sem = isset($props['semester']) ? $props['semester'] : '';
+                return "{$causerName} deleted term \"{$sy} {$sem}\".";
 
             default:
                 return "{$causerName} performed action on \"{$title}\".";

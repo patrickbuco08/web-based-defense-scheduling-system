@@ -54,6 +54,12 @@ class ResearchServiceProviderController extends Controller
         $provider = ResearchServiceProvider::create($validated);
         $provider->load('department');
 
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($provider)
+            ->withProperties(['name' => $provider->name, 'role' => $provider->role])
+            ->log('provider.created');
+
         return response()->json([
             'data' => [
                 'id' => $provider->id,
@@ -97,6 +103,12 @@ class ResearchServiceProviderController extends Controller
         $researchServiceProvider->update($validated);
         $researchServiceProvider->load('department');
 
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->performedOn($researchServiceProvider)
+            ->withProperties(['name' => $researchServiceProvider->name, 'role' => $researchServiceProvider->role])
+            ->log('provider.updated');
+
         return response()->json([
             'data' => [
                 'id' => $researchServiceProvider->id,
@@ -118,6 +130,11 @@ class ResearchServiceProviderController extends Controller
      */
     public function destroy(ResearchServiceProvider $researchServiceProvider)
     {
+        activity('admin')
+            ->causedBy(Auth::user())
+            ->withProperties(['name' => $researchServiceProvider->name, 'role' => $researchServiceProvider->role])
+            ->log('provider.deleted');
+
         $researchServiceProvider->delete();
 
         return response()->json([
