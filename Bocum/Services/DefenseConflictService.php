@@ -130,12 +130,12 @@ class DefenseConflictService
         $proposedStart = Carbon::createFromFormat('Y-m-d H:i', $proposedDate . ' ' . $startTime);
         $proposedEnd = Carbon::createFromFormat('Y-m-d H:i', $proposedDate . ' ' . $endTime);
 
-        // Find defenses where any of the proposed panelists are already assigned (only approved ones)
+        // Find defenses where any of the proposed research service providers are already assigned (only approved ones)
         $conflictingDefenses = Defense::where('id', '!=', $defenseId)
             ->where('status', 'approved')
             ->where('archived', false)
-            ->whereHas('panelists', function ($query) use ($panelistIds) {
-                $query->whereIn('panelist_id', $panelistIds);
+            ->whereHas('researchProviders', function ($query) use ($panelistIds) {
+                $query->whereIn('research_service_provider_id', $panelistIds);
             })
             ->where(function ($query) use ($proposedStart, $proposedEnd) {
                 // Check for time overlap
@@ -153,7 +153,7 @@ class DefenseConflictService
                       ->where('end_at', '<=', $proposedEnd);
                 });
             })
-            ->with(['group', 'panelists', 'room'])
+            ->with(['group', 'researchProviders', 'room'])
             ->get();
 
         $conflicts = [];
@@ -161,8 +161,8 @@ class DefenseConflictService
         $conflictedPanelists = [];
 
         foreach ($conflictingDefenses as $defense) {
-            // Get the specific panelists that are conflicted
-            $conflictedPanelistsInDefense = $defense->panelists->whereIn('id', $panelistIds);
+            // Get the specific research service providers that are conflicted
+            $conflictedPanelistsInDefense = $defense->researchProviders->whereIn('id', $panelistIds);
             
             foreach ($conflictedPanelistsInDefense as $panelist) {
                 if (!in_array($panelist->id, $conflictedPanelists)) {
