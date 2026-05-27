@@ -41,7 +41,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        if ($selectedRole && $user->hasAnyRole(['adviser', 'coordinator'])) {
+        if ($selectedRole && $user->hasAllRoles(['adviser', 'coordinator'])) {
             $currentRoles = $user->getRoleNames()->toArray();
             $preservedRoles = array_values(array_filter(
                 $currentRoles,
