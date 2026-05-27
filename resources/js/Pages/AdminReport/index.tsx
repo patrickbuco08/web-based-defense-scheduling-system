@@ -122,15 +122,12 @@ const AdminReport = () => {
         }));
     }, [reportsData]);
 
-    // Calculate KPIs
+    // Calculate KPIs using display status so completed records aren't double-counted
     const totalDefenses = filteredDefenses.length;
-    const pendingCount = filteredDefenses.filter(d => d.status === "pending").length;
-    const approvedCount = filteredDefenses.filter(d => d.status === "approved").length;
-    const completedCount = filteredDefenses.filter(d => {
-        const displayStatus = getDisplayStatus(d.status, d.endDateTime);
-        return displayStatus === "completed";
-    }).length;
-    const rescheduledCount = filteredDefenses.filter(d => d.status === "reschedule").length;
+    const pendingCount = filteredDefenses.filter(d => getDisplayStatus(d.status, d.endDateTime) === "pending").length;
+    const approvedCount = filteredDefenses.filter(d => getDisplayStatus(d.status, d.endDateTime) === "approved").length;
+    const completedCount = filteredDefenses.filter(d => getDisplayStatus(d.status, d.endDateTime) === "completed").length;
+    const rescheduledCount = filteredDefenses.filter(d => getDisplayStatus(d.status, d.endDateTime) === "reschedule").length;
 
     // Calculate unique panelists
     const uniquePanelists = new Set();

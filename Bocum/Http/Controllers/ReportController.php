@@ -76,7 +76,7 @@ class ReportController extends Controller
         $request->validate([
             'term' => 'nullable|string',
             'department' => 'nullable|string',
-            'status' => 'nullable|string|in:all,approved,pending,rejected,cancelled',
+            'status' => 'nullable|string|in:all,pending,approved,completed,reschedule',
             'room' => 'nullable|string',
             'date_start' => 'nullable|date',
             'date_end' => 'nullable|date|after_or_equal:date_start',
@@ -92,7 +92,7 @@ class ReportController extends Controller
      */
     private function getFilteredReportData(Request $request)
     {
-        // Build the query
+        // Build the query — exclude rejected and cancelled by default
         $query = Defense::with([
             'group.term',
             'group.department',
@@ -100,7 +100,7 @@ class ReportController extends Controller
             'group.critic',
             'room',
             'panelists'
-        ]);
+        ])->whereNotIn('status', ['rejected', 'cancelled']);
 
         // Filter by term
         if ($request->filled('term')) {
@@ -126,7 +126,23 @@ class ReportController extends Controller
 
         // Filter by status
         if ($request->filled('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
+            if ($request->status === 'completed') {
+                // Completed = approved or reschedule defenses whose end_at has passed
+                $query->where(function ($q) {
+                    $q->whereIn('status', ['approved', 'reschedule'])
+                      ->where('end_at', '<', now());
+                });
+            } elseif ($request->status === 'approved') {
+                // Approved = approved defenses that have NOT yet ended
+                $query->where('status', 'approved')
+                      ->where('end_at', '>=', now());
+            } elseif ($request->status === 'reschedule') {
+                // Rescheduled = reschedule defenses that have NOT yet ended
+                $query->where('status', 'reschedule')
+                      ->where('end_at', '>=', now());
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         // Filter by room
