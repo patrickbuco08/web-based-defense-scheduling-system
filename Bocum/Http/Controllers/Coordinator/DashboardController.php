@@ -19,26 +19,31 @@ class DashboardController extends Controller
         // Get defenses from groups that belong to coordinator's departments
         $defensesQuery = Defense::whereHas('group.departments', function ($query) use ($userDepartmentIds) {
             $query->whereIn('departments.id', $userDepartmentIds);
-        });
+        })->whereNotIn('status', ['rejected', 'cancelled']);
 
         $allDefenses = $defensesQuery->get();
+
+        $now = now();
 
         $stats = [
             'total' => $allDefenses->count(),
             'pending' => $allDefenses->where('status', 'pending')->count(),
-            'approved' => $allDefenses->where('status', 'approved')->count(),
-            'completed' => $allDefenses->filter(function ($defense) {
-                if (($defense->status === 'approved' || $defense->status === 'reschedule') && $defense->end_at) {
-                    return strtotime($defense->end_at) < time();
-                }
-                return false;
+            'approved' => $allDefenses->filter(function ($defense) use ($now) {
+                return $defense->status === 'approved' && $defense->end_at && $defense->end_at >= $now;
             })->count(),
-            'rescheduled' => $allDefenses->where('status', 'reschedule')->count(),
+            'completed' => $allDefenses->filter(function ($defense) use ($now) {
+                return ($defense->status === 'approved' || $defense->status === 'reschedule')
+                    && $defense->end_at && $defense->end_at < $now;
+            })->count(),
+            'rescheduled' => $allDefenses->filter(function ($defense) use ($now) {
+                return $defense->status === 'reschedule' && $defense->end_at && $defense->end_at >= $now;
+            })->count(),
         ];
 
         $recentDefenses = Defense::whereHas('group.departments', function ($query) use ($userDepartmentIds) {
             $query->whereIn('departments.id', $userDepartmentIds);
         })
+            ->whereNotIn('status', ['rejected', 'cancelled'])
             ->with(['room', 'group'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
